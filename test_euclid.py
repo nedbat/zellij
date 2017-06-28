@@ -1,6 +1,10 @@
+"""
+Test euclid.py
+"""
+
 import pytest
 
-from euclid import Line, Point
+from euclid import BadGeometry, Line, Point
 
 
 @pytest.mark.parametrize("p1, p2, equal", [
@@ -32,5 +36,5 @@ def test_intersect(p1, p2, p3, p4, pi):
 def test_no_intersection(p1, p2, p3, p4):
     l1 = Line(Point(*p1), Point(*p2))
     l2 = Line(Point(*p3), Point(*p4))
-    with pytest.raises(Exception):
+    with pytest.raises(BadGeometry):
         l1.intersect(l2)

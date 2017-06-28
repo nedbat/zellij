@@ -10,6 +10,11 @@ def _near_zero(v):
     return abs(v) < EPSILON
 
 
+class BadGeometry(Exception):
+    """Any exception raised by euclid."""
+    pass
+
+
 class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
     def __eq__(self, other):
@@ -23,9 +28,9 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
     def intersect(self, other):
         """
-        Find the point where this line an another intersect.
+        Find the point where this line and another intersect.
 
-        Raises an exception if the lines are parallel or coincident.
+        Raises BadGeometry if the lines are parallel or coincident.
         """
         # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
         (x1, y1), (x2, y2) = self
@@ -33,7 +38,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
         if _near_zero(denom):
-            raise Exception("Lines don't intersect usefully: denom = {}".format(denom))
+            raise BadGeometry("Lines don't intersect usefully: denom = {}".format(denom))
 
         a = x1 * y2 - y1 * x2
         b = x3 * y4 - y3 * x4
