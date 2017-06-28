@@ -17,10 +17,18 @@ class BadGeometry(Exception):
 
 class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
+
     def __eq__(self, other):
         x1, y1 = self
         x2, y2 = other
         return _near_zero(x1 - x2) and _near_zero(y1 - y2)
+
+
+def collinear(p1, p2, p3):
+    """Do three points lie on a line?"""
+    # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
+    (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
+    return _near_zero((y1 - y2) * (x1 - x3) - (y1 - y3) * (x1 - x2))
 
 
 class Line(namedtuple("Line", ["p1", "p2"])):
@@ -47,6 +55,3 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         yi = (a * (y3 - y4) - b * (y1 - y2)) / denom
 
         return Point(xi, yi)
-
-
-# https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line

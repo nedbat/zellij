@@ -4,18 +4,31 @@ Test euclid.py
 
 import pytest
 
-from euclid import BadGeometry, Line, Point
+from euclid import BadGeometry, collinear, Line, Point
 
 
-@pytest.mark.parametrize("p1, p2, equal", [
+# Points
+
+@pytest.mark.parametrize("p1, p2, result", [
     ((0, 0), (0, 0), True),
     ((0, 0), (1, 0), False),
     ((0, 0), (0.000000001, 0), True),
     ((0, 0), (0.001, 0), False),
 ])
-def test_point_equality(p1, p2, equal):
-    assert (Point(*p1) == Point(*p2)) == equal
+def test_point_equality(p1, p2, result):
+    assert (Point(*p1) == Point(*p2)) == result
 
+@pytest.mark.parametrize("p1, p2, p3, result", [
+    ((0, 0), (1, 1), (10, 10), True),
+    ((0, 0), (1, 1), (100, 200), False),
+    ((0, 0), (1, 1), (1000000, 1000001), False),
+    ((0, 0), (1, 1), (10.000000001, 10), True),
+])
+def test_points_collinear(p1, p2, p3, result):
+    assert collinear(Point(*p1), Point(*p2), Point(*p3)) == result
+
+
+# Lines
 
 @pytest.mark.parametrize("p1, p2, p3, p4, pi", [
     ((-1, 0), (1, 0),  (0, -1), (0, 1),  (0, 0)),
