@@ -52,7 +52,11 @@ pt = PathTiler()
 tile(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW, TILEW)
 
 def random_color():
-    return colorsys.hls_to_rgb(random.random(), random.choice([.3, .5, .7]), random.choice([1, .7]))
+    return colorsys.hls_to_rgb(
+        random.choice(range(36))/36,
+        random.choice(range(3, 9))/10,
+        random.choice(range(6, 11))/10,
+    )
 
 dwg.set_line_width(LINE_WIDTH)
 dwg.set_line_cap(cairo.LineCap.ROUND)
