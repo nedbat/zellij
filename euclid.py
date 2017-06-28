@@ -19,6 +19,7 @@ class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
 
     def __eq__(self, other):
+        assert isinstance(other, Point)
         x1, y1 = self
         x2, y2 = other
         return _near_zero(x1 - x2) and _near_zero(y1 - y2)
@@ -41,6 +42,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         Raises BadGeometry if the lines are parallel or coincident.
         """
         # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+        assert isinstance(other, Line)
         (x1, y1), (x2, y2) = self
         (x3, y3), (x4, y4) = other
 
