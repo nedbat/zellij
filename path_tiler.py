@@ -2,17 +2,7 @@ import contextlib
 
 from affine import Affine
 
-
-class Path:
-    def __init__(self):
-        self.ops = []
-
-    def append(self, op):
-        self.ops.append(op)
-
-    def replay(self, ctx):
-        for op in self.ops:
-            getattr(ctx, op[0])(*op[1:])
+from euclid import Point
 
 
 class PathTiler:
@@ -26,14 +16,13 @@ class PathTiler:
 
     def move_to(self, x, y):
         x, y = self.transform * (x, y)
-        newpath = Path()
-        self.paths.append(newpath)
-        self.paths[-1].append(('move_to', x, y))
+        self.paths.append([])
+        self.paths[-1].append(Point(x, y))
         self.curpt = x, y
 
     def line_to(self, x, y):
         x, y = self.transform * (x, y)
-        self.paths[-1].append(('line_to', x, y))
+        self.paths[-1].append(Point(x, y))
         self.curpt = x, y
 
     def rel_line_to(self, dx, dy):
@@ -41,7 +30,7 @@ class PathTiler:
         self.line_to(x + dx, y + dy)
 
     def close_path(self):
-        self.paths[-1].append(('close_path',))
+        self.paths[-1].append(self.paths[-1][0])
         self.curpt = None
 
     # Transformation.
@@ -72,4 +61,14 @@ class PathTiler:
 
     def replay_paths(self, ctx):
         for path in self.paths:
-            path.replay_path(ctx)
+            replay_path(path, ctx)
+
+
+def replay_path(path, ctx):
+    ctx.move_to(*path[0])
+    for pt in path[1:-1]:
+        ctx.line_to(*pt)
+    if path[-1] == path[0]:
+        ctx.close_path()
+    else:
+        ctx.line_to(*path[-1])

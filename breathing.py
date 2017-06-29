@@ -5,7 +5,7 @@ import random
 
 from drawing import Drawing
 from euclid import Line, Point
-from path_tiler import PathTiler
+from path_tiler import PathTiler, replay_path
 from pointmap import PointMap
 
 import cairo
@@ -53,13 +53,11 @@ pt = PathTiler()
 
 tile(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW, TILEW)
 
-if 0:
+if 1:
     pm = PointMap(list)
     for path in pt.paths:
-        assert path[0][0] == 'move_to'
-        start = Point(*path[0][1:])
-        assert path[-1][0] == 'line_to'
-        end = Point(*path[-1][1:])
+        start = Point(*path[0])
+        end = Point(*path[-1])
         pm[start].append(path)
         pm[end].append(path)
 
@@ -77,7 +75,7 @@ dwg.set_line_width(LINE_WIDTH)
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.set_source_rgb(0, 0, 0)
 for path in pt.paths:
-    path.replay(dwg)
+    replay_path(path, dwg)
     if RAINBOW:
         dwg.set_source_rgb(*random_color())
     dwg.stroke()
