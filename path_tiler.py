@@ -3,6 +3,18 @@ import contextlib
 from affine import Affine
 
 
+class Path:
+    def __init__(self):
+        self.ops = []
+
+    def append(self, op):
+        self.ops.append(op)
+
+    def replay(self, ctx):
+        for op in self.ops:
+            getattr(ctx, op[0])(*op[1:])
+
+
 class PathTiler:
     def __init__(self):
         self.paths = []
@@ -14,7 +26,9 @@ class PathTiler:
 
     def move_to(self, x, y):
         x, y = self.transform * (x, y)
-        self.paths.append([('move_to', x, y)])
+        newpath = Path()
+        self.paths.append(newpath)
+        self.paths[-1].append(('move_to', x, y))
         self.curpt = x, y
 
     def line_to(self, x, y):
@@ -58,9 +72,4 @@ class PathTiler:
 
     def replay_paths(self, ctx):
         for path in self.paths:
-            replay_path(path, ctx)
-
-
-def replay_path(path, ctx):
-    for op in path:
-        getattr(ctx, op[0])(*op[1:])
+            path.replay_path(ctx)

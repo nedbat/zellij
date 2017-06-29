@@ -1,15 +1,17 @@
 import colorsys
 import math
+import pprint
 import random
 
 from drawing import Drawing
 from euclid import Line, Point
-from path_tiler import PathTiler, replay_path
+from path_tiler import PathTiler
+from pointmap import PointMap
 
 import cairo
 
 DWGW = 800
-TILEW = int(DWGW/6)
+TILEW = int(DWGW/4)
 SQW = TILEW/2 * math.sqrt(2)
 
 RAINBOW = True
@@ -51,6 +53,19 @@ pt = PathTiler()
 
 tile(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW, TILEW)
 
+if 0:
+    pm = PointMap(list)
+    for path in pt.paths:
+        assert path[0][0] == 'move_to'
+        start = Point(*path[0][1:])
+        assert path[-1][0] == 'line_to'
+        end = Point(*path[-1][1:])
+        pm[start].append(path)
+        pm[end].append(path)
+
+    print(len(pm))
+    pprint.pprint(pm._items)
+
 def random_color():
     return colorsys.hls_to_rgb(
         random.choice(range(36))/36,
@@ -62,7 +77,7 @@ dwg.set_line_width(LINE_WIDTH)
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.set_source_rgb(0, 0, 0)
 for path in pt.paths:
-    replay_path(path, dwg)
+    path.replay(dwg)
     if RAINBOW:
         dwg.set_source_rgb(*random_color())
     dwg.stroke()
