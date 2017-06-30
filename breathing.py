@@ -15,7 +15,7 @@ TILEW = int(DWGW/5)
 SQW = TILEW/2 * math.sqrt(2)
 
 RAINBOW = True
-LINE_WIDTH = TILEW/10
+LINE_WIDTH = TILEW/4
 JOIN = True
 
 def draw_tile(dwg):
@@ -66,13 +66,21 @@ def random_color():
         random.choice(range(6, 11))/10,
     )
 
-dwg.set_line_width(LINE_WIDTH)
+styles = [
+    #(LINE_WIDTH, False, (0, 0, 0)),
+    (LINE_WIDTH-2, RAINBOW, (0, 0, 0)),
+    #(7, False, (0, 0, 0)),
+    #(5, False, (1, 1, 1)),
+]
+
 dwg.set_line_cap(cairo.LineCap.ROUND)
-dwg.set_source_rgb(0, 0, 0)
-for path in paths:
-    replay_path(path, dwg)
-    if RAINBOW:
-        dwg.set_source_rgb(*random_color())
-    dwg.stroke()
+for width, rainbow, color in styles:
+    dwg.set_line_width(width)
+    dwg.set_source_rgb(*color)
+    for path in paths:
+        replay_path(path, dwg)
+        if rainbow:
+            dwg.set_source_rgb(*random_color())
+        dwg.stroke()
 
 dwg.write_to_png('breathing.png')
