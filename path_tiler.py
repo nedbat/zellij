@@ -2,7 +2,8 @@ import contextlib
 
 from affine import Affine
 
-from euclid import Point
+from euclid import collinear, Point
+from pointmap import PointMap
 
 
 class PathTiler:
@@ -72,3 +73,70 @@ def replay_path(path, ctx):
         ctx.close_path()
     else:
         ctx.line_to(*path[-1])
+
+
+def penultimate(path, point):
+    """The second-to-last point from whichever end ends with `point`."""
+    if path[0] == point:
+        return path[1]
+    else:
+        assert path[-1] == point
+        return path[-2]
+
+def best_join(path, join_point, possibilities):
+    others = [p for p in possibilities if p != path]
+
+    # If there's only one other path, then join to that one.
+    if len(others) == 1:
+        return others[0]
+
+    # If there's more than one, find one we are collinear with.
+    path_pen = penultimate(path, join_point)
+    for other in others:
+        other_pen = penultimate(other, join_point)
+        if collinear(path_pen, join_point, other_pen):
+            return other
+
+    return None
+
+def join_paths(p1, p2):
+    if p1[-1] == p2[0]:
+        return p1 + p2[1:]
+    elif p1[-1] == p2[-1]:
+        return p1 + p2[-2::-1]
+    elif p1[0] == p2[-1]:
+        return p2 + p1[1:]
+    elif p1[0] == p2[0]:
+        return p1[::-1] + p2[1:]
+    else:
+        return None
+
+def combine_paths(paths):
+    pm = PointMap(list)
+    for path in paths:
+        pm[path[0]].append(path)
+        pm[path[-1]].append(path)
+
+    print(len(pm))
+
+    combined = []
+    used = []
+
+    for path in paths:
+        if path in used:
+            continue
+        while True:
+            target = path[0]
+            possibilities = pm[target]
+            possibilities = [p for p in possibilities if p not in used]
+            other = best_join(path, target, possibilities)
+            used.append(path)
+            if other is not None:
+                used.append(other)
+                path = join_paths(path, other)
+            else:
+                break
+
+        combined.append(path)
+
+    return combined

@@ -5,17 +5,18 @@ import random
 
 from drawing import Drawing
 from euclid import Line, Point
-from path_tiler import PathTiler, replay_path
-from pointmap import PointMap
+from path_tiler import PathTiler
+from path_tiler import combine_paths, replay_path
 
 import cairo
 
 DWGW = 800
-TILEW = int(DWGW/4)
+TILEW = int(DWGW/5)
 SQW = TILEW/2 * math.sqrt(2)
 
 RAINBOW = True
 LINE_WIDTH = TILEW/10
+JOIN = True
 
 def draw_tile(dwg):
     dwg.translate(TILEW/2, TILEW/2)
@@ -53,16 +54,10 @@ pt = PathTiler()
 
 tile(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW, TILEW)
 
-if 1:
-    pm = PointMap(list)
-    for path in pt.paths:
-        start = Point(*path[0])
-        end = Point(*path[-1])
-        pm[start].append(path)
-        pm[end].append(path)
-
-    print(len(pm))
-    pprint.pprint(pm._items)
+paths = pt.paths
+if JOIN:
+    paths = combine_paths(paths)
+    print(f"{len(pt.paths)} paths -> {len(paths)} paths")
 
 def random_color():
     return colorsys.hls_to_rgb(
@@ -74,7 +69,7 @@ def random_color():
 dwg.set_line_width(LINE_WIDTH)
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.set_source_rgb(0, 0, 0)
-for path in pt.paths:
+for path in paths:
     replay_path(path, dwg)
     if RAINBOW:
         dwg.set_source_rgb(*random_color())
