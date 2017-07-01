@@ -117,22 +117,20 @@ def combine_paths(paths):
         pm[path[0]].append(path)
         pm[path[-1]].append(path)
 
-    print(len(pm))
-
     combined = []
-    used = []
+    used = set()
 
     for path in paths:
-        if path in used:
+        if id(path) in used:
             continue
         while True:
             target = path[0]
             possibilities = pm[target]
-            possibilities = [p for p in possibilities if p not in used]
+            possibilities = [p for p in possibilities if id(p) not in used]
             other = best_join(path, target, possibilities)
-            used.append(path)
+            used.add(id(path))
             if other is not None:
-                used.append(other)
+                used.add(id(other))
                 path = join_paths(path, other)
             else:
                 break
