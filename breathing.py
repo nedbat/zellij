@@ -11,7 +11,6 @@ import cairo
 DWGW = 800
 TILEW = int(DWGW/5)
 
-RAINBOW = True
 LINE_WIDTH = TILEW/4
 JOIN = True
 
@@ -64,20 +63,21 @@ def random_color():
     )
 
 styles = [
-    #(LINE_WIDTH, False, (0, 0, 0)),
-    (LINE_WIDTH-2, RAINBOW, (0, 0, 0)),
-    #(7, False, (0, 0, 0)),
-    #(5, False, (1, 1, 1)),
+    #(LINE_WIDTH, (0, 0, 0)),
+    (LINE_WIDTH-2, random_color),
+    #(7, (0, 0, 0)),
+    (5, (1, 1, 1)),
 ]
 
 dwg.set_line_cap(cairo.LineCap.ROUND)
-for width, rainbow, color in styles:
+for width, color in styles:
     dwg.set_line_width(width)
-    dwg.set_source_rgb(*color)
     for path in paths:
         replay_path(path, dwg)
-        if rainbow:
-            dwg.set_source_rgb(*random_color())
+        if callable(color):
+            dwg.set_source_rgb(*color())
+        else:
+            dwg.set_source_rgb(*color)
         dwg.stroke()
 
 dwg.write_to_png('breathing.png')
