@@ -57,7 +57,6 @@ tile(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW, TILEW)
 paths = pt.paths
 if JOIN:
     paths = combine_paths(paths)
-    print(f"{len(pt.paths)} paths -> {len(paths)} paths")
 
 def random_color():
     return colorsys.hls_to_rgb(
