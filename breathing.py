@@ -1,6 +1,4 @@
 import colorsys
-import math
-import pprint
 import random
 
 from drawing import Drawing
@@ -12,7 +10,6 @@ import cairo
 
 DWGW = 800
 TILEW = int(DWGW/5)
-SQW = TILEW/2 * math.sqrt(2)
 
 RAINBOW = True
 LINE_WIDTH = TILEW/4
@@ -23,10 +20,11 @@ def draw_tile(dwg):
 
     west = Point(-TILEW/2, 0)
     north = Point(0, TILEW/2)
-    northwest = Point(-SQW/2, SQW/2)
+    sqw = west.distance(north)
+    northwest = Point(-sqw/2, sqw/2)
     diagonal = Line(west, north)
-    vert = Line(Point(-SQW/2, -SQW/2), northwest)
-    horz = Line(northwest, Point(SQW/2, SQW/2))
+    vert = Line(Point(-sqw/2, -sqw/2), northwest)
+    horz = Line(northwest, Point(sqw/2, sqw/2))
 
     wnw = diagonal.intersect(vert)
     nnw = diagonal.intersect(horz)
