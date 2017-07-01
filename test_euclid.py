@@ -2,6 +2,8 @@
 Test euclid.py
 """
 
+import math
+
 import pytest
 
 from euclid import BadGeometry, collinear, Line, Point
@@ -17,6 +19,14 @@ from euclid import BadGeometry, collinear, Line, Point
 ])
 def test_point_equality(p1, p2, result):
     assert (Point(*p1) == Point(*p2)) == result
+
+@pytest.mark.parametrize("p1, p2, result", [
+    ((0, 0), (1, 1), 1.4142135623730951),
+    ((10, 10), (10, 10), 0),
+    ((100, 100), (103, 104), 5),
+])
+def test_point_distance(p1, p2, result):
+    assert math.isclose(Point(*p1).distance(Point(*p2)), result)
 
 @pytest.mark.parametrize("p1, p2, p3, result", [
     ((0, 0), (1, 1), (10, 10), True),

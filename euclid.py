@@ -3,11 +3,13 @@ Simple 2D Euclidean geometric primitives.
 """
 
 from collections import namedtuple
+import math
+
 
 EPSILON = 1e-8
 
 def _near_zero(v):
-    return abs(v) < EPSILON
+    return math.isclose(v, 0, abs_tol=EPSILON)
 
 
 class BadGeometry(Exception):
@@ -26,6 +28,12 @@ class Point(namedtuple("Point", ["x", "y"])):
         x1, y1 = self
         x2, y2 = other
         return _near_zero(x1 - x2) and _near_zero(y1 - y2)
+
+    def distance(self, other):
+        assert isinstance(other, Point)
+        x1, y1 = self
+        x2, y2 = other
+        return math.hypot(x2 - x1, y2 - y1)
 
 
 def collinear(p1, p2, p3):
