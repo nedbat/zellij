@@ -111,6 +111,18 @@ def join_paths(p1, p2):
     else:
         return None
 
+def show_path(path):
+    if path is None:
+        return "None"
+    return f"Path[{path[0]}..{len(path)}..{path[-1]}]@{id(path)}"
+
+def show_paths(paths):
+    ret = "[\n"
+    for path in paths:
+        ret += f"    {show_path(path)}\n"
+    ret += "]"
+    return ret
+
 def combine_paths(paths):
     pm = PointMap(list)
     for path in paths:
@@ -127,11 +139,15 @@ def combine_paths(paths):
             target = path[0]
             possibilities = pm[target]
             possibilities = [p for p in possibilities if id(p) not in used]
+            if not possibilities:
+                break
             other = best_join(path, target, possibilities)
-            used.add(id(path))
             if other is not None:
+                used.add(id(path))
                 used.add(id(other))
                 path = join_paths(path, other)
+                pm[path[0]].append(path)
+                pm[path[-1]].append(path)
             else:
                 break
 

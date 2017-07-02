@@ -21,7 +21,7 @@ class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
 
     def __repr__(self):
-        return f"Point({self.x:.1f}, {self.y:.1f})"
+        return f"<{self.x:.1f}, {self.y:.1f}>"
 
     def __eq__(self, other):
         assert isinstance(other, Point)

@@ -9,7 +9,7 @@ from path_tiler import combine_paths, replay_path
 import cairo
 
 DWGW = 800
-TILEW = int(DWGW/5)
+TILEW = int(DWGW/2)
 
 LINE_WIDTH = TILEW/4
 JOIN = True
@@ -28,7 +28,7 @@ def draw_tile(dwg):
     wnw = diagonal.intersect(vert)
     nnw = diagonal.intersect(horz)
 
-    for angle in range(4):
+    for angle in range(2):
         with dwg.saved():
             dwg.rotate(angle * 90)
             dwg.move_to(*west)
