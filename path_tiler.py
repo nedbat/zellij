@@ -42,6 +42,9 @@ class PathTiler:
     def rotate(self, degrees):
         self.transform *= Affine.rotation(degrees)
 
+    def scale(self, x, y):
+        self.transform *= Affine.scale(x, y)
+
     # Save/Restore.
 
     def save(self):
