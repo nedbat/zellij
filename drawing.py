@@ -1,3 +1,7 @@
+"""
+A convenience wrapper around Cairo.
+"""
+
 import contextlib
 
 import cairo

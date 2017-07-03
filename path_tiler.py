@@ -45,6 +45,18 @@ class PathTiler:
     def scale(self, x, y):
         self.transform *= Affine.scale(x, y)
 
+    def reflect_x(self, x):
+        self.translate(x, 0)
+        self.scale(-1, 1)
+
+    def reflect_y(self, y):
+        self.translate(0, y)
+        self.scale(1, -1)
+
+    def reflect_xy(self, x, y):
+        self.translate(x, y)
+        self.scale(-1, -1)
+
     # Save/Restore.
 
     def save(self):
