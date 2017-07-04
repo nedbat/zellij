@@ -1,12 +1,10 @@
-import colorsys
-import random
-
-from drawing import Drawing
+from drawing import Drawing, random_color
 from euclid import Line, Point
 from path_tiler import PathTiler
-from path_tiler import combine_paths, replay_path
+from path_tiler import combine_paths
 
 import cairo
+
 
 DWGW = 800
 TILEW = int(DWGW/5)
@@ -42,13 +40,6 @@ paths = pt.paths
 if JOIN:
     paths = combine_paths(paths)
 
-def random_color():
-    return colorsys.hls_to_rgb(
-        random.choice(range(36))/36,
-        random.choice(range(3, 9))/10,
-        random.choice(range(6, 11))/10,
-    )
-
 styles = [
     #(LINE_WIDTH, (0, 0, 0)),
     (LINE_WIDTH-2, random_color),
@@ -57,14 +48,5 @@ styles = [
 ]
 
 dwg.set_line_cap(cairo.LineCap.ROUND)
-for width, color in styles:
-    dwg.set_line_width(width)
-    for path in paths:
-        replay_path(path, dwg)
-        if callable(color):
-            dwg.set_source_rgb(*color())
-        else:
-            dwg.set_source_rgb(*color)
-        dwg.stroke()
-
+dwg.multi_stroke(paths, styles)
 dwg.write_to_png('breathing.png')

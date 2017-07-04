@@ -2,9 +2,13 @@
 A convenience wrapper around Cairo.
 """
 
+import colorsys
 import contextlib
+import random
 
 import cairo
+
+from path_tiler import replay_path
 
 
 class Drawing:
@@ -31,3 +35,22 @@ class Drawing:
             yield
         finally:
             self.ctx.restore()
+
+    def multi_stroke(self, paths, styles):
+        for width, color in styles:
+            self.set_line_width(width)
+            for path in paths:
+                replay_path(path, self)
+                if callable(color):
+                    self.set_source_rgb(*color())
+                else:
+                    self.set_source_rgb(*color)
+                self.stroke()
+
+
+def random_color():
+    return colorsys.hls_to_rgb(
+        random.choice(range(36))/36,
+        random.choice(range(3, 9))/10,
+        random.choice(range(6, 11))/10,
+    )
