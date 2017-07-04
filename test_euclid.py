@@ -61,3 +61,10 @@ def test_no_intersection(p1, p2, p3, p4):
     l2 = Line(Point(*p3), Point(*p4))
     with pytest.raises(BadGeometry):
         l1.intersect(l2)
+
+
+def test_offset():
+    l1 = Line(Point(10, 10), Point(13, 14))
+    l2 = l1.offset(10)
+    assert l2.p1 == Point(18, 4)
+    assert l2.p2 == Point(21, 8)

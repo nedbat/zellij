@@ -68,3 +68,13 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         yi = (a * (y3 - y4) - b * (y1 - y2)) / denom
 
         return Point(xi, yi)
+
+    def offset(self, distance):
+        """Create another line `distance` from this one."""
+        (x1, y1), (x2, y2) = self
+        dx = x2 - x1
+        dy = y2 - y1
+        hyp = math.hypot(dx, dy)
+        offx = dy / hyp * distance
+        offy = -dx / hyp * distance
+        return Line(Point(x1 + offx, y1 + offy), Point(x2 + offx, y2 + offy))
