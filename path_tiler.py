@@ -67,11 +67,11 @@ class PathTiler:
         dy = p2y - p1y
         denom = dx * dx + dy * dy
 
+        a = (dx * dx - dy * dy) / denom
+        b = (2 * dx * dy) / denom
+
         self.translate(p1x, p1y)
-        self.transform *= Affine(
-            (dx * dx - dy * dy) / denom, (2 * dx * dy) / denom,       0,
-            (2 * dx * dy) / denom,       (dy * dy - dx * dx) / denom, 0,
-        )
+        self.transform *= Affine(a, b, 0, b, -a, 0)
         self.translate(-p1x, -p1y)
 
     # Save/Restore.
