@@ -36,6 +36,9 @@ class Drawing:
         finally:
             self.ctx.restore()
 
+    def get_size(self):
+        return (self.get_width(), self.get_height())
+
     def multi_stroke(self, paths, styles):
         for width, color in styles:
             self.set_line_width(width)

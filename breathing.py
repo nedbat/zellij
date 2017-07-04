@@ -34,7 +34,7 @@ def draw_tile(dwg):
 dwg = Drawing(DWGW, DWGW)
 pt = PathTiler()
 
-pt.tile_pmm(draw_tile, dwg.get_width(), dwg.get_height(), TILEW//2, TILEW//2)
+pt.tile_pmm(draw_tile, dwg.get_size(), TILEW//2, TILEW//2)
 
 paths = pt.paths
 if JOIN:

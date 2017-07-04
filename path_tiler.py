@@ -94,15 +94,24 @@ class PathTiler:
     # http://www.quadibloc.com/math/images/wall17.gif
     # https://www.math.toronto.edu/drorbn/Gallery/Symmetry/Tilings/Sanderson/index.html
 
-    def tile_p1(self, draw_func, w, h, dx, dy, ox=0, oy=0):
+    def tile_p1(self, draw_func, dwg_size, vcol, vrow, buffer=None):
         """Repeatedly call draw_func to tile the drawing."""
-        for x in range(int(ox), w, dx):
-            for y in range(int(oy), h, dy):
+        # Should compute exactly the grid of parallelograms needed, but I don't
+        # know how yet.
+        if buffer is None:
+            buffer = 3
+        dwgw, dwgh = dwg_size
+        (vrx, vry), (vcx, vcy) = vrow, vcol
+        tiles_across = dwgw // vcx
+        tiles_down = dwgh // vry
+        print(tiles_across, tiles_down)
+        for row in range(-buffer, tiles_across + buffer):
+            for col in range(-buffer, tiles_down + buffer):
                 with self.saved():
-                    self.translate(x, y)
+                    self.translate(row * vrx + col * vcx, row * vry + col * vcy)
                     draw_func(self)
 
-    def tile_pmm(self, draw_func, w, h, dx, dy):
+    def tile_pmm(self, draw_func, dwg_size, dx, dy):
         def four_mirror(pt):
             draw_func(pt)
             with pt.saved():
@@ -115,7 +124,7 @@ class PathTiler:
                 pt.reflect_y(dy)
                 draw_func(pt)
 
-        self.tile_p1(four_mirror, w, h, dx*2, dy*2)
+        self.tile_p1(four_mirror, dwg_size, (dx*2, 0), (0, dy*2), buffer=0)
 
     # More stuff.
 

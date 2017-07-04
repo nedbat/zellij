@@ -30,6 +30,7 @@ class Point(namedtuple("Point", ["x", "y"])):
         return _near_zero(x1 - x2) and _near_zero(y1 - y2)
 
     def distance(self, other):
+        """Compute the distance from this Point to another Point."""
         assert isinstance(other, Point)
         x1, y1 = self
         x2, y2 = other
@@ -48,7 +49,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
     def intersect(self, other):
         """
-        Find the point where this line and another intersect.
+        Find the point where this Line and another intersect.
 
         Raises BadGeometry if the lines are parallel or coincident.
         """
@@ -70,7 +71,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         return Point(xi, yi)
 
     def offset(self, distance):
-        """Create another line `distance` from this one."""
+        """Create another Line `distance` from this one."""
         (x1, y1), (x2, y2) = self
         dx = x2 - x1
         dy = y2 - y1
