@@ -29,6 +29,36 @@ def test_translation():
     ]
 
 
+def test_reflect_x():
+    pt = PathTiler()
+    pt.move_to(100, 100)
+    pt.reflect_x(1000)
+    pt.line_to(200, 200)
+    assert pt.paths == [
+        [Point(100.0, 100.0), Point(1800, 200)],
+    ]
+
+
+def test_reflect_y():
+    pt = PathTiler()
+    pt.move_to(100, 100)
+    pt.reflect_y(1000)
+    pt.line_to(200, 200)
+    assert pt.paths == [
+        [Point(100.0, 100.0), Point(200, 1800)],
+    ]
+
+
+def test_reflect_xy():
+    pt = PathTiler()
+    pt.move_to(100, 100)
+    pt.reflect_xy(1000, 2000)
+    pt.line_to(200, 200)
+    assert pt.paths == [
+        [Point(100.0, 100.0), Point(1800, 3800)],
+    ]
+
+
 def test_save_restore():
     pt = PathTiler()
     pt.move_to(100, 100)

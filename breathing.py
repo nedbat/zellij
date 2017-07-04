@@ -45,13 +45,13 @@ def tile_pmm(pt, draw_func, w, h, dx, dy):
     def four_mirror(dwg):
         draw_func(pt)
         with pt.saved():
-            pt.reflect_x(2*dx)
+            pt.reflect_x(dx)
             draw_func(pt)
         with pt.saved():
-            pt.reflect_xy(2*dx, 2*dy)
+            pt.reflect_xy(dx, dy)
             draw_func(pt)
         with pt.saved():
-            pt.reflect_y(2*dy)
+            pt.reflect_y(dy)
             draw_func(pt)
 
     tile_p1(pt, four_mirror, w, h, dx*2, dy*2)

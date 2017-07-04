@@ -48,14 +48,16 @@ class PathTiler:
     def reflect_x(self, x):
         self.translate(x, 0)
         self.scale(-1, 1)
+        self.translate(-x, 0)
 
     def reflect_y(self, y):
         self.translate(0, y)
         self.scale(1, -1)
+        self.translate(0, -y)
 
     def reflect_xy(self, x, y):
-        self.translate(x, y)
-        self.scale(-1, -1)
+        self.reflect_x(x)
+        self.reflect_y(y)
 
     # Save/Restore.
 
