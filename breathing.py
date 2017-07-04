@@ -33,34 +33,10 @@ def draw_tile(dwg):
     dwg.line_to(*ssw)
     dwg.line_to(*south)
 
-def tile_p1(pt, draw_func, w, h, dx, dy, ox=0, oy=0):
-    """Repeatedly call draw_func to tile the drawing."""
-    for x in range(int(ox), w, dx):
-        for y in range(int(oy), h, dy):
-            with pt.saved():
-                pt.translate(x, y)
-                draw_func(pt)
-
-def tile_pmm(pt, draw_func, w, h, dx, dy):
-    def four_mirror(dwg):
-        draw_func(pt)
-        with pt.saved():
-            pt.reflect_x(dx)
-            draw_func(pt)
-        with pt.saved():
-            pt.reflect_xy(dx, dy)
-            draw_func(pt)
-        with pt.saved():
-            pt.reflect_y(dy)
-            draw_func(pt)
-
-    tile_p1(pt, four_mirror, w, h, dx*2, dy*2)
-
-
 dwg = Drawing(DWGW, DWGW)
 pt = PathTiler()
 
-tile_pmm(pt, draw_tile, dwg.get_width(), dwg.get_height(), TILEW//2, TILEW//2)
+pt.tile_pmm(draw_tile, dwg.get_width(), dwg.get_height(), TILEW//2, TILEW//2)
 
 paths = pt.paths
 if JOIN:

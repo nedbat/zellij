@@ -90,6 +90,33 @@ class PathTiler:
         finally:
             self.restore()
 
+    # Tiling of draw functions.
+    # http://www.quadibloc.com/math/images/wall17.gif
+    # https://www.math.toronto.edu/drorbn/Gallery/Symmetry/Tilings/Sanderson/index.html
+
+    def tile_p1(self, draw_func, w, h, dx, dy, ox=0, oy=0):
+        """Repeatedly call draw_func to tile the drawing."""
+        for x in range(int(ox), w, dx):
+            for y in range(int(oy), h, dy):
+                with self.saved():
+                    self.translate(x, y)
+                    draw_func(self)
+
+    def tile_pmm(self, draw_func, w, h, dx, dy):
+        def four_mirror(pt):
+            draw_func(pt)
+            with pt.saved():
+                pt.reflect_x(dx)
+                draw_func(pt)
+            with pt.saved():
+                pt.reflect_xy(dx, dy)
+                draw_func(pt)
+            with pt.saved():
+                pt.reflect_y(dy)
+                draw_func(pt)
+
+        self.tile_p1(four_mirror, w, h, dx*2, dy*2)
+
     # More stuff.
 
     def replay_paths(self, ctx):
