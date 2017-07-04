@@ -59,6 +59,21 @@ class PathTiler:
         self.reflect_x(x)
         self.reflect_y(y)
 
+    def reflect_line(self, p1, p2):
+        """Reflect across the line from p1 to p2."""
+        # https://en.wikipedia.org/wiki/Transformation_matrix#Reflection
+        (p1x, p1y), (p2x, p2y) = p1, p2
+        dx = p2x - p1x
+        dy = p2y - p1y
+        denom = dx * dx + dy * dy
+
+        self.translate(p1x, p1y)
+        self.transform *= Affine(
+            (dx * dx - dy * dy) / denom, (2 * dx * dy) / denom,       0,
+            (2 * dx * dy) / denom,       (dy * dy - dx * dx) / denom, 0,
+        )
+        self.translate(-p1x, -p1y)
+
     # Save/Restore.
 
     def save(self):

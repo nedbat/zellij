@@ -59,6 +59,17 @@ def test_reflect_xy():
     ]
 
 
+def test_reflect_line():
+    pt = PathTiler()
+    pt.move_to(100, 100)
+    pt.reflect_line(Point(50, -50), Point(150, 50))
+    pt.line_to(100, 50)
+    pt.line_to(100, 100)
+    assert pt.paths == [
+        [Point(100.0, 100.0), Point(150, 0), Point(200, 0)],
+    ]
+
+
 def test_save_restore():
     pt = PathTiler()
     pt.move_to(100, 100)
