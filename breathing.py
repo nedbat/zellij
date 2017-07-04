@@ -8,9 +8,7 @@ import cairo
 
 DWGW = 800
 TILEW = int(DWGW/5)
-
 LINE_WIDTH = TILEW/4
-JOIN = True
 
 def draw_tile(dwg):
     t2 = TILEW/2
@@ -36,17 +34,13 @@ pt = PathTiler()
 
 pt.tile_pmm(draw_tile, dwg.get_size(), TILEW//2, TILEW//2)
 
-paths = pt.paths
-if JOIN:
-    paths = combine_paths(paths)
+paths = combine_paths(pt.paths)
 
-styles = [
+dwg.set_line_cap(cairo.LineCap.ROUND)
+dwg.multi_stroke(paths, [
     #(LINE_WIDTH, (0, 0, 0)),
     (LINE_WIDTH-2, random_color),
     #(7, (0, 0, 0)),
     (5, (1, 1, 1)),
-]
-
-dwg.set_line_cap(cairo.LineCap.ROUND)
-dwg.multi_stroke(paths, styles)
+])
 dwg.write_to_png('breathing.png')
