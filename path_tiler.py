@@ -1,4 +1,5 @@
 import contextlib
+import math
 
 from affine import Affine
 
@@ -102,8 +103,8 @@ class PathTiler:
             buffer = 3
         dwgw, dwgh = dwg_size
         (vrx, vry), (vcx, vcy) = vrow, vcol
-        tiles_across = dwgw // vcx
-        tiles_down = dwgh // vry
+        tiles_across = int(dwgw // vcx)
+        tiles_down = int(dwgh // vry)
         print(tiles_across, tiles_down)
         for row in range(-buffer, tiles_across + buffer):
             for col in range(-buffer, tiles_down + buffer):
@@ -125,6 +126,25 @@ class PathTiler:
                 draw_func(pt)
 
         self.tile_p1(four_mirror, dwg_size, (dx*2, 0), (0, dy*2), buffer=0)
+
+    def tile_p6(self, draw_func, dwg_size, triw):
+        def six_triangles(pt):
+            pt.translate(0, triw)
+            for _ in range(6):
+                self.rotate(60)
+                draw_func(pt)
+
+        triw3 = triw * math.sqrt(3) / 2
+        self.tile_p1(six_triangles, dwg_size, (2 * triw3, 0), (triw3, 1.5 * triw))
+
+    def tile_p6m(self, draw_func, dwg_size, triw):
+        def draw_mirrored(pt):
+            draw_func(pt)
+            with pt.saved():
+                pt.reflect_x(0)
+                draw_func(pt)
+
+        self.tile_p6(draw_mirrored, dwg_size, triw)
 
     # More stuff.
 
