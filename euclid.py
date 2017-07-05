@@ -29,6 +29,9 @@ class Point(namedtuple("Point", ["x", "y"])):
         x2, y2 = other
         return _near_zero(x1 - x2) and _near_zero(y1 - y2)
 
+    def __hash__(self):
+        return tuple.__hash__(self)
+
     def distance(self, other):
         """Compute the distance from this Point to another Point."""
         assert isinstance(other, Point)
