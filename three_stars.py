@@ -11,7 +11,7 @@ from path_tiler import combine_paths
 DWGW = 800
 TILEW = int(DWGW/5)
 OFFSET = 20
-LINE_WIDTH = TILEW/30
+LINE_WIDTH = TILEW/15
 
 def draw_tile(dwg):
     top = Point(0, 0)
@@ -33,23 +33,35 @@ def draw_tile(dwg):
 
     snip_top = dwg.in_user(*snip_top)
     snip_bottom = dwg.in_user(*snip_bottom)
-    dwg.move_to(*snip_top)
-    dwg.line_to(*snip_bottom)
+    snip_line = Line(snip_top, snip_bottom)
 
-    side_top = side_line.intersect(border_shoulder)
+    far_left = Point(-TILEW * math.sqrt(3) / 2, -TILEW / 2)
+    shoulder_limit = Line(far_left, top)
+    shoulder_limit = shoulder_limit.offset(OFFSET)
+
+    far_right = Point(TILEW * math.sqrt(3) / 2, 0)
+    side_limit = Line(top, far_right)
+    side_limit = side_limit.offset(OFFSET)
+
+    side_top = side_line.intersect(side_limit)
     side_bottom = side_line.intersect(border_foot)
     dwg.move_to(*side_top)
     dwg.line_to(*side_bottom)
 
-    shoulder_top = shoulder_line.intersect(border_side)
-    shoulder_bottom = shoulder_line.intersect(border_foot)
+    shoulder_top = shoulder_line.intersect(shoulder_limit)
+    shoulder_bottom = shoulder_line.intersect(snip_line)
     dwg.move_to(*shoulder_top)
     dwg.line_to(*shoulder_bottom)
 
-    foot_top = foot_line.intersect(border_shoulder)
+    foot_top = foot_line.intersect(snip_line)
     foot_bottom = foot_line.intersect(border_side)
     dwg.move_to(*foot_top)
     dwg.line_to(*foot_bottom)
+
+    dwg.move_to(*snip_top)
+    dwg.line_to(*foot_top)
+    dwg.move_to(*shoulder_bottom)
+    dwg.line_to(*snip_bottom)
 
     if 0:   # Outline the base triangle
         dwg.move_to(*top)
@@ -70,7 +82,7 @@ paths = combine_paths(pt.paths)
 
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
-    (LINE_WIDTH, random_color),
-    #(5, (1, 1, 1)),
+    (LINE_WIDTH, (0, 0, 0)), #random_color),
+    (5, (1, 1, 1)),
 ])
 dwg.write_to_png('three_stars.png')
