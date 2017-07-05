@@ -35,6 +35,13 @@ class PathTiler:
         self.paths[-1].append(self.paths[-1][0])
         self.curpt = None
 
+    def in_device(self, x, y):
+        """Return the transformed coordinates."""
+        return self.transform * (x, y)
+
+    def in_user(self, x, y):
+        return ~self.transform * (x, y)
+
     # Transformation.
 
     def translate(self, dx, dy):
@@ -134,7 +141,7 @@ class PathTiler:
                 draw_func(pt)
 
         triw3 = triw * math.sqrt(3) / 2
-        self.tile_p1(six_triangles, dwg_size, (2 * triw3, 0), (triw3, 1.5 * triw))
+        self.tile_p1(six_triangles, dwg_size, (2 * triw3, 0), (triw3, 1.5 * triw), buffer=2)
 
     def tile_p6m(self, draw_func, dwg_size, triw):
         def draw_mirrored(pt):
