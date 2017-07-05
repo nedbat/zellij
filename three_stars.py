@@ -11,7 +11,7 @@ from path_tiler import combine_paths
 DWGW = 800
 TILEW = int(DWGW/5)
 OFFSET = 20
-LINE_WIDTH = TILEW/20
+LINE_WIDTH = TILEW/10
 
 def draw_tile(dwg):
     top = Point(0, 0)
@@ -47,7 +47,7 @@ paths = combine_paths(pt.paths)
 
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
-    (LINE_WIDTH-2, random_color),
-    #(5, (1, 1, 1)),
+    (LINE_WIDTH, random_color),
+    (5, (1, 1, 1)),
 ])
 dwg.write_to_png('three_stars.png')

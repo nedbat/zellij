@@ -105,7 +105,6 @@ class PathTiler:
         (vrx, vry), (vcx, vcy) = vrow, vcol
         tiles_across = int(dwgw // vcx)
         tiles_down = int(dwgh // vry)
-        print(tiles_across, tiles_down)
         for row in range(-buffer, tiles_across + buffer):
             for col in range(-buffer, tiles_down + buffer):
                 with self.saved():
