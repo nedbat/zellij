@@ -27,7 +27,9 @@ def random_color():
 
 
 # Some classic tile colors.
-# More ideas: http://casaceramica.com/wp-content/gallery/moroccan-field-tiles/zellige-color-palette-wnames-sol.jpg
+# More ideas:
+# http://casaceramica.com/wp-content/gallery/moroccan-field-tiles/zellige-color-palette-wnames-sol.jpg
+# https://s-media-cache-ak0.pinimg.com/736x/4c/4a/7b/4c4a7bfe6a545875ac26043d2371702f--kitchen-tiles-kitchen-colors.jpg
 TILE_COLORS = [
     lighten(color255(45, 86, 72), 25),
     lighten(color255(38, 68, 111), 25),
