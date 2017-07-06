@@ -5,13 +5,13 @@ import cairo
 from drawing import Drawing, random_color
 from euclid import Line, Point
 from path_tiler import PathTiler
-from path_tiler import combine_paths
+from path_tiler import combine_paths, replay_path
 
 
 DWGW = 800
 TILEW = int(DWGW/5)
 OFFSET = 20
-LINE_WIDTH = TILEW/15
+LINE_WIDTH = TILEW/12
 
 def draw_tile(dwg):
     top = Point(0, 0)
@@ -83,6 +83,38 @@ paths = combine_paths(pt.paths)
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
     (LINE_WIDTH, (0, 0, 0)), #random_color),
-    (5, (1, 1, 1)),
+    (8, (1, 1, 1)),
 ])
+
+
+def point_in_box(pt, ll, ur):
+    px, py = pt
+    llx, lly = ll
+    urx, ury = ur
+    return (llx <= px <= urx) and (lly <= py <= ury)
+
+def path_in_box(path, ll, ur):
+    return all(point_in_box(pt, ll, ur) for pt in path)
+
+def color256(r, g, b):
+    return (r/256, g/256, b/256)
+
+def lighten(color, pct):
+    import colorsys
+    h, l, s = colorsys.rgb_to_hls(*color)
+    l += (1 - l) * (pct / 100)
+    return colorsys.hls_to_rgb(h, l, s)
+
+paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
+drawn = set()
+colors = iter([(45/256, 86/256, 72/256), (38/256, 68/256, 111/256), (1, 0, 0)])
+colors = iter([lighten(color256(45, 86, 72), 25), lighten(color256(38, 68, 111), 25), (1, 0, 0)])
+for path in paths_in_box:
+    if len(path) not in drawn:
+        dwg.set_source_rgb(*next(colors))
+        dwg.set_line_width(8)
+        replay_path(path, dwg)
+        dwg.stroke()
+        drawn.add(len(path))
+
 dwg.write_to_png('three_stars.png')
