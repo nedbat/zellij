@@ -1,4 +1,5 @@
-from drawing import Drawing, random_color
+from color import random_color
+from drawing import Drawing
 from euclid import Line, Point
 from path_tiler import PathTiler
 from path_tiler import combine_paths

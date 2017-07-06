@@ -2,9 +2,7 @@
 A convenience wrapper around Cairo.
 """
 
-import colorsys
 import contextlib
-import random
 
 import cairo
 
@@ -49,11 +47,3 @@ class Drawing:
                 else:
                     self.set_source_rgb(*color)
                 self.stroke()
-
-
-def random_color():
-    return colorsys.hls_to_rgb(
-        random.choice(range(36))/36,
-        random.choice(range(3, 9))/10,
-        random.choice(range(6, 11))/10,
-    )

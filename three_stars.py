@@ -2,10 +2,11 @@ import math
 
 import cairo
 
-from drawing import Drawing, random_color
+from color import random_color, TILE_COLORS
+from drawing import Drawing
 from euclid import Line, Point
 from path_tiler import PathTiler
-from path_tiler import combine_paths, replay_path
+from path_tiler import combine_paths, replay_path, path_in_box
 
 
 DWGW = 800
@@ -75,7 +76,7 @@ pt = PathTiler()
 if 1:
     pt.tile_p6m(draw_tile, dwg.get_size(), TILEW)
 else:   # Draw one triangle
-    pt.translate(400,400)
+    pt.translate(400, 400)
     pt.scale(2, 2)
     draw_tile(pt)
 paths = combine_paths(pt.paths)
@@ -87,28 +88,9 @@ dwg.multi_stroke(paths, [
 ])
 
 
-def point_in_box(pt, ll, ur):
-    px, py = pt
-    llx, lly = ll
-    urx, ury = ur
-    return (llx <= px <= urx) and (lly <= py <= ury)
-
-def path_in_box(path, ll, ur):
-    return all(point_in_box(pt, ll, ur) for pt in path)
-
-def color256(r, g, b):
-    return (r/256, g/256, b/256)
-
-def lighten(color, pct):
-    import colorsys
-    h, l, s = colorsys.rgb_to_hls(*color)
-    l += (1 - l) * (pct / 100)
-    return colorsys.hls_to_rgb(h, l, s)
-
 paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
 drawn = set()
-colors = iter([(45/256, 86/256, 72/256), (38/256, 68/256, 111/256), (1, 0, 0)])
-colors = iter([lighten(color256(45, 86, 72), 25), lighten(color256(38, 68, 111), 25), (1, 0, 0)])
+colors = iter(TILE_COLORS)
 for path in paths_in_box:
     if len(path) not in drawn:
         dwg.set_source_rgb(*next(colors))

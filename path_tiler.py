@@ -169,6 +169,10 @@ def replay_path(path, ctx):
         ctx.line_to(*path[-1])
 
 
+def path_in_box(path, ll, ur):
+    return all(pt.in_box(ll, ur) for pt in path)
+
+
 def penultimate(path, point):
     """The second-to-last point from whichever end ends with `point`."""
     if path[0] == point:
