@@ -10,12 +10,12 @@ from path_tiler import replay_path
 
 
 class Drawing:
-    def __init__(self, width, height):
+    def __init__(self, width, height, bg=(1, 1, 1)):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.ctx = cairo.Context(self.surface)
 
-        # Start with a white canvas.
-        self.set_source_rgb(1, 1, 1)
+        # Start with a solid-color canvas.
+        self.set_source_rgb(*bg)
         self.set_operator(cairo.OPERATOR_SOURCE)
         self.paint()
 

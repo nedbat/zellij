@@ -1,3 +1,4 @@
+import itertools
 import math
 
 import cairo
@@ -70,7 +71,7 @@ def draw_tile(dwg):
         dwg.line_to(*belly)
         dwg.close_path()
 
-dwg = Drawing(DWGW, DWGW)
+dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
 pt = PathTiler()
 
 if 1:
@@ -79,27 +80,36 @@ else:   # Draw one triangle
     pt.translate(400, 400)
     pt.scale(2, 2)
     draw_tile(pt)
-paths = combine_paths(pt.paths)
+
+if 1:
+    paths = combine_paths(pt.paths)
+else:
+    paths = pt.paths
+
 
 dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
-    (LINE_WIDTH, (0, 0, 0)), #random_color),
+    #(5, random_color),
+    (LINE_WIDTH, (0, 0, 0)),
     (8, (1, 1, 1)),
 ])
 
 
-paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
-drawn = set()
-colors = iter([
-    CasaCeramica.DarkGreen,
-    CasaCeramica.Yellow,
-])
-for path in paths_in_box:
-    if len(path) not in drawn:
-        dwg.set_source_rgb(*next(colors))
-        dwg.set_line_width(8)
-        replay_path(path, dwg)
-        dwg.stroke()
-        drawn.add(len(path))
+if 1:
+    paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
+    drawn = set()
+    colors = iter(itertools.cycle([
+        CasaCeramica.DarkGreen,
+        CasaCeramica.Yellow,
+        CasaCeramica.Red,
+        CasaCeramica.NavyBlue,
+    ]))
+    for path in paths_in_box:
+        if len(path) not in drawn:
+            dwg.set_source_rgb(*next(colors))
+            dwg.set_line_width(8)
+            replay_path(path, dwg)
+            dwg.stroke()
+            drawn.add(len(path))
 
 dwg.write_to_png('three_stars.png')
