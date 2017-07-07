@@ -9,14 +9,17 @@ class PointMap:
     """
     Like a defaultdict, but with Points as keys.
 
-    Points compare inexactly, so misses have to be checked with a linear
-    search.  The values are constructed with the factory.
+    Points compare inexactly.  We get constant-time behavior by storing points
+    three ways: as-is, and rounded two different ways.  If any of those three
+    maps finds the point, then we have a hit.  This works because Zellij will
+    either have points very close together (a match), or not (a miss). We don't
+    have to deal with points close together that shouldn't be considered the
+    same.
     """
 
     def __init__(self, factory):
         self._items = {}        # maps points to values
-        self._grida = {}        # maps rounded points to points
-        self._gridb = {}
+        self._grid = {}         # maps rounded points to points
         self._factory = factory
 
     def _round(self, pt, alt=False):
@@ -43,13 +46,13 @@ class PointMap:
 
         # Check the grid
         pta = self._round(pt)
-        pt0 = self._grida.get(pta)
+        pt0 = self._grid.get(pta)
         if pt0 is not None:
             return self._items[pt0]
 
         # Check the alt grid.
         ptb = self._round(pt, alt=True)
-        pt0 = self._gridb.get(ptb)
+        pt0 = self._grid.get(ptb)
         if pt0 is not None:
             return self._items[pt0]
 
@@ -57,8 +60,8 @@ class PointMap:
 
     def _set(self, pt, val):
         self._items[pt] = val
-        self._grida[self._round(pt)] = pt
-        self._gridb[self._round(pt, alt=True)] = pt
+        self._grid[self._round(pt)] = pt
+        self._grid[self._round(pt, alt=True)] = pt
         return val
 
     def __len__(self):
