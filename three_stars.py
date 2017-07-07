@@ -2,7 +2,7 @@ import math
 
 import cairo
 
-from color import random_color, TILE_COLORS
+from color import random_color, CasaCeramica
 from drawing import Drawing
 from euclid import Line, Point
 from path_tiler import PathTiler
@@ -90,7 +90,10 @@ dwg.multi_stroke(paths, [
 
 paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
 drawn = set()
-colors = iter(TILE_COLORS)
+colors = iter([
+    CasaCeramica.DarkGreen,
+    CasaCeramica.Yellow,
+])
 for path in paths_in_box:
     if len(path) not in drawn:
         dwg.set_source_rgb(*next(colors))
