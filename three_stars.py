@@ -79,9 +79,6 @@ class Draw:
         dwg.close_path()
 
 
-DWGW = 800
-TILEW = int(DWGW/3)
-LINE_WIDTH = TILEW/12
 
 
 def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
@@ -94,6 +91,7 @@ def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
     dwg.set_line_cap(cairo.LineCap.ROUND)
 
     if fat:
+        LINE_WIDTH = TILEW / 12
         styles = [
             (LINE_WIDTH, (0, 0, 0)),
             (LINE_WIDTH*.7, (1, 1, 1)),
@@ -101,15 +99,6 @@ def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
     else:
         styles = [(line_width, color)]
     dwg.multi_stroke(paths, styles)
-
-
-if 0:
-    if 1:
-        pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
-    else:   # Draw one triangle
-        pt.translate(400, 400)
-        pt.scale(2, 2)
-        draw_tile(pt, ())
 
 
 if 0:
@@ -128,6 +117,9 @@ if 0:
             replay_path(path, dwg)
             dwg.stroke()
             drawn.add(len(path))
+
+DWGW = 800
+TILEW = int(DWGW/3)
 
 dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
 draw_it(dwg)
@@ -167,3 +159,16 @@ dwg.write_to_png('three_stars_2_lined.png')
 dwg = Drawing(DWGW, DWGW)
 draw_it(dwg, fat=False, color=random_color, combined=False, line_width=8)
 dwg.write_to_png('three_stars_3_chaos.png')
+
+
+dwg = Drawing(DWGW, DWGW)
+draw_it(dwg, fat=False, color=random_color, combined=True, line_width=8)
+dwg.write_to_png('three_stars_4_joined.png')
+
+
+DWGW = 800
+TILEW = int(DWGW/5)
+
+dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+draw_it(dwg)
+dwg.write_to_png('three_stars_final.png')
