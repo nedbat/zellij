@@ -140,8 +140,8 @@ class PathTiler:
                 self.rotate(60)
                 draw_func(pt, args)
 
-        triw3 = triw * math.sqrt(3) / 2
-        self.tile_p1(six_triangles, dwg_size, (2 * triw3, 0), (triw3, 1.5 * triw), buffer=2, args=args)
+        triw3 = triw * math.sqrt(3)
+        self.tile_p1(six_triangles, dwg_size, (triw3, 0), (triw3 / 2, 1.5 * triw), buffer=2, args=args)
 
     def tile_p6m(self, draw_func, dwg_size, triw, args=()):
         def draw_mirrored(pt, args):
