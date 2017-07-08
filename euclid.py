@@ -6,10 +6,8 @@ from collections import namedtuple
 import math
 
 
-EPSILON = 1e-8
-
-def _near_zero(v):
-    return math.isclose(v, 0, abs_tol=EPSILON)
+def isclose(a, b):
+    return math.isclose(a, b, abs_tol=1e-8)
 
 
 class BadGeometry(Exception):
@@ -27,7 +25,7 @@ class Point(namedtuple("Point", ["x", "y"])):
         assert isinstance(other, Point)
         x1, y1 = self
         x2, y2 = other
-        return _near_zero(x1 - x2) and _near_zero(y1 - y2)
+        return isclose(x1, x2) and isclose(y1, y2)
 
     def __hash__(self):
         return tuple.__hash__(self)
@@ -51,7 +49,7 @@ def collinear(p1, p2, p3):
     """Do three points lie on a line?"""
     # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
     (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
-    return _near_zero((y1 - y2) * (x1 - x3) - (y1 - y3) * (x1 - x2))
+    return isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2))
 
 
 class Line(namedtuple("Line", ["p1", "p2"])):
@@ -69,7 +67,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         (x3, y3), (x4, y4) = other
 
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-        if _near_zero(denom):
+        if isclose(denom, 0):
             raise BadGeometry("Lines don't intersect usefully: denom = {}".format(denom))
 
         a = x1 * y2 - y1 * x2
