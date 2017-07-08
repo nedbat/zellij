@@ -11,7 +11,8 @@ DWGW = 800
 TILEW = int(DWGW/5)
 LINE_WIDTH = TILEW/4
 
-def draw_tile(dwg):
+def draw_tile(dwg, args):
+    TILEW, = args
     t2 = TILEW/2
     west = Point(0, t2)
     south = Point(t2, 0)
@@ -33,7 +34,7 @@ def draw_tile(dwg):
 dwg = Drawing(DWGW, DWGW)
 pt = PathTiler()
 
-pt.tile_pmm(draw_tile, dwg.get_size(), TILEW//2, TILEW//2)
+pt.tile_pmm(draw_tile, dwg.get_size(), TILEW//2, TILEW//2, args=(TILEW,))
 
 paths = combine_paths(pt.paths)
 

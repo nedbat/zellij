@@ -12,10 +12,11 @@ from path_tiler import combine_paths, replay_path, path_in_box
 
 DWGW = 800
 TILEW = int(DWGW/5)
-OFFSET = 20
 LINE_WIDTH = TILEW/12
 
-def draw_tile(dwg):
+def draw_tile(dwg, args):
+    TILEW, = args
+    OFFSET = TILEW/8
     top = Point(0, 0)
     bottom = Point(0, -TILEW)
     belly = (TILEW * math.sqrt(3) / 4, -TILEW*.75)
@@ -75,11 +76,11 @@ dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
 pt = PathTiler()
 
 if 1:
-    pt.tile_p6m(draw_tile, dwg.get_size(), TILEW)
+    pt.tile_p6m(draw_tile, dwg.get_size(), TILEW, args=(TILEW,))
 else:   # Draw one triangle
     pt.translate(400, 400)
     pt.scale(2, 2)
-    draw_tile(pt)
+    draw_tile(pt, args=(TILEW,))
 
 if 1:
     paths = combine_paths(pt.paths)
@@ -91,7 +92,7 @@ dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
     #(5, random_color),
     (LINE_WIDTH, (0, 0, 0)),
-    (8, (1, 1, 1)),
+    (LINE_WIDTH*.7, (1, 1, 1)),
 ])
 
 
@@ -107,7 +108,7 @@ if 1:
     for path in paths_in_box:
         if len(path) not in drawn:
             dwg.set_source_rgb(*next(colors))
-            dwg.set_line_width(8)
+            dwg.set_line_width(LINE_WIDTH*.7)
             replay_path(path, dwg)
             dwg.stroke()
             drawn.add(len(path))
