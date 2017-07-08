@@ -12,9 +12,6 @@ from path_tiler import combine_paths, replay_path, path_in_box
 SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
 
-DWGW = 800
-TILEW = int(DWGW/5)
-LINE_WIDTH = TILEW/12
 
 class Draw:
     def __init__(self, tilew):
@@ -74,7 +71,7 @@ class Draw:
         dwg.move_to(*shoulder_bottom)
         dwg.line_to(*snip_bottom)
 
-    def draw_triangle(self):
+    def draw_triangle(self, dwg, args):
         self.three_points()
         dwg.move_to(*self.top)
         dwg.line_to(*self.bottom)
@@ -82,32 +79,40 @@ class Draw:
         dwg.close_path()
 
 
-dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
-pt = PathTiler()
-draw = Draw(TILEW)
+DWGW = 800
+TILEW = int(DWGW/3)
+LINE_WIDTH = TILEW/12
 
-if 1:
+
+def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
+    pt = PathTiler()
+    draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
-else:   # Draw one triangle
-    pt.translate(400, 400)
-    pt.scale(2, 2)
-    draw_tile(pt, args=(TILEW,))
-
-if 1:
-    paths = combine_paths(pt.paths)
-else:
     paths = pt.paths
+    if combined:
+        paths = combine_paths(pt.paths)
+    dwg.set_line_cap(cairo.LineCap.ROUND)
+
+    if fat:
+        styles = [
+            (LINE_WIDTH, (0, 0, 0)),
+            (LINE_WIDTH*.7, (1, 1, 1)),
+        ]
+    else:
+        styles = [(line_width, color)]
+    dwg.multi_stroke(paths, styles)
 
 
-dwg.set_line_cap(cairo.LineCap.ROUND)
-dwg.multi_stroke(paths, [
-    #(5, random_color),
-    (LINE_WIDTH, (0, 0, 0)),
-    (LINE_WIDTH*.7, (1, 1, 1)),
-])
+if 0:
+    if 1:
+        pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
+    else:   # Draw one triangle
+        pt.translate(400, 400)
+        pt.scale(2, 2)
+        draw_tile(pt, ())
 
 
-if 1:
+if 0:
     paths_in_box = [path for path in paths if path_in_box(path, (0, 0), (DWGW, DWGW))]
     drawn = set()
     colors = iter(itertools.cycle([
@@ -124,4 +129,41 @@ if 1:
             dwg.stroke()
             drawn.add(len(path))
 
-dwg.write_to_png('three_stars.png')
+dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+draw_it(dwg)
+dwg.write_to_png('three_stars_0.png')
+
+
+dwg = Drawing(DWGW, DWGW)
+draw_it(dwg, fat=False)
+dwg.write_to_png('three_stars_1_thin.png')
+
+
+dwg = Drawing(DWGW, DWGW)
+draw_it(dwg, fat=False, color=(.8, .8, .8))
+
+pt = PathTiler()
+draw = Draw(TILEW)
+pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+dwg.set_source_rgb(1, 0, 0)
+dwg.set_line_width(2)
+dwg.set_dash([5, 5])
+pt.replay_paths(dwg)
+dwg.stroke()
+
+pt = PathTiler()
+pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
+pt.reflect_xy(0, 0)
+draw.draw_tile(pt, ())
+dwg.set_source_rgb(0, 0, 0)
+dwg.set_line_width(6)
+dwg.set_dash([])
+pt.replay_paths(dwg)
+dwg.stroke()
+
+dwg.write_to_png('three_stars_2_lined.png')
+
+
+dwg = Drawing(DWGW, DWGW)
+draw_it(dwg, fat=False, color=random_color, combined=False, line_width=8)
+dwg.write_to_png('three_stars_3_chaos.png')
