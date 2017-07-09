@@ -53,23 +53,21 @@ class Draw:
 
         side_top = side_line.intersect(side_limit)
         side_bottom = side_line.intersect(border_foot)
+        shoulder_top = shoulder_line.intersect(shoulder_limit)
+        shoulder_bottom = shoulder_line.intersect(snip_line)
+        foot_top = foot_line.intersect(snip_line)
+        foot_bottom = foot_line.intersect(border_side)
+
         dwg.move_to(*side_top)
         dwg.line_to(*side_bottom)
 
-        shoulder_top = shoulder_line.intersect(shoulder_limit)
-        shoulder_bottom = shoulder_line.intersect(snip_line)
         dwg.move_to(*shoulder_top)
         dwg.line_to(*shoulder_bottom)
-
-        foot_top = foot_line.intersect(snip_line)
-        foot_bottom = foot_line.intersect(border_side)
-        dwg.move_to(*foot_top)
-        dwg.line_to(*foot_bottom)
+        dwg.line_to(*snip_bottom)
 
         dwg.move_to(*snip_top)
         dwg.line_to(*foot_top)
-        dwg.move_to(*shoulder_bottom)
-        dwg.line_to(*snip_bottom)
+        dwg.line_to(*foot_bottom)
 
     def draw_triangle(self, dwg, args):
         self.three_points()
@@ -77,8 +75,6 @@ class Draw:
         dwg.line_to(*self.bottom)
         dwg.line_to(*self.belly)
         dwg.close_path()
-
-
 
 
 def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
