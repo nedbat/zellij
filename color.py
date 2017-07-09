@@ -29,6 +29,8 @@ def random_color():
 # Some classic tile colors.
 # More ideas:
 # https://s-media-cache-ak0.pinimg.com/736x/4c/4a/7b/4c4a7bfe6a545875ac26043d2371702f--kitchen-tiles-kitchen-colors.jpg
+# http://www.sainttropezboutique.us/products/tiles/zillij-tiles-color-pallet.aspx
+
 TILE_COLORS = [
     lighten(rgb255(45, 86, 72), 25),
     lighten(rgb255(38, 68, 111), 25),
