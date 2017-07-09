@@ -21,6 +21,9 @@ class Point(namedtuple("Point", ["x", "y"])):
     def __repr__(self):
         return f"<{self.x:.1f}, {self.y:.1f}>"
 
+    def fullrepr(self):
+        return  f"<{self.x}, {self.y}>"
+
     def __eq__(self, other):
         assert isinstance(other, Point)
         x1, y1 = self
