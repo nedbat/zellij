@@ -1,5 +1,5 @@
 ######
-Zellij
+ᴢᴇllij
 ######
 
 A toy for making geometric art, inspired by `Islamic Zellij`_.
