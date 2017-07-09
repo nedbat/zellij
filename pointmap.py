@@ -28,10 +28,9 @@ class PointMap:
 
     def _round(self, pt, jitter):
         """Round the point, with a little bit of jitter added."""
-        x, y = pt
-        x = round(x + jitter, ndigits=self.ROUND_DIGITS)
-        y = round(y + jitter, ndigits=self.ROUND_DIGITS)
-        return Point(x, y)
+        rx = round(pt.x + jitter, ndigits=self.ROUND_DIGITS)
+        ry = round(pt.y + jitter, ndigits=self.ROUND_DIGITS)
+        return Point(rx, ry)
 
     def __getitem__(self, pt):
         val = self._get(pt)
@@ -42,7 +41,7 @@ class PointMap:
         return val
 
     def _get(self, pt):
-        """Get the value for `pt`."""
+        """Get the value for `pt`, if any."""
         val = self._items.get(pt)
         if val is not None:
             return val
