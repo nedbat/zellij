@@ -23,14 +23,13 @@ class PointMap:
         self._rounded = {}      # maps rounded points to points
         self._factory = factory
 
-    ROUND_DIGITS = 6
-    JITTERS = [0, 0.5 * 10 ** -ROUND_DIGITS]
-
-    def _round(self, pt, jitter):
-        """Round the point, with a little bit of jitter added."""
-        rx = round(pt.x + jitter, ndigits=self.ROUND_DIGITS)
-        ry = round(pt.y + jitter, ndigits=self.ROUND_DIGITS)
-        return Point(rx, ry)
+    def _roundeds(self, pt):
+        """Produce the different roundings of `pt`."""
+        ROUND_DIGITS = 6
+        for jitter in [0, 0.5 * 10 ** -ROUND_DIGITS]:
+            rx = round(pt.x + jitter, ndigits=ROUND_DIGITS)
+            ry = round(pt.y + jitter, ndigits=ROUND_DIGITS)
+            yield Point(rx, ry)
 
     def __getitem__(self, pt):
         val = self._get(pt)
@@ -47,8 +46,7 @@ class PointMap:
             return val
 
         # Check the rounded points
-        for jitter in self.JITTERS:
-            pt_round = self._round(pt, jitter)
+        for pt_round in self._roundeds(pt):
             pt0 = self._rounded.get(pt_round)
             if pt0 is not None:
                 return self._items[pt0]
@@ -58,8 +56,8 @@ class PointMap:
     def _set(self, pt, val):
         """Set the value for `pt`."""
         self._items[pt] = val
-        for jitter in self.JITTERS:
-            self._rounded[self._round(pt, jitter)] = pt
+        for pt_round in self._roundeds(pt):
+            self._rounded[pt_round] = pt
 
     def __len__(self):
         return len(self._items)
