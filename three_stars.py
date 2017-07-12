@@ -7,7 +7,7 @@ from color import random_color, CasaCeramica
 from drawing import Drawing
 from euclid import Line, Point
 from path_tiler import PathTiler
-from path_tiler import combine_paths, replay_path, path_in_box
+from path_tiler import combine_paths, replay_path, path_in_box, offset_path
 
 SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
@@ -77,13 +77,15 @@ class Draw:
         dwg.close_path()
 
 
-def draw_it(dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2):
+def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, offset=None):
     pt = PathTiler()
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
     paths = pt.paths
     if combined:
         paths = combine_paths(pt.paths)
+    if offset is not None:
+        paths = [offset_path(p, offset) for p in paths]
     dwg.set_line_cap(cairo.LineCap.ROUND)
 
     if fat:
@@ -120,17 +122,17 @@ def talk_pictures():
     TILEW = int(DWGW/3)
 
     dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
-    draw_it(dwg)
+    draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_0.png')
 
 
     dwg = Drawing(DWGW, DWGW)
-    draw_it(dwg, fat=False)
+    draw_it(TILEW, dwg, fat=False)
     dwg.write_to_png('three_stars_1_thin.png')
 
 
     dwg = Drawing(DWGW, DWGW)
-    draw_it(dwg, fat=False, color=(.8, .8, .8))
+    draw_it(TILEW, dwg, fat=False, color=(.8, .8, .8))
 
     pt = PathTiler()
     draw = Draw(TILEW)
@@ -155,18 +157,29 @@ def talk_pictures():
 
 
     dwg = Drawing(DWGW, DWGW)
-    draw_it(dwg, fat=False, color=random_color, combined=False, line_width=8)
+    draw_it(TILEW, dwg, fat=False, color=random_color, combined=False, line_width=8)
     dwg.write_to_png('three_stars_3_chaos.png')
 
 
     dwg = Drawing(DWGW, DWGW)
-    draw_it(dwg, fat=False, color=random_color, combined=True, line_width=8)
+    draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.write_to_png('three_stars_4_joined.png')
 
 #talk_pictures()
 
-TILEW = int(DWGW/5)
+def final():
+    TILEW = int(DWGW/5)
 
-dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
-draw_it(dwg)
-dwg.write_to_png('three_stars_final.png')
+    dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+    draw_it(TILEW, dwg)
+    dwg.write_to_png('three_stars_final.png')
+
+
+TILEW = int(DWGW/5)
+dwg = Drawing(DWGW, DWGW)
+draw_it(TILEW, dwg, fat=False, offset=5, color=(.7,.7,.7))
+draw_it(TILEW, dwg, fat=False, offset=-5, color=(.7,.7,.7))
+#draw_it(TILEW, dwg, fat=False, offset=2.5, color=(.5,.5,.5))
+#draw_it(TILEW, dwg, fat=False, offset=-2.5, color=(.5,.5,.5))
+draw_it(TILEW, dwg, fat=False)
+dwg.write_to_png('three_stars_offset.png')

@@ -1,9 +1,10 @@
 import contextlib
+import itertools
 import math
 
 from affine import Affine
 
-from euclid import collinear, Point
+from euclid import collinear, Point, Line
 from pointmap import PointMap
 
 
@@ -252,3 +253,33 @@ def combine_paths(paths):
         combined.append(path)
 
     return combined
+
+
+def adjacent_pairs(seq):
+    """From e0, e1, e2, e3, ... produce (e0,e1), (e1,e2), (e2, e3), ..."""
+    return zip(seq, itertools.islice(seq, 1, None))
+
+
+def offset_path(path, offset):
+    closed = (path[0] == path[-1])
+
+    lines = []
+    for p1, p2 in adjacent_pairs(path):
+        lines.append(Line(p1, p2).offset(offset))
+
+    points = []
+    if closed:
+        p0 = lines[-1].intersect(lines[0])
+        points.append(p0)
+    else:
+        points.append(lines[0].p1)
+
+    for l1, l2 in adjacent_pairs(lines):
+        points.append(l1.intersect(l2))
+
+    if closed:
+        points.append(p0)
+    else:
+        points.append(lines[-1].p2)
+
+    return points
