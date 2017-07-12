@@ -115,54 +115,56 @@ if 0:
             drawn.add(len(path))
 
 DWGW = 800
-TILEW = int(DWGW/3)
 
-dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
-draw_it(dwg)
-dwg.write_to_png('three_stars_0.png')
+def talk_pictures():
+    TILEW = int(DWGW/3)
 
-
-dwg = Drawing(DWGW, DWGW)
-draw_it(dwg, fat=False)
-dwg.write_to_png('three_stars_1_thin.png')
+    dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+    draw_it(dwg)
+    dwg.write_to_png('three_stars_0.png')
 
 
-dwg = Drawing(DWGW, DWGW)
-draw_it(dwg, fat=False, color=(.8, .8, .8))
-
-pt = PathTiler()
-draw = Draw(TILEW)
-pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
-dwg.set_source_rgb(1, 0, 0)
-dwg.set_line_width(2)
-dwg.set_dash([5, 5])
-pt.replay_paths(dwg)
-dwg.stroke()
-
-pt = PathTiler()
-pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
-pt.reflect_xy(0, 0)
-draw.draw_tile(pt, ())
-dwg.set_source_rgb(0, 0, 0)
-dwg.set_line_width(6)
-dwg.set_dash([])
-pt.replay_paths(dwg)
-dwg.stroke()
-
-dwg.write_to_png('three_stars_2_lined.png')
+    dwg = Drawing(DWGW, DWGW)
+    draw_it(dwg, fat=False)
+    dwg.write_to_png('three_stars_1_thin.png')
 
 
-dwg = Drawing(DWGW, DWGW)
-draw_it(dwg, fat=False, color=random_color, combined=False, line_width=8)
-dwg.write_to_png('three_stars_3_chaos.png')
+    dwg = Drawing(DWGW, DWGW)
+    draw_it(dwg, fat=False, color=(.8, .8, .8))
+
+    pt = PathTiler()
+    draw = Draw(TILEW)
+    pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+    dwg.set_source_rgb(1, 0, 0)
+    dwg.set_line_width(2)
+    dwg.set_dash([5, 5])
+    pt.replay_paths(dwg)
+    dwg.stroke()
+
+    pt = PathTiler()
+    pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
+    pt.reflect_xy(0, 0)
+    draw.draw_tile(pt, ())
+    dwg.set_source_rgb(0, 0, 0)
+    dwg.set_line_width(6)
+    dwg.set_dash([])
+    pt.replay_paths(dwg)
+    dwg.stroke()
+
+    dwg.write_to_png('three_stars_2_lined.png')
 
 
-dwg = Drawing(DWGW, DWGW)
-draw_it(dwg, fat=False, color=random_color, combined=True, line_width=8)
-dwg.write_to_png('three_stars_4_joined.png')
+    dwg = Drawing(DWGW, DWGW)
+    draw_it(dwg, fat=False, color=random_color, combined=False, line_width=8)
+    dwg.write_to_png('three_stars_3_chaos.png')
 
 
-DWGW = 800
+    dwg = Drawing(DWGW, DWGW)
+    draw_it(dwg, fat=False, color=random_color, combined=True, line_width=8)
+    dwg.write_to_png('three_stars_4_joined.png')
+
+#talk_pictures()
+
 TILEW = int(DWGW/5)
 
 dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
