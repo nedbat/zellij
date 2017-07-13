@@ -175,11 +175,12 @@ def final():
     dwg.write_to_png('three_stars_final.png')
 
 
-TILEW = int(DWGW/5)
-dwg = Drawing(DWGW, DWGW)
-draw_it(TILEW, dwg, fat=False, offset=5, color=(.7,.7,.7))
-draw_it(TILEW, dwg, fat=False, offset=-5, color=(.7,.7,.7))
-#draw_it(TILEW, dwg, fat=False, offset=2.5, color=(.5,.5,.5))
-#draw_it(TILEW, dwg, fat=False, offset=-2.5, color=(.5,.5,.5))
-draw_it(TILEW, dwg, fat=False)
-dwg.write_to_png('three_stars_offset.png')
+if 0:
+    TILEW = int(DWGW/5)
+    dwg = Drawing(DWGW, DWGW)
+    draw_it(TILEW, dwg, fat=False, offset=5, color=(.7,.7,.7))
+    draw_it(TILEW, dwg, fat=False, offset=-5, color=(.7,.7,.7))
+    #draw_it(TILEW, dwg, fat=False, offset=2.5, color=(.5,.5,.5))
+    #draw_it(TILEW, dwg, fat=False, offset=-2.5, color=(.5,.5,.5))
+    draw_it(TILEW, dwg, fat=False)
+    dwg.write_to_png('three_stars_offset.png')
