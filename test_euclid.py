@@ -8,7 +8,7 @@ from hypothesis import given
 from hypothesis.strategies import floats, tuples
 import pytest
 
-from euclid import BadGeometry, collinear, Line, Point
+from euclid import BadGeometry, collinear, Line, Point, along_the_way
 
 
 # Points
@@ -40,17 +40,18 @@ def test_points_collinear(p1, p2, p3, result):
     assert collinear(Point(*p1), Point(*p2), Point(*p3)) == result
 
 
-f = floats(min_value=-1000000, max_value=1000000, allow_nan=False, allow_infinity=False)
+f = floats(min_value=-10000, max_value=10000, allow_nan=False, allow_infinity=False)
+points = tuples(f, f)
 
 @given(
-    tuples(f, f), tuples(f, f), f.filter(lambda f: abs(f) > 1e-8)
+    points, points, f.filter(lambda f: abs(f) > 1e-4)
 )
 def test_hypo_points_collinear(p1, p2, t):
     # If I pick a point that is a linear combination of two points, it should
     # be considered collinear.
     p1 = Point(*p1)
     p2 = Point(*p2)
-    p3 = Point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
+    p3 = along_the_way(p1, p2, t)
     assert collinear(p1, p2, p3)
 
 
