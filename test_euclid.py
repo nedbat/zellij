@@ -42,10 +42,9 @@ def test_points_collinear(p1, p2, p3, result):
 
 f = floats(min_value=-10000, max_value=10000, allow_nan=False, allow_infinity=False)
 points = tuples(f, f)
+t_zero_one = floats(min_value=-100, max_value=100, allow_nan=False, allow_infinity=False).filter(lambda f: abs(f) > 1e-4)
 
-@given(
-    points, points, f.filter(lambda f: abs(f) > 1e-4)
-)
+@given(points, points, t_zero_one)
 def test_hypo_points_collinear(p1, p2, t):
     # If I pick a point that is a linear combination of two points, it should
     # be considered collinear.
@@ -53,6 +52,20 @@ def test_hypo_points_collinear(p1, p2, t):
     p2 = Point(*p2)
     p3 = along_the_way(p1, p2, t)
     assert collinear(p1, p2, p3)
+
+@given(points, points, t_zero_one)
+def test_hypo_points_not_collinear(p1, p2, t):
+    # If I pick a point that is a linear combination of two points, it should
+    # not be considered collinear with a line that is offset from the two points.
+    p1 = Point(*p1)
+    p2 = Point(*p2)
+    if p1.distance(p2) < 1:
+        # If the endpoints are too close together, the floats get unwieldy.
+        return
+    p3 = along_the_way(p1, p2, t)
+    next_to = Line(p1, p2).offset(1)
+    p1o, p2o = next_to.p1, next_to.p2
+    assert not collinear(p1o, p2o, p3)
 
 
 # Lines
