@@ -7,7 +7,7 @@ from color import random_color, CasaCeramica
 from drawing import Drawing
 from euclid import Line, Point
 from path_tiler import PathTiler
-from path_tiler import combine_paths, replay_path, path_in_box, offset_path
+from path_tiler import combine_paths, replay_path, path_in_box, offset_path, paths_box
 
 SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
@@ -184,3 +184,51 @@ if 0:
     #draw_it(TILEW, dwg, fat=False, offset=-2.5, color=(.5,.5,.5))
     draw_it(TILEW, dwg, fat=False)
     dwg.write_to_png('three_stars_offset.png')
+
+
+if 1:
+    import poly_point_isect
+
+    TILEW = int(DWGW/7)
+    dwg = Drawing(DWGW, DWGW)
+    pt = PathTiler()
+    pt.rotate(4)
+    draw = Draw(TILEW)
+    pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
+    paths = pt.paths
+    paths = combine_paths(pt.paths)
+
+    segments = [(tuple(p1), tuple(p2)) for path in paths for p1,p2 in zip(path, path[1:])]
+
+    ll, ur = paths_box(paths)
+    dx, dy = int(ur.x - ll.x), int(ur.y - ll.y)
+    dwgdbg = Drawing(dx, dy)
+    dwgdbg.translate(-ll.x, -ll.y)
+    with dwgdbg.line_style(rgb=(0, 0, 0), width=1):
+        for (x1, y1), (x2, y2) in segments:
+            dwgdbg.move_to(x1, y1)
+            dwgdbg.line_to(x2, y2)
+            dwgdbg.stroke()
+
+    dup_segments = []
+    segments.sort()
+    for s1, s2 in zip(segments, segments[1:]):
+        if s1 == s2:
+            dup_segments.append(s1)
+
+    with dwgdbg.line_style(rgb=(1, 0, 0), width=7):
+        for (x1, y1), (x2, y2) in dup_segments:
+            dwgdbg.move_to(x1, y1)
+            dwgdbg.line_to(x2, y2)
+            dwgdbg.stroke()
+
+    with dwgdbg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
+        dwgdbg.rectangle(0, 0, DWGW, DWGW)
+        dwgdbg.stroke()
+
+    dwgdbg.write_to_png("debug.png")
+
+    segments = list(set(segments))
+    #import pprint; pprint.pprint(segments)
+    isects = poly_point_isect.isect_segments(segments)
+    #print(isects)
