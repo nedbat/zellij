@@ -32,7 +32,7 @@ class PointMap:
             yield Point(rx, ry)
 
     def __getitem__(self, pt):
-        val = self._get(pt)
+        _, val = self._get(pt)
         if val is None:
             # Really didn't find it: make one.
             val = self._factory()
@@ -40,18 +40,18 @@ class PointMap:
         return val
 
     def _get(self, pt):
-        """Get the value for `pt`, if any."""
+        """Get the canonical key, and value for `pt`, if any."""
         val = self._items.get(pt)
         if val is not None:
-            return val
+            return pt, val
 
         # Check the rounded points
         for pt_round in self._roundeds(pt):
             pt0 = self._rounded.get(pt_round)
             if pt0 is not None:
-                return self._items[pt0]
+                return pt0, self._items[pt0]
 
-        return None
+        return None, None
 
     def _set(self, pt, val):
         """Set the value for `pt`."""
@@ -66,8 +66,15 @@ class PointMap:
         return iter(self._items)
 
     def __contains__(self, key):
-        val = self._get(key)
+        _, val = self._get(key)
         return val is not None
 
     def items(self):
         return self._items.items()
+
+    def good_key(self, key):
+        """Return the canonicalized key"""
+        good, _ = self._get(key)
+        if good is None:
+            return key
+        return good

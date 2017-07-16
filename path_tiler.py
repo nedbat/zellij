@@ -252,6 +252,9 @@ def combine_paths(paths):
 
         combined.append(path)
 
+    # Canonicalize the points.
+    combined = [[pm.good_key(pt) for pt in path] for path in combined]
+
     return combined
 
 
@@ -283,3 +286,11 @@ def offset_path(path, offset):
         points.append(lines[-1].p2)
 
     return points
+
+def paths_box(paths):
+    """Return the (ll, ur) pair of points that define the bounding box."""
+    minx = min(p.x for path in paths for p in path)
+    maxx = max(p.x for path in paths for p in path)
+    miny = min(p.y for path in paths for p in path)
+    maxy = max(p.y for path in paths for p in path)
+    return Point(minx, miny), Point(maxx, maxy)
