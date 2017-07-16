@@ -1,7 +1,7 @@
 import random
 
 from hypothesis import given
-from hypothesis.strategies import lists, randoms
+from hypothesis.strategies import lists, randoms, composite
 
 from euclid import Point
 from hypo_helpers import points
@@ -114,14 +114,14 @@ def num_segments(paths):
     """How many individual line segments are in these paths?"""
     return sum(len(p)-1 for p in paths)
 
-@given(lists(points, min_size=3, max_size=200, unique_by=tuple))
-def test_combine_paths(points):
-    rand = random.Random()
-    rand.seed(len(points))
+@composite
+def combinable_paths(draw):
+    path_points = draw(lists(points, min_size=3, max_size=200, unique_by=tuple))
+    rand = draw(randoms())
 
     paths = [[]]
     length = rand.randint(2, 4)
-    for pt in points:
+    for pt in path_points:
         paths[-1].append(pt)
         length -= 1
         if length == 0:
@@ -135,7 +135,10 @@ def test_combine_paths(points):
         paths.pop()
 
     rand.shuffle(paths)
+    return paths
 
+@given(combinable_paths())
+def test_combine_paths(paths):
     combined = combine_paths(paths)
 
     print(f"p: {paths}")
