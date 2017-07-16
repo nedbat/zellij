@@ -296,3 +296,24 @@ def paths_box(paths):
     miny = min(p.y for path in paths for p in path)
     maxy = max(p.y for path in paths for p in path)
     return Point(minx, miny), Point(maxx, maxy)
+
+
+def canonicalize_path(path):
+    """Produce an equivalent canonical path."""
+    if path[0] == path[-1]:
+        path = path[:-1]
+        path = min((path[i:]+path[:i])[::s] for i in range(len(path)) for s in [1, -1])
+        path.append(path[0])
+        return path
+    else:
+        return min(path, path[::-1])
+
+def canonicalize_paths(paths):
+    """Canonicalize a list of paths."""
+    paths = list(canonicalize_path(p) for p in paths)
+    paths.sort()
+    return paths
+
+def equal_paths(paths1, paths2):
+    """Are the paths in paths1 and paths2 equivalent?"""
+    return canonicalize_paths(paths1) == canonicalize_paths(paths2)

@@ -8,7 +8,7 @@ from hypothesis.strategies import lists, randoms, composite, one_of
 
 from euclid import Point
 from hypo_helpers import points
-from path_tiler import PathTiler, combine_paths
+from path_tiler import PathTiler, combine_paths, equal_paths
 
 
 def test_do_nothing():
@@ -182,9 +182,11 @@ def combinable_paths_maybe_loops(draw):
         if point_use[b] == 2:
             endpoints.remove(b)
 
-    return paths
+    return list(paths)
 
-@given(one_of(combinable_paths_no_loops(), combinable_paths_maybe_loops()))
+combinable_paths = one_of(combinable_paths_no_loops(), combinable_paths_maybe_loops())
+
+@given(combinable_paths)
 def test_combine_paths(paths):
     combined = combine_paths(paths)
 
@@ -199,3 +201,15 @@ def test_combine_paths(paths):
     # Property: the combined paths should have the same number of segments as
     # the original paths.
     assert num_segments(paths) == num_segments(combined)
+
+@given(combinable_paths)
+def test_combine_paths_recursive(paths):
+    # We can combine the paths in two halves, then combine the halves, and get
+    # the same results as combining them all at once.
+    combined_all_at_once = combine_paths(paths)
+
+    combined_evens = combine_paths(paths[0::2])
+    combined_odds = combine_paths(paths[1::2])
+    combined_in_halves = combine_paths(combined_evens + combined_odds)
+
+    assert equal_paths(combined_all_at_once, combined_in_halves)
