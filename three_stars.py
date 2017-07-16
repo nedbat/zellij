@@ -185,7 +185,7 @@ if 0:
 if 1:
     import poly_point_isect
 
-    TILEW = int(DWGW/7)
+    TILEW = int(DWGW/2)
     dwg = Drawing(DWGW, DWGW)
     pt = PathTiler()
     pt.rotate(4)
@@ -222,9 +222,11 @@ if 1:
         dwgdbg.rectangle(0, 0, DWGW, DWGW)
         dwgdbg.stroke()
 
-    dwgdbg.write_to_png("debug.png")
-
-    segments = list(set(segments))
-    #import pprint; pprint.pprint(segments)
     isects = poly_point_isect.isect_segments(segments)
-    #print(isects)
+
+    with dwgdbg.line_style(rgb=(0, 1, 0), width=2):
+        for pt in isects:
+            dwgdbg.circle(pt[0], pt[1], 5)
+            dwgdbg.stroke()
+
+    dwgdbg.write_to_png("debug.png")

@@ -3,6 +3,7 @@ A convenience wrapper around Cairo.
 """
 
 import contextlib
+import math
 
 import cairo
 
@@ -36,6 +37,9 @@ class Drawing:
 
     def get_size(self):
         return (self.get_width(), self.get_height())
+
+    def circle(self, xc, yc, radius):
+        self.arc(xc, yc, radius, 0, math.pi * 2 - .001)
 
     def multi_stroke(self, paths, styles):
         for width, color in styles:
