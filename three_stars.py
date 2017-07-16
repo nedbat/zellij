@@ -137,21 +137,17 @@ def talk_pictures():
     pt = PathTiler()
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
-    dwg.set_source_rgb(1, 0, 0)
-    dwg.set_line_width(2)
-    dwg.set_dash([5, 5])
-    pt.replay_paths(dwg)
-    dwg.stroke()
+    with dwg.line_style(rgb=(1, 0, 0), width=2, dash=[5, 5]):
+        pt.replay_paths(dwg)
+        dwg.stroke()
 
     pt = PathTiler()
     pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
     pt.reflect_xy(0, 0)
     draw.draw_tile(pt, ())
-    dwg.set_source_rgb(0, 0, 0)
-    dwg.set_line_width(6)
-    dwg.set_dash([])
-    pt.replay_paths(dwg)
-    dwg.stroke()
+    with dwg.line_style(rgb=(0, 0, 0), width=6):
+        pt.replay_paths(dwg)
+        dwg.stroke()
 
     dwg.write_to_png('three_stars_2_lined.png')
 
