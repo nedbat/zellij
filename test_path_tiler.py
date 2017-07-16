@@ -1,5 +1,12 @@
+import random
+
+from hypothesis import given
+from hypothesis.strategies import lists, randoms
+
 from euclid import Point
-from path_tiler import PathTiler
+from hypo_helpers import points
+from path_tiler import PathTiler, combine_paths
+
 
 def test_do_nothing():
     pt = PathTiler()
@@ -97,3 +104,51 @@ def test_rel_line_to():
     assert pt.paths == [
         [Point(1000.0, 2000.0), Point(1100.0, 2200.0)],
     ]
+
+
+def point_set(paths):
+    """The set of points in all these paths."""
+    return set(pt for path in paths for pt in path)
+
+def num_segments(paths):
+    """How many individual line segments are in these paths?"""
+    return sum(len(p)-1 for p in paths)
+
+@given(lists(points, min_size=3, max_size=200, unique_by=tuple))
+def test_combine_paths(points):
+    rand = random.Random()
+    rand.seed(len(points))
+
+    paths = [[]]
+    length = rand.randint(2, 4)
+    for pt in points:
+        paths[-1].append(pt)
+        length -= 1
+        if length == 0:
+            paths.append([])
+            length = rand.randint(2, 4)
+            joinable = (rand.random() > .5)
+            if joinable:
+                paths[-1].append(pt)
+
+    if len(paths[-1]) < 2:
+        paths.pop()
+
+    rand.shuffle(paths)
+
+    combined = combine_paths(paths)
+
+    print(f"p: {paths}")
+    print(f"c: {combined}")
+
+    # Property: the points in the combined paths should all have been in the
+    # original paths.
+    assert point_set(paths) == point_set(combined)
+
+    # Property: the combined paths should have no duplicate endpoints.
+    endpoints = [path[i] for path in combined for i in [0, -1]]
+    assert len(endpoints) == len(set(endpoints))
+
+    # Property: the combined paths should have the same number of segments as
+    # the original paths.
+    assert num_segments(paths) == num_segments(combined)

@@ -1,15 +1,17 @@
 """Zellij-specific helpers for Hypothesis."""
 
-from hypothesis.strategies import builds, floats, tuples
+from hypothesis.strategies import builds, floats, integers, tuples
 
 from euclid import Point
 
+LIMIT = 10000
 
-# Floats that are reasonable for Zellij.
-f = floats(min_value=-10000, max_value=10000, allow_nan=False, allow_infinity=False)
+# Numbers that are reasonable for Zellij.
+f = floats(min_value=-LIMIT, max_value=LIMIT, allow_nan=False, allow_infinity=False)
+i = integers(min_value=-LIMIT, max_value=LIMIT)
 
-# Points.
-points = builds(Point, f, f)
+# Points, on an integer grid to avoid some hairiness with pathological floats.
+points = builds(Point, i, i)
 
 # A parameter for positioning along a line segment, including beyond the
 # endpoints.
