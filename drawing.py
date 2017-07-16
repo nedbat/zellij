@@ -47,3 +47,21 @@ class Drawing:
                 else:
                     self.set_source_rgb(*color)
                 self.stroke()
+
+    @contextlib.contextmanager
+    def line_style(self, rgb=None, width=None, dash=None):
+        o_source = self.get_source()
+        o_width = self.get_line_width()
+        o_dash = self.get_dash()
+        try:
+            if rgb is not None:
+                self.set_source_rgb(*rgb)
+            if width is not None:
+                self.set_line_width(width)
+            if dash is not None:
+                self.set_dash(dash)
+            yield
+        finally:
+            self.set_source(o_source)
+            self.set_line_width(o_width)
+            self.set_dash(*o_dash)
