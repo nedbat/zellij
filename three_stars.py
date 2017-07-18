@@ -1,5 +1,7 @@
+import collections
 import itertools
 import math
+import pprint
 
 import cairo
 
@@ -237,8 +239,17 @@ if 1:
         for p1, p2 in zip(path, path[1:]):
             segment = (tuple(p1), tuple(p2))
             segments.append(segment)
-            segs_to_paths[segment] = path
+            segs_to_paths[tuple(sorted(segment))] = path
 
-    isects = poly_point_isect.isect_segments(segments)
+    isects = poly_point_isect.isect_segments_include_segments(segments)
+    isect_points = [isect[0] for isect in isects]
 
-    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isects)
+    paths_to_intersections = collections.defaultdict(list)
+
+    for isect, segs in isects:
+        for seg in segs:
+            paths_to_intersections[tuple(segs_to_paths[tuple(sorted(seg))])].append((seg, isect))
+
+    pprint.pprint(paths_to_intersections)
+
+    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
