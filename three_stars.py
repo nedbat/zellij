@@ -182,20 +182,7 @@ if 0:
     dwg.write_to_png('three_stars_offset.png')
 
 
-if 1:
-    import poly_point_isect
-
-    TILEW = int(DWGW/2)
-    dwg = Drawing(DWGW, DWGW)
-    pt = PathTiler()
-    pt.rotate(4)
-    draw = Draw(TILEW)
-    pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
-    paths = pt.paths
-    paths = combine_paths(pt.paths)
-
-    segments = [(tuple(p1), tuple(p2)) for path in paths for p1,p2 in zip(path, path[1:])]
-
+def debug_output(dwgw=None, paths=None, segments=None, isects=None):
     ll, ur = paths_box(paths)
     dx, dy = int(ur.x - ll.x), int(ur.y - ll.y)
     dwgdbg = Drawing(dx, dy)
@@ -218,15 +205,40 @@ if 1:
             dwgdbg.line_to(x2, y2)
             dwgdbg.stroke()
 
-    with dwgdbg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
-        dwgdbg.rectangle(0, 0, DWGW, DWGW)
-        dwgdbg.stroke()
+    if dwgw is not None:
+        with dwgdbg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
+            dwgdbg.rectangle(0, 0, dwgw, dwgw)
+            dwgdbg.stroke()
+
+    if isects is not None:
+        with dwgdbg.line_style(rgb=(0, 1, 0), width=2):
+            for pt in isects:
+                dwgdbg.circle(pt[0], pt[1], 5)
+                dwgdbg.stroke()
+
+    dwgdbg.write_to_png("debug.png")
+
+
+if 1:
+    import poly_point_isect
+
+    TILEW = int(DWGW/2)
+    dwg = Drawing(DWGW, DWGW)
+    pt = PathTiler()
+    pt.rotate(5)
+    draw = Draw(TILEW)
+    pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
+    paths = pt.paths
+    paths = combine_paths(pt.paths)
+
+    segments = []
+    segs_to_paths = {}
+    for path in paths:
+        for p1, p2 in zip(path, path[1:]):
+            segment = (tuple(p1), tuple(p2))
+            segments.append(segment)
+            segs_to_paths[segment] = path
 
     isects = poly_point_isect.isect_segments(segments)
 
-    with dwgdbg.line_style(rgb=(0, 1, 0), width=2):
-        for pt in isects:
-            dwgdbg.circle(pt[0], pt[1], 5)
-            dwgdbg.stroke()
-
-    dwgdbg.write_to_png("debug.png")
+    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isects)
