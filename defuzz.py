@@ -5,15 +5,12 @@ De-fuzz tuples of floats.
 
 class Defuzzer:
     """
-    Like a defaultdict, but with Points as keys.
+    Remove the fuzz from a collection of float tuples.
 
-    Points compare inexactly, so a simple dict with points as keys won't work.
-
-    We get constant-time behavior by storing points three ways: as-is, and
-    rounded two different ways.  If any of those three maps finds the point,
-    then we have a hit.  This works because Zellij will either have points very
-    close together (a match), or not (a miss). We don't have to deal with
-    points close together that shouldn't be considered the same.
+    Call `defuzz` with a tuple of floats. It will return a tuple of floats
+    which are close enough to the input.  The returned value will be either the
+    same as the input, or will be a previously seen tuple which is close to the
+    input.
     """
 
     def __init__(self, round_digits=6):
