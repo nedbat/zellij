@@ -1,11 +1,12 @@
+import collections
 import contextlib
 import itertools
 import math
 
 from affine import Affine
 
+from defuzz import Defuzzer
 from euclid import collinear, Point, Line
-from pointmap import PointMap
 
 
 class PathTiler:
@@ -223,7 +224,16 @@ def show_paths(paths):
     return ret
 
 def combine_paths(paths):
-    pm = PointMap(list)
+    dfz = Defuzzer()
+    dfpaths = []
+    for path in paths:
+        dfpath = []
+        for pt in path:
+            dfpath.append(Point(*dfz.defuzz(pt)))
+        dfpaths.append(dfpath)
+    paths = dfpaths
+
+    pm = collections.defaultdict(list)
     for path in paths:
         pm[path[0]].append(path)
         pm[path[-1]].append(path)
@@ -253,9 +263,6 @@ def combine_paths(paths):
 
         used.add(id(path))
         combined.append(path)
-
-    # Canonicalize the points.
-    combined = [[pm.good_key(pt) for pt in path] for path in combined]
 
     return combined
 
