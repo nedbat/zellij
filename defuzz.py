@@ -11,17 +11,23 @@ class Defuzzer:
     which are close enough to the input.  The returned value will be either the
     same as the input, or will be a previously seen tuple which is close to the
     input.
+
+    The `ndigits` argument defines closeness.  `10 ** -ndigits` is the window
+    size.  Numbers within window/2 of each other are guaranteed to be compared
+    equal.  Numbers that are 3*window/2 apart or more are guaranteed to be
+    compared different.
+
     """
 
-    def __init__(self, round_digits=6):
-        self.round_digits = round_digits
+    def __init__(self, ndigits=6):
+        self.ndigits = ndigits
         self.points = set()     # the set of good points
         self.rounds = {}        # maps rounded tuples to good tuples
 
     def roundeds(self, pt):
         """Produce the different roundings of `pt`."""
-        for jitter in [0, 0.5 * 10 ** -self.round_digits]:
-            yield tuple(round(v + jitter, ndigits=self.round_digits) for v in pt)
+        for jitter in [0, 0.5 * 10 ** -self.ndigits]:
+            yield tuple(round(v + jitter, ndigits=self.ndigits) for v in pt)
 
     def defuzz(self, pt):
         if pt in self.points:
