@@ -33,7 +33,7 @@ def test_hypo(points):
             if a == b:
                 continue
             distance = math.hypot(a[0] - b[0], a[1] - b[1])
-            assert distance > .01
+            assert distance > .005
 
 
 @given(f, integers(min_value=-2, max_value=6))

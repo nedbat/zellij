@@ -13,8 +13,8 @@ class Defuzzer:
     input.
 
     The `ndigits` argument defines closeness.  `10 ** -ndigits` is the window
-    size.  Numbers within window/2 of each other are guaranteed to be compared
-    equal.  Numbers that are 3*window/2 apart or more are guaranteed to be
+    size.  Numbers within 0.5*window of each other are guaranteed to be compared
+    equal.  Numbers that are 1.5*window apart or more are guaranteed to be
     compared different.
 
     """

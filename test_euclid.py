@@ -16,11 +16,20 @@ from hypo_helpers import points, t_zero_one
 @pytest.mark.parametrize("p1, p2, result", [
     ((0, 0), (0, 0), True),
     ((0, 0), (1, 0), False),
-    ((0, 0), (0.000000001, 0), True),
+    ((0, 0), (0.000000001, 0), False),
     ((0, 0), (0.001, 0), False),
 ])
 def test_point_equality(p1, p2, result):
     assert (Point(*p1) == Point(*p2)) == result
+
+@pytest.mark.parametrize("p1, p2, result", [
+    ((0, 0), (0, 0), True),
+    ((0, 0), (1, 0), False),
+    ((0, 0), (0.000000001, 0), True),
+    ((0, 0), (0.001, 0), False),
+])
+def test_point_is_close(p1, p2, result):
+    assert Point(*p1).is_close(Point(*p2)) == result
 
 @pytest.mark.parametrize("p1, p2, result", [
     ((0, 0), (1, 1), 1.4142135623730951),
@@ -69,7 +78,7 @@ def test_hypo_points_not_collinear(p1, p2, t):
 def test_intersect(p1, p2, p3, p4, pi):
     l1 = Line(Point(*p1), Point(*p2))
     l2 = Line(Point(*p3), Point(*p4))
-    assert l1.intersect(l2) == Point(*pi)
+    assert l1.intersect(l2).is_close(Point(*pi))
 
 
 @pytest.mark.parametrize("p1, p2, p3, p4", [

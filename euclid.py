@@ -24,14 +24,12 @@ class Point(namedtuple("Point", ["x", "y"])):
     def fullrepr(self):
         return  f"<{self.x}, {self.y}>"
 
-    def __eq__(self, other):
+    def is_close(self, other):
+        """Are two points close enough to be considered the same?"""
         assert isinstance(other, Point)
         x1, y1 = self
         x2, y2 = other
         return isclose(x1, x2) and isclose(y1, y2)
-
-    def __hash__(self):
-        return tuple.__hash__(self)
 
     def distance(self, other):
         """Compute the distance from this Point to another Point."""
