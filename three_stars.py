@@ -163,7 +163,7 @@ def talk_pictures():
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.write_to_png('three_stars_4_joined.png')
 
-#talk_pictures()
+talk_pictures()
 
 def final():
     TILEW = int(DWGW/5)
@@ -171,6 +171,8 @@ def final():
     dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
     draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_final.png')
+
+final()
 
 
 if 0:
