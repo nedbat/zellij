@@ -3,7 +3,7 @@ import math
 
 from defuzz import Defuzzer
 
-from hypothesis import given
+from hypothesis import given, example
 from hypothesis.strategies import floats, integers, lists, tuples
 
 from hypo_helpers import f
@@ -20,9 +20,14 @@ def test_it():
 
 
 @given(lists(tuples(f, f)))
+#@example([(-9921.873619430073, -10000.0), (-9921.875, -9999.995194375517)])
+#@example([(-992187.3619430073, -1000000.), (-992187.5, -999999.5194375517)])
+# it only fails if the .5 is exactly .5:
+@example([(-992187.3619430073, -1000000.), (-992187.5, -999999.5194375517)])
 def test_hypo(points):
-    dfz = Defuzzer(ndigits=2)
+    dfz = Defuzzer(ndigits=0)
     dfz_points = [dfz.defuzz(pt) for pt in points]
+    print(f"{points}\n{dfz_points}\n")
 
     # The output values should all be in the inputs.
     assert all(pt in points for pt in dfz_points)
@@ -33,7 +38,7 @@ def test_hypo(points):
             if a == b:
                 continue
             distance = math.hypot(a[0] - b[0], a[1] - b[1])
-            assert distance > .005
+            assert distance > .5
 
 
 @given(f, integers(min_value=-2, max_value=6))
