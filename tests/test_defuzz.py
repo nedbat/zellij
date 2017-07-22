@@ -1,12 +1,12 @@
 import itertools
 import math
 
-from defuzz import Defuzzer
+from zellij.defuzz import Defuzzer
 
 from hypothesis import given, example
 from hypothesis.strategies import floats, integers, lists, tuples
 
-from hypo_helpers import f
+from .hypo_helpers import f
 
 
 def test_it():

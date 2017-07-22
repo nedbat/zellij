@@ -6,9 +6,9 @@ import random
 from hypothesis import given
 from hypothesis.strategies import lists, randoms, composite, one_of
 
-from euclid import Point
-from hypo_helpers import points
-from path_tiler import PathTiler, combine_paths, equal_paths
+from zellij.euclid import Point
+from zellij.path_tiler import PathTiler, combine_paths, equal_paths
+from .hypo_helpers import points
 
 
 def test_do_nothing():

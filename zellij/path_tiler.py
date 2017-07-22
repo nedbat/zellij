@@ -5,8 +5,8 @@ import math
 
 from affine import Affine
 
-from defuzz import Defuzzer
-from euclid import collinear, Point, Line
+from .defuzz import Defuzzer
+from .euclid import collinear, Point, Line
 
 
 class PathTiler:

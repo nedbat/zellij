@@ -7,7 +7,7 @@ import math
 
 import cairo
 
-from path_tiler import replay_path
+from .path_tiler import replay_path
 
 
 class Drawing:

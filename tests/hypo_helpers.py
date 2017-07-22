@@ -2,7 +2,7 @@
 
 from hypothesis.strategies import builds, floats, integers, tuples
 
-from euclid import Point
+from zellij.euclid import Point
 
 LIMIT = 10000
 

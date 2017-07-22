@@ -7,8 +7,8 @@ import math
 from hypothesis import given
 import pytest
 
-from euclid import BadGeometry, collinear, Line, Point, along_the_way
-from hypo_helpers import points, t_zero_one
+from zellij.euclid import BadGeometry, collinear, Line, Point, along_the_way
+from .hypo_helpers import points, t_zero_one
 
 
 # Points

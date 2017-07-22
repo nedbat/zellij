@@ -5,11 +5,11 @@ import pprint
 
 import cairo
 
-from color import random_color, CasaCeramica
-from drawing import Drawing
-from euclid import Line, Point
-from path_tiler import PathTiler
-from path_tiler import combine_paths, replay_path, path_in_box, offset_path, paths_box
+from zellij.color import random_color, CasaCeramica
+from zellij.drawing import Drawing
+from zellij.euclid import Line, Point
+from zellij.path_tiler import PathTiler
+from zellij.path_tiler import combine_paths, replay_path, path_in_box, offset_path, paths_box
 
 SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
