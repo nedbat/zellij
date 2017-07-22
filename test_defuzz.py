@@ -20,10 +20,7 @@ def test_it():
 
 
 @given(lists(tuples(f, f)))
-#@example([(-9921.873619430073, -10000.0), (-9921.875, -9999.995194375517)])
-#@example([(-992187.3619430073, -1000000.), (-992187.5, -999999.5194375517)])
-# it only fails if the .5 is exactly .5:
-@example([(-992187.3619430073, -1000000.), (-992187.5, -999999.5194375517)])
+@example([(.48, 1.02), (.52, .98)])
 def test_hypo(points):
     dfz = Defuzzer(ndigits=0)
     dfz_points = [dfz.defuzz(pt) for pt in points]
