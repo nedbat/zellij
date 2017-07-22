@@ -37,18 +37,30 @@ def test_hypo(points):
             assert distance > .5
 
 
-@given(f, integers(min_value=-2, max_value=6))
-def test_correct_distance(start, ndigits):
-    dfz = Defuzzer(ndigits=ndigits)
+@given(
+    start=f,
+    ndigits=integers(min_value=-2, max_value=6),
+    dimensions=integers(min_value=1, max_value=4),
+)
+def test_correct_distance(start, ndigits, dimensions):
     eps = 1e-10
     window = 10 ** -ndigits
     smallest_different = 1.5 * window + eps
     largest_same = 0.5 * window - eps
-    step = 10 * window
-    for i in range(20):
+    step = 10.09 * window
+    for i in range(10):
         num = start + i * step
-        assert dfz.defuzz((num,)) == (num,)
-        assert dfz.defuzz((num + largest_same,)) == (num,)
-        assert dfz.defuzz((num - largest_same,)) == (num,)
-        assert dfz.defuzz((num + smallest_different,)) != (num,)
-        assert dfz.defuzz((num - smallest_different,)) != (num,)
+        pt = (num,) * dimensions
+        for signs in itertools.product([-1, 0, 1], repeat=dimensions):
+            if all(s == 0 for s in signs):
+                continue
+            # Need a new defuzzer for each attempt, or previous "should be
+            # different" points will be close to the "should be same" point.
+            dfz = Defuzzer(ndigits=ndigits)
+            assert dfz.defuzz(pt) == pt
+            st = tuple(num + s * largest_same for s in signs)
+            dfzst = dfz.defuzz(st)
+            assert dfzst == pt
+            dt = tuple(num + s * smallest_different for s in signs)
+            dfzdt = dfz.defuzz(dt)
+            assert dfzdt != pt
