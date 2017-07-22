@@ -24,11 +24,11 @@ class Defuzzer:
         self.ndigits = ndigits
         self.points = set()     # the set of good points
         self.rounds = {}        # maps rounded points to good points
+        self.jitters = [0, 0.5 * 10 ** -self.ndigits]
 
     def roundings(self, pt):
         """Produce the different roundings of `pt`."""
-        jitters = [0, 0.5 * 10 ** -self.ndigits]
-        for jitter in itertools.product(jitters, repeat=len(pt)):
+        for jitter in itertools.product(self.jitters, repeat=len(pt)):
             yield tuple(round(v + j, ndigits=self.ndigits) for v, j in zip(pt, jitter))
 
     def defuzz(self, pt):
@@ -36,15 +36,15 @@ class Defuzzer:
             return pt
 
         # Check the rounded points.
-        rounds = list(self.roundings(pt))
-        for pt_round in rounds:
+        roundings = list(self.roundings(pt))
+        for pt_round in roundings:
             pt0 = self.rounds.get(pt_round)
             if pt0 is not None:
                 return pt0
 
         # This point is new to us.
         self.points.add(pt)
-        for pt_round in rounds:
+        for pt_round in roundings:
             self.rounds[pt_round] = pt
 
         return pt
