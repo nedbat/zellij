@@ -24,7 +24,6 @@ def test_it():
 def test_hypo(points):
     dfz = Defuzzer(ndigits=0)
     dfz_points = [dfz.defuzz(pt) for pt in points]
-    print(f"{points}\n{dfz_points}\n")
 
     # The output values should all be in the inputs.
     assert all(pt in points for pt in dfz_points)
