@@ -4,3 +4,4 @@ __pycache__
 .coverage
 .hypothesis
 *.egg-info
+scratch
