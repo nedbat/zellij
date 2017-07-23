@@ -1,8 +1,8 @@
-from color import random_color
-from drawing import Drawing
-from euclid import Line, Point
-from path_tiler import PathTiler
-from path_tiler import combine_paths
+from zellij.color import random_color
+from zellij.drawing import Drawing
+from zellij.euclid import Line, Point
+from zellij.path_tiler import PathTiler
+from zellij.path_tiler import combine_paths
 
 import cairo
 
