@@ -7,9 +7,12 @@ import cairo
 
 from zellij.color import random_color, CasaCeramica
 from zellij.drawing import Drawing
-from zellij.euclid import Line, Point
+from zellij.euclid import Line, Point, Segment
 from zellij.path_tiler import PathTiler
-from zellij.path_tiler import combine_paths, replay_path, path_in_box, offset_path, paths_box
+from zellij.path_tiler import (
+    combine_paths, replay_path, path_in_box, offset_path,
+    path_segments, join_paths, show_path,
+)
 
 SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
@@ -172,25 +175,11 @@ def final():
     draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_final.png')
 
-final()
-
-
-if 0:
-    TILEW = int(DWGW/5)
-    dwg = Drawing(DWGW, DWGW)
-    draw_it(TILEW, dwg, fat=False, offset=5, color=(.7,.7,.7))
-    draw_it(TILEW, dwg, fat=False, offset=-5, color=(.7,.7,.7))
-    #draw_it(TILEW, dwg, fat=False, offset=2.5, color=(.5,.5,.5))
-    #draw_it(TILEW, dwg, fat=False, offset=-2.5, color=(.5,.5,.5))
-    draw_it(TILEW, dwg, fat=False)
-    dwg.write_to_png('three_stars_offset.png')
+#final()
 
 
 def debug_output(dwgw=None, paths=None, segments=None, isects=None):
-    ll, ur = paths_box(paths)
-    dx, dy = int(ur.x - ll.x), int(ur.y - ll.y)
-    dwgdbg = Drawing(dx, dy)
-    dwgdbg.translate(-ll.x, -ll.y)
+    dwgdbg = Drawing(paths=paths)
     with dwgdbg.line_style(rgb=(0, 0, 0), width=1):
         for (x1, y1), (x2, y2) in segments:
             dwgdbg.move_to(x1, y1)
@@ -223,6 +212,47 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
     dwgdbg.write_to_png("debug.png")
 
 
+def path_pieces(path, segs_to_points):
+    """Produce a new series of paths, split at intersection points.
+
+    Yields a series of pieces (paths).  The pieces trace the same line as the
+    original path.  The endpoints of the pieces are all intersection points
+    in `segs_to_points`, or the endpoints of the original path, if it isn't
+    circular.  The pieces are in order along `path`, so consecutive pieces
+    end and begin at the same point. If `path` is closed, then the first piece
+    returned will begin at the first cut, not at the path's first point.
+
+    """
+    # If path is circular, then the first piece we collect has to be added to
+    # the last piece, so save it for later.
+    collecting_head = (path[0] == path[-1])
+    head = None
+
+    piece = []
+    for pt in path:
+        if not piece:
+            piece.append(pt)
+        else:
+            cuts = segs_to_points.get(Segment(piece[-1], pt))
+            if cuts is not None:
+                if len(cuts) > 1:
+                    down = (piece[-1] > pt)
+                    cuts = sorted(cuts, reverse=down)
+                for cut in cuts:
+                    ptcut = Point(*cut)
+                    piece.append(ptcut)
+                    if collecting_head:
+                        head = piece
+                        collecting_head = False
+                    else:
+                        yield piece
+                    piece = [ptcut]
+            piece.append(pt)
+
+    if head:
+        piece = join_paths(piece, head)
+    yield piece
+
 if 1:
     import poly_point_isect
 
@@ -234,24 +264,134 @@ if 1:
     pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
     paths = pt.paths
     paths = combine_paths(pt.paths)
+    paths = [tuple(path) for path in paths]
 
     segments = []
     segs_to_paths = {}
     for path in paths:
-        for p1, p2 in zip(path, path[1:]):
-            segment = (tuple(p1), tuple(p2))
+        for segment in path_segments(path):
             segments.append(segment)
-            segs_to_paths[tuple(sorted(segment))] = path
+            segs_to_paths[segment] = path
 
     isects = poly_point_isect.isect_segments_include_segments(segments)
+    points_to_segments = dict(isects)
     isect_points = [isect[0] for isect in isects]
 
-    paths_to_intersections = collections.defaultdict(list)
+    segs_to_points = collections.defaultdict(list)
+    for pt, segs in points_to_segments.items():
+        for seg in segs:
+            segs_to_points[seg].append(pt)
 
+    points_to_paths = collections.defaultdict(list)
     for isect, segs in isects:
         for seg in segs:
-            paths_to_intersections[tuple(segs_to_paths[tuple(sorted(seg))])].append((seg, isect))
+            points_to_paths[isect].append(segs_to_paths[seg])
 
-    pprint.pprint(paths_to_intersections)
+    print(f"{len(isect_points)} intersections")
 
     debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
+
+    if 0:
+        dwg = Drawing(paths=paths)
+        with dwg.line_style(rgb=(0, 0, 0), width=1):
+            for path in paths:
+                for piece in path_pieces(path, segs_to_points):
+                    replay_path(piece, dwg, gap=.1)
+                    dwg.stroke()
+        dwg.write_to_png("gap.png")
+
+    class Xing:
+        def __init__(self, under=None, over=None):
+            self.under = under
+            self.over = over
+
+        def __repr__(self):
+            return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
+
+    def pieces_under_over(path, segs_to_points, xings):
+        """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
+        pieces = list(path_pieces(path, segs_to_points))
+        for i, piece in enumerate(pieces):
+            xing = xings.get(piece[-1])
+            if xing is None:
+                continue
+            if xing.under == path:
+                over = False
+            elif xing.over == path:
+                over = True
+            elif xing.under is not None:
+                over = True
+            else:
+                assert xing.over is not None
+                over = False
+            ou = [over, not over]
+            if i % 2:
+                ou = ou[::-1]
+            break
+        else:
+            ou = [True, False]
+
+        yield from zip(pieces, itertools.cycle(ou))
+
+    paths_to_do = set(paths)
+    print(f"{len(paths_to_do)} paths to do, {len(paths)} paths")
+    xings = {}      # pt -> xing
+    straps = []     # new smaller paths, ending at unders.
+    while paths_to_do:
+        next_paths = set()
+        next_paths.add(paths_to_do.pop())
+        while next_paths:
+            path = next_paths.pop()
+            last_piece = None
+            last_cut = None
+            for piece, over in pieces_under_over(path, segs_to_points, xings):
+                cut = None
+                if over:
+                    assert last_piece is None
+                    last_piece = piece
+                    if last_cut:
+                        cut = last_cut
+                        xing = xings.get(cut)
+                        if xing is None:
+                            xing = Xing(under=path)
+                            xings[cut] = xing
+                        else:
+                            assert xing.under is None or xing.under == path
+                            xing.under = path
+                        last_cut = None
+                else:
+                    if last_piece:
+                        cut = last_piece[-1]
+                        assert cut == piece[0]
+                        straps.append(join_paths(last_piece, piece))
+                        xing = xings.get(cut)
+                        if xing is None:
+                            xing = Xing(over=path)
+                            xings[cut] = xing
+                        else:
+                            assert xing.over is None or xing.over == path
+                            xing.over = path
+                    else:
+                        straps.append(piece)
+                    last_cut = piece[-1]
+                    last_piece = None
+                if cut:
+                    for next_path in points_to_paths[cut]:
+                        if next_path in paths_to_do:
+                            paths_to_do.remove(next_path)
+                            next_paths.add(next_path)
+            if last_piece:
+                straps.append(last_piece)
+
+    dwg = Drawing(paths=paths)
+    if 0:
+        with dwg.line_style(rgb=(0, 0, 0), width=1):
+            for path in paths:
+                replay_path(path, dwg)
+                dwg.stroke()
+    with dwg.line_style(rgb=(0, 0, 0), width=5):
+        for path in straps:
+            replay_path(path, dwg, gap=.15)
+            dwg.stroke()
+
+    dwg.write_to_png("straps.png")
