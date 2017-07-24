@@ -7,18 +7,45 @@ import math
 
 import cairo
 
-from .path_tiler import replay_path
+from .path_tiler import replay_path, paths_box
 
 
 class Drawing:
-    def __init__(self, width, height, bg=(1, 1, 1)):
+    def __init__(self, width=None, height=None, paths=None, bg=(1, 1, 1)):
+        """Create a new Cairo drawing.
+
+        If `paths` is provided, the drawing is sized and positioned so that all
+        of the paths are included.  Otherwise, provide `width` and `height` to
+        specify a size explicitly.
+
+        `bg` is the background color to paint initially.
+
+        """
+        if paths:
+            (llx, lly), (urx, ury) = paths_box(paths)
+            dx = urx - llx
+            dy = ury - lly
+            margin = max(dx, dy) * .02
+            urx += margin
+            ury += margin
+            llx -= margin
+            lly -= margin
+            width, height = int(urx - llx), int(ury - lly)
+        else:
+            assert width is not None
+            assert height is not None
+
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.ctx = cairo.Context(self.surface)
 
+        if paths:
+            self.translate(-llx, -lly)
+
         # Start with a solid-color canvas.
-        self.set_source_rgb(*bg)
-        self.set_operator(cairo.OPERATOR_SOURCE)
-        self.paint()
+        if bg is not None:
+            self.set_source_rgb(*bg)
+            self.set_operator(cairo.OPERATOR_SOURCE)
+            self.paint()
 
     def __getattr__(self, name):
         """Use the drawing like a context, or a surface."""
