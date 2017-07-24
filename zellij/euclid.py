@@ -93,3 +93,11 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         offx = dy / hyp * distance
         offy = -dx / hyp * distance
         return Line(Point(x1 + offx, y1 + offy), Point(x2 + offx, y2 + offy))
+
+
+class Segment(namedtuple('Segment', 'p1 p2')):
+    def __eq__(self, other):
+        return sorted(self) == sorted(other)
+
+    def __hash__(self):
+        return hash(tuple(sorted(self)))

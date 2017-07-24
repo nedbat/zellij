@@ -5,9 +5,10 @@ import random
 
 from hypothesis import given
 from hypothesis.strategies import lists, randoms, composite, one_of
+import pytest
 
 from zellij.euclid import Point
-from zellij.path_tiler import PathTiler, combine_paths, equal_paths
+from zellij.path_tiler import PathTiler, combine_paths, equal_path, equal_paths, join_paths
 from .hypo_helpers import points
 
 
@@ -107,6 +108,28 @@ def test_rel_line_to():
     assert pt.paths == [
         [Point(1000.0, 2000.0), Point(1100.0, 2200.0)],
     ]
+
+
+@pytest.mark.parametrize("p1, p2, result", [
+    ([Point(0, 0), Point(1, 1)], [Point(1, 1), Point(2, 0), Point(3, 0)],
+            [Point(0, 0), Point(1, 1), Point(2, 0), Point(3, 0)]),
+    ([Point(0, 0), Point(1, 1)], [Point(2, 2), Point(3, 3)],
+            None),
+    ([Point(0, 0), Point(1, 1)], [Point(1, 1), Point(2, 2), Point(3, 0)],
+            [Point(0, 0), Point(2, 2), Point(3, 0)]),
+])
+def test_join_paths(p1, p2, result):
+    def same(p1, p2):
+        if p1 is None and p2 is None:
+            return True
+        elif p1 is None or p2 is None:
+            return False
+        else:
+            return equal_path(p1, p2)
+    assert same(join_paths(p1, p2), result)
+    assert same(join_paths(p1[::-1], p2), result)
+    assert same(join_paths(p1, p2[::-1]), result)
+    assert same(join_paths(p1[::-1], p2[::-1]), result)
 
 
 def point_set(paths):

@@ -6,7 +6,7 @@ import math
 from affine import Affine
 
 from .defuzz import Defuzzer
-from .euclid import collinear, Point, Line
+from .euclid import collinear, Point, Line, Segment
 
 
 class PathTiler:
@@ -200,16 +200,26 @@ def best_join(path, join_point, possibilities):
     return None
 
 def join_paths(p1, p2):
+    """Join `p1` and `p2` together by their common endpoint."""
+    # Find the ends that are the same point. Rearrange p1 and p2 so that p1+p2
+    # is the join we need, and remove the duplicate point at p2[0].
     if p1[-1] == p2[0]:
-        return p1 + p2[1:]
+        p2 = p2[1:]
     elif p1[-1] == p2[-1]:
-        return p1 + p2[-2::-1]
+        p2 = p2[-2::-1]
     elif p1[0] == p2[-1]:
-        return p2 + p1[1:]
+        p1, p2 = p2, p1[1:]
     elif p1[0] == p2[0]:
-        return p1[::-1] + p2[1:]
+        p1, p2 = p1[::-1], p2[1:]
     else:
         return None
+
+    # If the join would have a redundant point because of three collinear
+    # points in a row, then remove the middle point.
+    if collinear(p1[-2], p1[-1], p2[0]):
+        p1 = p1[:-1]
+
+    return p1 + p2
 
 def show_path(path):
     if path is None:
@@ -268,7 +278,7 @@ def combine_paths(paths):
 
 
 def adjacent_pairs(seq):
-    """From e0, e1, e2, e3, ... produce (e0,e1), (e1,e2), (e2, e3), ..."""
+    """From e0, e1, e2, e3, ... produce (e0,e1), (e1,e2), (e2,e3), ..."""
     return zip(seq, itertools.islice(seq, 1, None))
 
 
@@ -315,6 +325,9 @@ def canonicalize_path(path):
     else:
         return min(path, path[::-1])
 
+def equal_path(path1, path2):
+    return canonicalize_path(path1) == canonicalize_path(path2)
+
 def canonicalize_paths(paths):
     """Canonicalize a list of paths."""
     paths = list(canonicalize_path(p) for p in paths)
@@ -324,3 +337,7 @@ def canonicalize_paths(paths):
 def equal_paths(paths1, paths2):
     """Are the paths in paths1 and paths2 equivalent?"""
     return canonicalize_paths(paths1) == canonicalize_paths(paths2)
+
+def path_segments(path):
+    for p1, p2 in adjacent_pairs(path):
+        yield Segment(tuple(p1), tuple(p2))
