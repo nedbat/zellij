@@ -52,9 +52,25 @@ def test_points_collinear(p1, p2, p3, result):
 @given(points, points, t_zero_one)
 def test_hypo_points_collinear(p1, p2, t):
     # If I pick a point that is a linear combination of two points, it should
-    # be considered collinear.
+    # be considered collinear. The value of t determines in what order the
+    # points are collinear.  We check for not-collinear, but only if t is away
+    # from the fuzzy areas near zero and one, and if p1 and p2 are separated.
     p3 = along_the_way(p1, p2, t)
-    assert collinear(p1, p2, p3)
+    if t < 0:
+        assert collinear(p3, p1, p2)
+        if t < 0.01 and p1 != p2:
+            assert not collinear(p1, p3, p2)
+            assert not collinear(p1, p2, p3)
+    elif t <= 1:
+        assert collinear(p1, p3, p2)
+        if 0.01 < t < 0.99 and p1 != p2:
+            assert not collinear(p3, p1, p2)
+            assert not collinear(p1, p2, p3)
+    else:
+        assert collinear(p1, p2, p3)
+        if t > 1.01 and p1 != p2:
+            assert not collinear(p3, p1, p2)
+            assert not collinear(p1, p3, p2)
 
 @given(points, points, t_zero_one)
 def test_hypo_points_not_collinear(p1, p2, t):

@@ -50,7 +50,10 @@ def collinear(p1, p2, p3):
     """Do three points lie on a line?"""
     # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
     (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
-    return math.isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2), abs_tol=1e-6)
+    if ((x1 <= x2 <= x3) or (x1 >= x2 >= x3)) and ((y1 <= y2 <= y3) or (y1 >= y2 >= y3)):
+        return math.isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2), abs_tol=1e-6)
+    else:
+        return False
 
 
 def along_the_way(p1, p2, t):
