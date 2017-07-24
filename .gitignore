@@ -2,6 +2,7 @@ __pycache__
 *.png
 .cache
 .coverage
+htmlcov
 .hypothesis
 *.egg-info
 scratch
