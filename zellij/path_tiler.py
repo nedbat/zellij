@@ -338,6 +338,12 @@ def equal_paths(paths1, paths2):
     """Are the paths in paths1 and paths2 equivalent?"""
     return canonicalize_paths(paths1) == canonicalize_paths(paths2)
 
+def path_length(path):
+    return sum(p1.distance(p2) for p1, p2 in adjacent_pairs(path))
+
+def paths_length(paths):
+    return sum(path_length(path) for path in paths)
+
 def path_segments(path):
     for p1, p2 in adjacent_pairs(path):
         yield Segment(tuple(p1), tuple(p2))

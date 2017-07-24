@@ -1,6 +1,7 @@
 """Test path_tiler.py"""
 
 import collections
+import math
 import random
 
 from hypothesis import given
@@ -8,7 +9,7 @@ from hypothesis.strategies import lists, randoms, composite, one_of
 import pytest
 
 from zellij.euclid import Point
-from zellij.path_tiler import PathTiler, combine_paths, equal_path, equal_paths, join_paths
+from zellij.path_tiler import PathTiler, combine_paths, equal_path, equal_paths, join_paths, paths_length
 from .hypo_helpers import points
 
 
@@ -215,15 +216,19 @@ def test_combine_paths(paths):
 
     # Property: the points in the combined paths should all have been in the
     # original paths.
-    assert point_set(paths) == point_set(combined)
+    assert point_set(paths) >= point_set(combined)
 
     # Property: the combined paths should have no duplicate endpoints.
     the_ends = endpoints(combined)
     assert len(the_ends) == len(set(the_ends))
 
-    # Property: the combined paths should have the same number of segments as
+    # Property: the combined paths should have the same or fewer segments as
     # the original paths.
-    assert num_segments(paths) == num_segments(combined)
+    assert num_segments(paths) >= num_segments(combined)
+
+    # Property: the combined paths should have the same total length as the
+    # original paths.
+    assert math.isclose(paths_length(paths), paths_length(combined))
 
 @given(combinable_paths)
 def test_combine_paths_recursive(paths):
