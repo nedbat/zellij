@@ -15,3 +15,6 @@ clean:
 
 sterile: clean
 	-rm -rf .cache .hypothesis *.egg-info
+
+cloc:
+	cloc --exclude-dir=scratch,htmlcov .
