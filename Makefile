@@ -9,6 +9,9 @@ coverage:
 	coverage run --branch --source=zellij,tests -m py.test
 	coverage report -m
 
+htmlcov: coverage
+	coverage html
+
 clean:
 	-rm -rf __pycache__ */__pycache__ */*/__pycache__ */*/*/__pycache__ */*/*/*/__pycache__ */*/*/*/*/__pycache__
 	-rm -f .coverage
