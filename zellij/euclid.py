@@ -14,6 +14,14 @@ class BadGeometry(Exception):
     """Any exception raised by euclid."""
     pass
 
+class ParallelLines(BadGeometry):
+    """Two lines considered for intersection are parallel."""
+    pass
+
+class CoincidentLines(BadGeometry):
+    """Two lines considered for intersection are the same infinite lines."""
+    pass
+
 
 class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
@@ -46,12 +54,28 @@ class Point(namedtuple("Point", ["x", "y"])):
         return (llx <= x <= urx) and (lly <= y <= ury)
 
 
+def overlap(start1, end1, start2, end2):
+    """Does the range (start1, end1) overlap with (start2, end2)?"""
+    # https://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html
+    return end1 >= start2 and end2 >= start1
+
+
+def line_collinear(x1, y1, x2, y2, x3, y3):
+    """Are three points on the same line, regardless of order?"""
+    return math.isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2), abs_tol=1e-6)
+
+
 def collinear(p1, p2, p3):
-    """Do three points lie on a line?"""
+    """
+    Do three points lie on a line?
+
+    The points must be in order: p2 must be between p1 and p3 for this to
+    return True.
+    """
     # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
     (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
     if ((x1 <= x2 <= x3) or (x1 >= x2 >= x3)) and ((y1 <= y2 <= y3) or (y1 >= y2 >= y3)):
-        return math.isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2), abs_tol=1e-6)
+        return line_collinear(x1, y1, x2, y2, x3, y3)
     else:
         return False
 
@@ -77,7 +101,10 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
         if isclose(denom, 0):
-            raise BadGeometry("Lines don't intersect usefully: denom = {}".format(denom))
+            if line_collinear(x1, y1, x2, y2, x3, y3):
+                raise CoincidentLines("No intersection of identical lines")
+            else:
+                raise ParallelLines("No intersection of parallel lines")
 
         a = x1 * y2 - y1 * x2
         b = x3 * y4 - y3 * x4
@@ -104,3 +131,26 @@ class Segment(namedtuple('Segment', 'p1 p2')):
 
     def __hash__(self):
         return hash(tuple(sorted(self)))
+
+    def intersect(self, other):
+        """
+        Find the point where this Segment and another intersect. Returns None
+        if there is no point of intersection, or BadGeometry if the answer is
+        undefined.
+        """
+        l1 = Line(*self)
+        l2 = Line(*other)
+        try:
+            p = l1.intersect(l2)
+        except ParallelLines:
+            return None
+        except CoincidentLines:
+            # If the segments overlap, BadGeometry, else, None
+            if overlap(self.p1[0], self.p2[0], other.p1[0], other.p2[0]):
+                raise CoincidentLines("Segments overlap")
+            else:
+                return None
+        if collinear(self.p1, p, self.p2) and collinear(other.p1, p, other.p2):
+            return p
+        else:
+            return None

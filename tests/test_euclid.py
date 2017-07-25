@@ -7,7 +7,11 @@ import math
 from hypothesis import given
 import pytest
 
-from zellij.euclid import BadGeometry, collinear, Line, Point, along_the_way
+from zellij.euclid import (
+    Line, Point, Segment,
+    along_the_way, collinear,
+    CoincidentLines, ParallelLines,
+)
 from .hypo_helpers import points, t_zero_one
 
 
@@ -97,16 +101,17 @@ def test_intersect(p1, p2, p3, p4, pi):
     assert l1.intersect(l2).is_close(Point(*pi))
 
 
-@pytest.mark.parametrize("p1, p2, p3, p4", [
+@pytest.mark.parametrize("p1, p2, p3, p4, err", [
     # Two identical lines.
-    ((-1, 0), (1, 0),  (-1, 0), (1, 0)),
+    ((-1, 0), (1, 0),  (-1, 0), (1, 0),  CoincidentLines),
+    ((-1, 0), (1, 0),  (-2, 0), (2, 0),  CoincidentLines),
     # Two parallel lines.
-    ((-1, 0), (1, 0),  (-2, 0), (2, 0)),
+    ((-1, 0), (1, 0),  (-2, 1), (2, 1),  ParallelLines),
 ])
-def test_no_intersection(p1, p2, p3, p4):
+def test_no_intersection(p1, p2, p3, p4, err):
     l1 = Line(Point(*p1), Point(*p2))
     l2 = Line(Point(*p3), Point(*p4))
-    with pytest.raises(BadGeometry):
+    with pytest.raises(err):
         l1.intersect(l2)
 
 
@@ -115,3 +120,30 @@ def test_offset():
     l2 = l1.offset(10)
     assert l2.p1 == Point(18, 4)
     assert l2.p2 == Point(21, 8)
+
+
+# Segments
+
+@pytest.mark.parametrize("p1, p2, p3, p4, isect", [
+    # Good intersection.
+    ((0, 1), (2, 1),  (1, 0), (1, 2),  (1, 1)),
+    # lines intersect, but segments don't.
+    ((0, 1), (2, 1),  (1, 2), (1, 4),  None),
+    ((0, 1), (2, 1),  (3, 0), (3, 2),  None),
+    ((1, 2), (1, 4),  (3, 1), (5, 1),  None),
+    # lines are parallel.
+    ((0, 1), (2, 1),  (1, 3), (3, 3),  None),
+    # lines are coincident, segments don't overlap.
+    ((0, 1), (2, 1),  (3, 1), (5, 1),  None),
+])
+def test_segment_intersection(p1, p2, p3, p4, isect):
+    assert Segment(p1, p2).intersect(Segment(p3, p4)) == isect
+
+
+@pytest.mark.parametrize("p1, p2, p3, p4, err", [
+    # lines are coincident, segments do overlap.
+    ((0, 1), (2, 1),  (1, 1), (3, 1),  CoincidentLines),
+])
+def test_segment_intersection_error(p1, p2, p3, p4, err):
+    with pytest.raises(err):
+        assert Segment(p1, p2).intersect(Segment(p3, p4))
