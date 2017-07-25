@@ -1,6 +1,6 @@
 """Zellij-specific helpers for Hypothesis."""
 
-from hypothesis.strategies import builds, floats, integers, tuples
+from hypothesis.strategies import builds, floats, integers, one_of, tuples
 
 from zellij.euclid import Point
 
@@ -15,4 +15,9 @@ points = builds(Point, i, i)
 
 # A parameter for positioning along a line segment, including beyond the
 # endpoints.
-t_zero_one = floats(min_value=-100, max_value=100, allow_nan=False, allow_infinity=False).filter(lambda f: abs(f) > 1e-4)
+t_zero_one = one_of(
+    # Make half the values be in -1..2:
+    builds(lambda i: i/1000, integers(min_value=-1000, max_value=2000)),
+    # The other half can be wider-ranging:
+    builds(lambda i: i/1000, integers(min_value=-100000, max_value=100000)),
+)
