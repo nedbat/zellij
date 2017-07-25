@@ -233,11 +233,10 @@ def path_pieces(path, segs_to_points):
         if not piece:
             piece.append(pt)
         else:
-            cuts = segs_to_points.get(Segment(piece[-1], pt))
+            seg = Segment(piece[-1], pt)
+            cuts = segs_to_points.get(seg)
             if cuts is not None:
-                if len(cuts) > 1:
-                    down = (piece[-1] > pt)
-                    cuts = sorted(cuts, reverse=down)
+                cuts = seg.sort_along(cuts)
                 for cut in cuts:
                     ptcut = Point(*cut)
                     piece.append(ptcut)

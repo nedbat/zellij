@@ -154,3 +154,11 @@ class Segment(namedtuple('Segment', 'p1 p2')):
             return p
         else:
             return None
+
+    def sort_along(self, points):
+        """Sort `points` so that they are ordered from p1 to p2.
+
+        Assumes that `points` lie on the Segment, but makes no check that they
+        do.
+        """
+        return sorted(points, reverse=(self.p1 > self.p2))

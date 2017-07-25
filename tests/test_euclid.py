@@ -5,6 +5,7 @@ Test euclid.py
 import math
 
 from hypothesis import given
+from hypothesis.strategies import lists, floats
 import pytest
 
 from zellij.euclid import (
@@ -147,3 +148,21 @@ def test_segment_intersection(p1, p2, p3, p4, isect):
 def test_segment_intersection_error(p1, p2, p3, p4, err):
     with pytest.raises(err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
+
+
+@given(points, points, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
+def test_segment_sort_along(p1, p2, tvals):
+    points = [along_the_way(p1, p2, t) for t in tvals]
+    seg = Segment(p1, p2)
+    spoints = seg.sort_along(points)
+
+    assert len(spoints) == len(points)
+    assert all(pt in points for pt in spoints)
+    from zellij.path_tiler import adjacent_pairs
+    original = Point(*p1).distance(Point(*p2))
+    total = (
+        Point(*p1).distance(Point(*spoints[0])) +
+        sum(Point(*p).distance(Point(*q)) for p, q in adjacent_pairs(spoints)) +
+        Point(*spoints[-1]).distance(Point(*p2))
+    )
+    assert math.isclose(total, original)
