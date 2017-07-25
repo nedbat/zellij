@@ -179,12 +179,12 @@ def final():
 
 
 def debug_output(dwgw=None, paths=None, segments=None, isects=None):
-    dwgdbg = Drawing(paths=paths)
-    with dwgdbg.line_style(rgb=(0, 0, 0), width=1):
+    dwg = Drawing(paths=paths)
+    with dwg.line_style(rgb=(0, 0, 0), width=1):
         for (x1, y1), (x2, y2) in segments:
-            dwgdbg.move_to(x1, y1)
-            dwgdbg.line_to(x2, y2)
-            dwgdbg.stroke()
+            dwg.move_to(x1, y1)
+            dwg.line_to(x2, y2)
+            dwg.stroke()
 
     dup_segments = []
     segments.sort()
@@ -192,24 +192,24 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
         if s1 == s2:
             dup_segments.append(s1)
 
-    with dwgdbg.line_style(rgb=(1, 0, 0), width=7):
+    with dwg.line_style(rgb=(1, 0, 0), width=7):
         for (x1, y1), (x2, y2) in dup_segments:
-            dwgdbg.move_to(x1, y1)
-            dwgdbg.line_to(x2, y2)
-            dwgdbg.stroke()
+            dwg.move_to(x1, y1)
+            dwg.line_to(x2, y2)
+            dwg.stroke()
 
     if dwgw is not None:
-        with dwgdbg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
-            dwgdbg.rectangle(0, 0, dwgw, dwgw)
-            dwgdbg.stroke()
+        with dwg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
+            dwg.rectangle(0, 0, dwgw, dwgw)
+            dwg.stroke()
 
     if isects is not None:
-        with dwgdbg.line_style(rgb=(0, 1, 0), width=2):
+        with dwg.line_style(rgb=(0, 1, 0), width=2):
             for pt in isects:
-                dwgdbg.circle(pt[0], pt[1], 5)
-                dwgdbg.stroke()
+                dwg.circle(pt[0], pt[1], 5)
+                dwg.stroke()
 
-    dwgdbg.write_to_png("debug.png")
+    dwg.write_to_png("debug.png")
 
 
 def path_pieces(path, segs_to_points):
