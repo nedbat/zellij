@@ -66,7 +66,7 @@ class Drawing:
         return (self.get_width(), self.get_height())
 
     def circle(self, xc, yc, radius):
-        self.arc(xc, yc, radius, 0, math.pi * 2 - .001)
+        self.arc(xc, yc, radius, 0, math.pi * 2)
 
     def multi_stroke(self, paths, styles):
         for width, color in styles:
