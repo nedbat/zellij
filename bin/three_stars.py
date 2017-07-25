@@ -304,6 +304,7 @@ if 1:
         def __init__(self, under=None, over=None):
             self.under = under
             self.over = over
+            self.over_piece = None
 
         def __repr__(self):
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
@@ -342,13 +343,13 @@ if 1:
         next_paths.add(paths_to_do.pop())
         while next_paths:
             path = next_paths.pop()
-            last_piece = None
+            prev_piece = None
             last_cut = None
             for piece, over in pieces_under_over(path, segs_to_points, xings):
                 cut = None
                 if over:
-                    assert last_piece is None
-                    last_piece = piece
+                    assert prev_piece is None
+                    prev_piece = piece
                     if last_cut:
                         cut = last_cut
                         xing = xings.get(cut)
@@ -360,10 +361,11 @@ if 1:
                             xing.under = path
                         last_cut = None
                 else:
-                    if last_piece:
-                        cut = last_piece[-1]
+                    if prev_piece:
+                        cut = prev_piece[-1]
                         assert cut == piece[0]
-                        straps.append(join_paths(last_piece, piece))
+                        strap = join_paths(prev_piece, piece)
+                        straps.append(strap)
                         xing = xings.get(cut)
                         if xing is None:
                             xing = Xing(over=path)
@@ -371,17 +373,18 @@ if 1:
                         else:
                             assert xing.over is None or xing.over == path
                             xing.over = path
+                        xing.over_piece = strap
                     else:
                         straps.append(piece)
                     last_cut = piece[-1]
-                    last_piece = None
+                    prev_piece = None
                 if cut:
                     for next_path in points_to_paths[cut]:
                         if next_path in paths_to_do:
                             paths_to_do.remove(next_path)
                             next_paths.add(next_path)
-            if last_piece:
-                straps.append(last_piece)
+            if prev_piece:
+                straps.append(prev_piece)
 
     dwg = Drawing(paths=paths)
     if 0:
