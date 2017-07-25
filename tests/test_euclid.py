@@ -13,6 +13,8 @@ from zellij.euclid import (
     along_the_way, collinear,
     CoincidentLines, ParallelLines,
 )
+from zellij.postulates import adjacent_pairs
+
 from .hypo_helpers import points, t_zero_one
 
 
@@ -158,7 +160,6 @@ def test_segment_sort_along(p1, p2, tvals):
 
     assert len(spoints) == len(points)
     assert all(pt in points for pt in spoints)
-    from zellij.path_tiler import adjacent_pairs
     original = Point(*p1).distance(Point(*p2))
     total = (
         Point(*p1).distance(Point(*spoints[0])) +

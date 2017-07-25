@@ -1,12 +1,12 @@
 import collections
 import contextlib
-import itertools
 import math
 
 from affine import Affine
 
 from .defuzz import Defuzzer
 from .euclid import collinear, Point, Line, Segment, along_the_way
+from .postulates import adjacent_pairs
 
 
 class PathTiler:
@@ -285,11 +285,6 @@ def combine_paths(paths):
         combined.append(path)
 
     return combined
-
-
-def adjacent_pairs(seq):
-    """From e0, e1, e2, e3, ... produce (e0,e1), (e1,e2), (e2,e3), ..."""
-    return zip(seq, itertools.islice(seq, 1, None))
 
 
 def offset_path(path, offset):

@@ -5,6 +5,8 @@ Simple 2D Euclidean geometric primitives.
 from collections import namedtuple
 import math
 
+from .postulates import overlap
+
 
 def isclose(a, b):
     return math.isclose(a, b, abs_tol=1e-8)
@@ -52,12 +54,6 @@ class Point(namedtuple("Point", ["x", "y"])):
         llx, lly = ll
         urx, ury = ur
         return (llx <= x <= urx) and (lly <= y <= ury)
-
-
-def overlap(start1, end1, start2, end2):
-    """Does the range (start1, end1) overlap with (start2, end2)?"""
-    # https://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html
-    return end1 >= start2 and end2 >= start1
 
 
 def line_collinear(x1, y1, x2, y2, x3, y3):
