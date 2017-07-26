@@ -3,7 +3,9 @@ A convenience wrapper around Cairo.
 """
 
 import contextlib
+import itertools
 import math
+import sys
 
 import cairo
 
@@ -11,7 +13,7 @@ from .path_tiler import replay_path, paths_box
 
 
 class Drawing:
-    def __init__(self, width=None, height=None, paths=None, bg=(1, 1, 1)):
+    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1)):
         """Create a new Cairo drawing.
 
         If `paths` is provided, the drawing is sized and positioned so that all
@@ -47,6 +49,8 @@ class Drawing:
             self.set_operator(cairo.OPERATOR_SOURCE)
             self.paint()
 
+        self.name = name
+
     def __getattr__(self, name):
         """Use the drawing like a context, or a surface."""
         try:
@@ -79,6 +83,9 @@ class Drawing:
                     self.set_source_rgb(*color)
                 self.stroke()
 
+    def write(self):
+        self.write_to_png(self.name)
+
     @contextlib.contextmanager
     def style(self, rgb=None, width=None, dash=None):
         """Set and restore the drawing style."""
@@ -98,6 +105,17 @@ class Drawing:
             self.set_line_width(o_width)
             self.set_dash(*o_dash)
 
+    def draw_path(self, path, **style_kwargs):
+        with self.style(**style_kwargs):
+            replay_path(path, self)
+            self.stroke()
+
+    def draw_paths(self, paths, **style_kwargs):
+        with self.style(**style_kwargs):
+            for path in paths:
+                replay_path(path, self)
+            self.stroke()
+
     def draw_segments(self, segments, **style_kwargs):
         with self.style(**style_kwargs):
             for (x1, y1), (x2, y2) in segments:
@@ -107,6 +125,46 @@ class Drawing:
 
     def circle_points(self, points, radius=5, **style_kwargs):
         with self.style(**style_kwargs):
-            for pt in points:
-                self.circle(pt[0], pt[1], radius)
+            for x, y in points:
+                self.circle(x, y, radius)
                 self.stroke()
+
+    def fill_points(self, points, radius=5, **style_kwargs):
+        with self.style(**style_kwargs):
+            for x, y in points:
+                self.circle(x, y, radius)
+                self.fill()
+
+    def cross_points(self, points, radius=5, rotate=0, **style_kwargs):
+        with self.style(**style_kwargs):
+            for x, y in points:
+                with self.saved():
+                    self.translate(x, y)
+                    self.rotate(rotate)
+                    self.move_to(radius, 0)
+                    self.line_to(2 * radius, 0)
+                    self.move_to(-radius, 0)
+                    self.line_to(-2 * radius, 0)
+                    self.move_to(0, radius)
+                    self.line_to(0, 2 * radius)
+                    self.move_to(0, -radius)
+                    self.line_to(0, -2 * radius)
+                    self.stroke()
+
+
+class DrawingSequence:
+    def __init__(self, name, *args, **kwargs):
+        self.name = name
+        self.args = args
+        self.kwargs = kwargs
+
+    def __iter__(self):
+        nums = itertools.count()
+        while True:
+            num = next(nums)
+            name = self.name.replace("_", f"_{num:04d}")
+            dwg = Drawing(name=name, *self.args, **self.kwargs)
+            dwg.num = num
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            yield dwg

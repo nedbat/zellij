@@ -6,7 +6,7 @@ import pprint
 import cairo
 
 from zellij.color import random_color, CasaCeramica
-from zellij.drawing import Drawing
+from zellij.drawing import Drawing, DrawingSequence
 from zellij.euclid import Line, Point, Segment
 from zellij.path_tiler import PathTiler
 from zellij.path_tiler import (
@@ -179,7 +179,7 @@ def final():
 
 
 def debug_output(dwgw=None, paths=None, segments=None, isects=None):
-    dwg = Drawing(paths=paths)
+    dwg = Drawing(paths=paths, name="debug.png")
     dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
 
     dup_segments = []
@@ -198,7 +198,7 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
     if isects is not None:
         dwg.circle_points(isects, radius=9, rgb=(0, .5, 0), width=3)
 
-    dwg.write_to_png("debug.png")
+    dwg.write()
 
 
 def path_pieces(path, segs_to_points):
@@ -328,19 +328,54 @@ if 1:
 
         yield from zip(pieces, itertools.cycle(ou))
 
+    if 1:
+        dbgdwgs = iter(DrawingSequence(name="debugs_.png", paths=paths))
+    else:
+        dbgdwgs = None
+
     paths_to_do = set(paths)
+    paths_done = set()
     xings = {}      # pt -> xing
     straps = []     # new smaller paths, ending at unders.
+    path = None
     while paths_to_do:
         next_paths = set()
         skips = [paths_to_do.pop() for _ in range(1)]
         next_paths.add(paths_to_do.pop())
         paths_to_do.update(skips)
         while next_paths:
+            previous_path = path
             path = next_paths.pop()
+
+            if dbgdwgs:
+                dwg = next(dbgdwgs)
+                dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
+                dwg.draw_paths(paths_done, rgb=(0, 0, 0), width=3)
+                dwg.draw_paths(next_paths, rgb=(.7, .7, 0), width=9)
+                if previous_path:
+                    dwg.draw_path(previous_path, rgb=(1, 0, 0), width=10, dash=[30, 30])
+                dwg.draw_path(path, rgb=(1, 0, 0), width=15)
+                dwg.fill_points([path[0]], rgb=(1, 0, 0), radius=15*3/2)
+                dwg.fill_points([path[1]], rgb=(1, 0, 0), radius=15*2/2)
+                partial_over = [pt for pt, xing in xings.items() if xing.under is None]
+                partial_under = [pt for pt, xing in xings.items() if xing.over is None]
+                dwg.circle_points(partial_over, rgb=(.8, 0, 0), radius=21, width=9)
+                dwg.circle_points(partial_under, rgb=(0, 0, .8), radius=21, width=9)
+                done = [pt for pt, xing in xings.items() if xing.under is not None and xing.over is not None]
+                dwg.circle_points(done, rgb=(0, .8, 0), radius=15, width=3)
+
             prev_piece = None
             last_cut = None
+            first_piece = True
             for piece, over in pieces_under_over(path, segs_to_points, xings):
+                if first_piece and dbgdwgs:
+                    dwg.cross_points([piece[0], piece[-1]], radius=20, rgb=(1, 0, 0), width=5)
+                    dwg.write()
+                    if dwg.num > 10:
+                        print()
+                        import sys; sys.exit()
+                    first_piece = False
+
                 cut = None
                 if over:
                     assert prev_piece is None
@@ -379,7 +414,17 @@ if 1:
                             paths_to_do.remove(next_path)
                             next_paths.add(next_path)
             if prev_piece:
-                straps.append(Strap(prev_piece))
+                strap = Strap(prev_piece)
+                straps.append(strap)
+
+            paths_done.add(path)
+
+            if dbgdwgs:
+                dwg.cross_points([piece[0], piece[-1]], radius=20, rotate=45, rgb=(0, 0, 1), width=5)
+                dwg.write()
+                if dwg.num > 10:
+                    print()
+                    import sys; sys.exit()
 
     bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
     debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
@@ -399,7 +444,7 @@ if 1:
             CasaCeramica.Red,
             CasaCeramica.NavyBlue,
         ]
-        dwg = Drawing(paths=paths)#DWGW, DWGW)  #(paths=paths)
+        dwg = Drawing(paths=paths, name="straps.png")#DWGW, DWGW)  #(paths=paths)
         if 0:
             with dwg.style(rgb=(0, 0, 0), width=1):
                 for path in paths:
@@ -418,4 +463,4 @@ if 1:
                     replay_path(side, dwg)
                     dwg.stroke()
 
-        dwg.write_to_png("straps.png")
+        dwg.write()
