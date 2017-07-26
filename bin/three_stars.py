@@ -287,7 +287,7 @@ if 1:
         def __repr__(self):
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
 
-    STRAP_WIDTH = 10
+    STRAP_WIDTH = TILEW / 15
     class Strap:
         def __init__(self, path):
             self.path = path
