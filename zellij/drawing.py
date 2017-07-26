@@ -80,7 +80,8 @@ class Drawing:
                 self.stroke()
 
     @contextlib.contextmanager
-    def line_style(self, rgb=None, width=None, dash=None):
+    def style(self, rgb=None, width=None, dash=None):
+        """Set and restore the drawing style."""
         o_source = self.get_source()
         o_width = self.get_line_width()
         o_dash = self.get_dash()
@@ -96,3 +97,16 @@ class Drawing:
             self.set_source(o_source)
             self.set_line_width(o_width)
             self.set_dash(*o_dash)
+
+    def draw_segments(self, segments, **style_kwargs):
+        with self.style(**style_kwargs):
+            for (x1, y1), (x2, y2) in segments:
+                self.move_to(x1, y1)
+                self.line_to(x2, y2)
+                self.stroke()
+
+    def circle_points(self, points, radius=5, **style_kwargs):
+        with self.style(**style_kwargs):
+            for pt in points:
+                self.circle(pt[0], pt[1], radius)
+                self.stroke()

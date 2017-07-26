@@ -142,7 +142,7 @@ def talk_pictures():
     pt = PathTiler()
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
-    with dwg.line_style(rgb=(1, 0, 0), width=2, dash=[5, 5]):
+    with dwg.style(rgb=(1, 0, 0), width=2, dash=[5, 5]):
         pt.replay_paths(dwg)
         dwg.stroke()
 
@@ -150,7 +150,7 @@ def talk_pictures():
     pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
     pt.reflect_xy(0, 0)
     draw.draw_tile(pt, ())
-    with dwg.line_style(rgb=(0, 0, 0), width=6):
+    with dwg.style(rgb=(0, 0, 0), width=6):
         pt.replay_paths(dwg)
         dwg.stroke()
 
@@ -180,11 +180,7 @@ def final():
 
 def debug_output(dwgw=None, paths=None, segments=None, isects=None):
     dwg = Drawing(paths=paths)
-    with dwg.line_style(rgb=(0, 0, 0), width=1):
-        for (x1, y1), (x2, y2) in segments:
-            dwg.move_to(x1, y1)
-            dwg.line_to(x2, y2)
-            dwg.stroke()
+    dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
 
     dup_segments = []
     segments.sort()
@@ -192,22 +188,15 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
         if s1 == s2:
             dup_segments.append(s1)
 
-    with dwg.line_style(rgb=(1, 0, 0), width=7):
-        for (x1, y1), (x2, y2) in dup_segments:
-            dwg.move_to(x1, y1)
-            dwg.line_to(x2, y2)
-            dwg.stroke()
+    dwg.draw_segments(dup_segments, rgb=(1, 0, 0), width=7)
 
     if dwgw is not None:
-        with dwg.line_style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
+        with dwg.style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
             dwg.rectangle(0, 0, dwgw, dwgw)
             dwg.stroke()
 
     if isects is not None:
-        with dwg.line_style(rgb=(0, .5, 0), width=3):
-            for pt in isects:
-                dwg.circle(pt[0], pt[1], 9)
-                dwg.stroke()
+        dwg.circle_points(isects, radius=9, rgb=(0, .5, 0), width=3)
 
     dwg.write_to_png("debug.png")
 
@@ -292,7 +281,7 @@ if 1:
 
     if 0:
         dwg = Drawing(paths=paths)
-        with dwg.line_style(rgb=(0, 0, 0), width=1):
+        with dwg.style(rgb=(0, 0, 0), width=1):
             for path in paths:
                 for piece in path_pieces(path, segs_to_points):
                     replay_path(piece, dwg, gap=.1)
@@ -412,14 +401,14 @@ if 1:
         ]
         dwg = Drawing(paths=paths)#DWGW, DWGW)  #(paths=paths)
         if 0:
-            with dwg.line_style(rgb=(0, 0, 0), width=1):
+            with dwg.style(rgb=(0, 0, 0), width=1):
                 for path in paths:
                     replay_path(path, dwg)
                     dwg.stroke()
-        with dwg.line_style(rgb=(0, 0, 0), width=1):
+        with dwg.style(rgb=(0, 0, 0), width=1):
             for strap in straps:
                 if 0:
-                    with dwg.line_style(rgb=colors[len(strap.path) % len(colors)]):
+                    with dwg.style(rgb=colors[len(strap.path) % len(colors)]):
                         replay_path(strap.sides[0], dwg)
                         replay_path(strap.sides[1][::-1], dwg, start=False)
                         dwg.close_path()
