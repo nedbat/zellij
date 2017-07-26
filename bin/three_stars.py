@@ -204,9 +204,9 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
             dwg.stroke()
 
     if isects is not None:
-        with dwg.line_style(rgb=(0, 1, 0), width=2):
+        with dwg.line_style(rgb=(0, .5, 0), width=3):
             for pt in isects:
-                dwg.circle(pt[0], pt[1], 5)
+                dwg.circle(pt[0], pt[1], 9)
                 dwg.stroke()
 
     dwg.write_to_png("debug.png")
@@ -255,10 +255,10 @@ def path_pieces(path, segs_to_points):
 if 1:
     import poly_point_isect
 
-    TILEW = int(DWGW/2)
+    TILEW = int(DWGW/1)
     dwg = Drawing(DWGW, DWGW)
     pt = PathTiler()
-    pt.rotate(5)
+    pt.rotate(2)
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
     paths = pt.paths
@@ -344,7 +344,9 @@ if 1:
     straps = []     # new smaller paths, ending at unders.
     while paths_to_do:
         next_paths = set()
+        skips = [paths_to_do.pop() for _ in range(1)]
         next_paths.add(paths_to_do.pop())
+        paths_to_do.update(skips)
         while next_paths:
             path = next_paths.pop()
             prev_piece = None
@@ -390,16 +392,24 @@ if 1:
             if prev_piece:
                 straps.append(Strap(prev_piece))
 
+    bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
+    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
+
     for strap in straps:
         sides = strap.sides
         for end in [0, -1]:
             xing = xings.get(strap.path[end])
             if xing is not None:
-                print(xing)
                 trimmers = xing.over_piece.sides
                 strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
 
     if 1:
+        colors = [
+            CasaCeramica.DarkGreen,
+            CasaCeramica.Yellow,
+            CasaCeramica.Red,
+            CasaCeramica.NavyBlue,
+        ]
         dwg = Drawing(paths=paths)#DWGW, DWGW)  #(paths=paths)
         if 0:
             with dwg.line_style(rgb=(0, 0, 0), width=1):
@@ -408,6 +418,13 @@ if 1:
                     dwg.stroke()
         with dwg.line_style(rgb=(0, 0, 0), width=1):
             for strap in straps:
+                if 0:
+                    with dwg.line_style(rgb=colors[len(strap.path) % len(colors)]):
+                        replay_path(strap.sides[0], dwg)
+                        replay_path(strap.sides[1][::-1], dwg, start=False)
+                        dwg.close_path()
+                        dwg.fill()
+
                 for side in strap.sides:
                     replay_path(side, dwg)
                     dwg.stroke()
