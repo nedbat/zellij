@@ -352,3 +352,22 @@ def paths_length(paths):
 def path_segments(path):
     for p1, p2 in adjacent_pairs(path):
         yield Segment(tuple(p1), tuple(p2))
+
+def seg_path_intersections(segment, path):
+    """Return a list of all the points where segment and path intersect."""
+    for pseg in path_segments(path):
+        pt = segment.intersect(pseg)
+        if pt is not None:
+            yield pt
+
+def trim_path(path, end, trimmers):
+    """Trim one end of path where trimmers (paths) cross it."""
+    seg = Segment(*path[[None, -2][end]:[2, None][end]])
+    cuts = [pt for t in trimmers for pt in seg_path_intersections(seg, t)]
+    cuts = seg.sort_along(cuts)
+    cut = cuts[[-1, 0][end]]
+    if end == 0:
+        path = [cuts[-1]] + path[1:]
+    else:
+        path = path[:-1] + [cuts[0]]
+    return path

@@ -11,7 +11,7 @@ from zellij.euclid import Line, Point, Segment
 from zellij.path_tiler import PathTiler
 from zellij.path_tiler import (
     combine_paths, replay_path, path_in_box, offset_path,
-    path_segments, join_paths, show_path,
+    path_segments, join_paths, show_path, trim_path,
 )
 
 SQRT2 = math.sqrt(2)
@@ -308,6 +308,12 @@ if 1:
         def __repr__(self):
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
 
+    STRAP_WIDTH = 20
+    class Strap:
+        def __init__(self, path):
+            self.path = path
+            self.sides = [offset_path(path, d) for d in [STRAP_WIDTH/2, -STRAP_WIDTH/2]]
+
     def pieces_under_over(path, segs_to_points, xings):
         """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
         pieces = list(path_pieces(path, segs_to_points))
@@ -334,7 +340,6 @@ if 1:
         yield from zip(pieces, itertools.cycle(ou))
 
     paths_to_do = set(paths)
-    print(f"{len(paths_to_do)} paths to do, {len(paths)} paths")
     xings = {}      # pt -> xing
     straps = []     # new smaller paths, ending at unders.
     while paths_to_do:
@@ -363,7 +368,7 @@ if 1:
                     if prev_piece:
                         cut = prev_piece[-1]
                         assert cut == piece[0]
-                        strap = join_paths(prev_piece, piece)
+                        strap = Strap(join_paths(prev_piece, piece))
                         straps.append(strap)
                         xing = xings.get(cut)
                         if xing is None:
@@ -374,7 +379,7 @@ if 1:
                             xing.over = path
                         xing.over_piece = strap
                     else:
-                        straps.append(piece)
+                        straps.append(Strap(piece))
                     last_cut = piece[-1]
                     prev_piece = None
                 if cut:
@@ -383,17 +388,28 @@ if 1:
                             paths_to_do.remove(next_path)
                             next_paths.add(next_path)
             if prev_piece:
-                straps.append(prev_piece)
+                straps.append(Strap(prev_piece))
 
-    dwg = Drawing(paths=paths)
-    if 0:
+    for strap in straps:
+        sides = strap.sides
+        for end in [0, -1]:
+            xing = xings.get(strap.path[end])
+            if xing is not None:
+                print(xing)
+                trimmers = xing.over_piece.sides
+                strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
+
+    if 1:
+        dwg = Drawing(paths=paths)#DWGW, DWGW)  #(paths=paths)
+        if 0:
+            with dwg.line_style(rgb=(0, 0, 0), width=1):
+                for path in paths:
+                    replay_path(path, dwg)
+                    dwg.stroke()
         with dwg.line_style(rgb=(0, 0, 0), width=1):
-            for path in paths:
-                replay_path(path, dwg)
-                dwg.stroke()
-    with dwg.line_style(rgb=(0, 0, 0), width=5):
-        for path in straps:
-            replay_path(path, dwg, gap=.15)
-            dwg.stroke()
+            for strap in straps:
+                for side in strap.sides:
+                    replay_path(side, dwg)
+                    dwg.stroke()
 
-    dwg.write_to_png("straps.png")
+        dwg.write_to_png("straps.png")
