@@ -241,14 +241,12 @@ def path_pieces(path, segs_to_points):
     yield piece
 
 if 1:
-    import poly_point_isect
+    from zellij.intersection import segment_intersections
 
     TILEW = int(DWGW/4.5)
-    dwg = Drawing(DWGW, DWGW)
     pt = PathTiler()
-    pt.rotate(2)
     draw = Draw(TILEW)
-    pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
+    pt.tile_p6m(draw.draw_tile, (DWGW, DWGW), TILEW)
     paths = pt.paths
     paths = combine_paths(pt.paths)
     paths = [tuple(path) for path in paths]
@@ -260,9 +258,8 @@ if 1:
             segments.append(segment)
             segs_to_paths[segment] = path
 
-    isects = poly_point_isect.isect_segments_include_segments(segments)
-    points_to_segments = dict(isects)
-    isect_points = [isect[0] for isect in isects]
+    points_to_segments = segment_intersections(segments)
+    isect_points = list(points_to_segments.keys())
 
     segs_to_points = collections.defaultdict(list)
     for pt, segs in points_to_segments.items():
@@ -270,7 +267,7 @@ if 1:
             segs_to_points[seg].append(pt)
 
     points_to_paths = collections.defaultdict(list)
-    for isect, segs in isects:
+    for isect, segs in points_to_segments.items():
         for seg in segs:
             points_to_paths[isect].append(segs_to_paths[seg])
 
