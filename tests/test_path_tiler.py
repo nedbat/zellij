@@ -10,7 +10,7 @@ import pytest
 
 from zellij.euclid import Point
 from zellij.path_tiler import PathTiler, combine_paths, equal_path, equal_paths, join_paths, paths_length
-from .hypo_helpers import points
+from .hypo_helpers import ipoints
 
 
 def test_do_nothing():
@@ -155,7 +155,7 @@ def endpoints(paths):
 @composite
 def combinable_paths_no_loops(draw):
     """Makes varying-length paths, but no loops."""
-    path_points = draw(lists(points, min_size=2, max_size=200, unique_by=tuple))
+    path_points = draw(lists(ipoints, min_size=2, max_size=200, unique_by=tuple))
     rand = draw(randoms())
 
     paths = [[]]
@@ -179,7 +179,7 @@ def combinable_paths_no_loops(draw):
 @composite
 def combinable_paths_maybe_loops(draw):
     """Makes single-segment paths, with loops a possibility."""
-    endpoints = draw(lists(points, min_size=2, max_size=200, unique_by=tuple))
+    endpoints = draw(lists(ipoints, min_size=2, max_size=200, unique_by=tuple))
     rand = draw(randoms())
     paths = set()
     point_use = collections.defaultdict(int)

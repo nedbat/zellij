@@ -11,7 +11,7 @@ f = floats(min_value=-LIMIT, max_value=LIMIT)
 i = integers(min_value=-LIMIT, max_value=LIMIT)
 
 # Points, on an integer grid to avoid some hairiness with pathological floats.
-points = builds(Point, i, i)
+ipoints = builds(Point, i, i)
 
 # A parameter for positioning along a line segment, including beyond the
 # endpoints.

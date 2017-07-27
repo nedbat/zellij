@@ -15,7 +15,7 @@ from zellij.euclid import (
 )
 from zellij.postulates import adjacent_pairs
 
-from .hypo_helpers import points, t_zero_one
+from .hypo_helpers import ipoints, t_zero_one
 
 
 # Points
@@ -56,7 +56,7 @@ def test_points_collinear(p1, p2, p3, result):
     assert collinear(Point(*p1), Point(*p2), Point(*p3)) == result
 
 
-@given(points, points, t_zero_one)
+@given(ipoints, ipoints, t_zero_one)
 def test_hypo_points_collinear(p1, p2, t):
     # If I pick a point that is a linear combination of two points, it should
     # be considered collinear. The value of t determines in what order the
@@ -79,7 +79,7 @@ def test_hypo_points_collinear(p1, p2, t):
             assert not collinear(p3, p1, p2)
             assert not collinear(p1, p3, p2)
 
-@given(points, points, t_zero_one)
+@given(ipoints, ipoints, t_zero_one)
 def test_hypo_points_not_collinear(p1, p2, t):
     # If I pick a point that is a linear combination of two points, it should
     # not be considered collinear with a line that is offset from the two points.
@@ -152,7 +152,7 @@ def test_segment_intersection_error(p1, p2, p3, p4, err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
 
 
-@given(points, points, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
+@given(ipoints, ipoints, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
 def test_segment_sort_along(p1, p2, tvals):
     points = [along_the_way(p1, p2, t) for t in tvals]
     seg = Segment(p1, p2)
@@ -160,6 +160,7 @@ def test_segment_sort_along(p1, p2, tvals):
 
     assert len(spoints) == len(points)
     assert all(pt in points for pt in spoints)
+
     original = Point(*p1).distance(Point(*p2))
     total = (
         Point(*p1).distance(Point(*spoints[0])) +
