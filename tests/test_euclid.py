@@ -2,9 +2,10 @@
 Test euclid.py
 """
 
+import itertools
 import math
 
-from hypothesis import given
+from hypothesis import example, given
 from hypothesis.strategies import lists, floats
 import pytest
 
@@ -13,9 +14,9 @@ from zellij.euclid import (
     along_the_way, collinear,
     CoincidentLines, ParallelLines,
 )
-from zellij.postulates import adjacent_pairs
+from zellij.postulates import adjacent_pairs, isclose
 
-from .hypo_helpers import ipoints, t_zero_one
+from .hypo_helpers import fpoints, ipoints, t_zero_one
 
 
 # Points
@@ -154,9 +155,12 @@ def test_segment_intersection_error(p1, p2, p3, p4, err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
 
 
-@given(ipoints, ipoints, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
+@given(fpoints, fpoints, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
+@example(p1=Point(-9999.999999998867, 5.59552404411079e-09), p2=Point(-9999.999999998865, 0.0), tvals=[0.01, 0.8673137385253227])
 def test_segment_sort_along(p1, p2, tvals):
+    fuzz = [1e-10, -1e-10]
     points = [along_the_way(p1, p2, t) for t in tvals]
+    points = [Point(x+f, y+f) for (x, y), f in zip(points, itertools.cycle(fuzz))]
     seg = Segment(p1, p2)
     spoints = seg.sort_along(points)
 
@@ -169,4 +173,4 @@ def test_segment_sort_along(p1, p2, tvals):
         sum(Point(*p).distance(Point(*q)) for p, q in adjacent_pairs(spoints)) +
         Point(*spoints[-1]).distance(Point(*p2))
     )
-    assert math.isclose(total, original)
+    assert isclose(total, original)
