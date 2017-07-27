@@ -364,10 +364,10 @@ def trim_path(path, end, trimmers):
     """Trim one end of path where trimmers (paths) cross it."""
     seg = Segment(*path[[None, -2][end]:[2, None][end]])
     cuts = [pt for t in trimmers for pt in seg_path_intersections(seg, t)]
-    cuts = seg.sort_along(cuts)
-    cut = cuts[[-1, 0][end]]
-    if end == 0:
-        path = [cuts[-1]] + path[1:]
-    else:
-        path = path[:-1] + [cuts[0]]
+    if cuts:
+        cuts = seg.sort_along(cuts)
+        if end == 0:
+            path = [cuts[-1]] + path[1:]
+        else:
+            path = path[:-1] + [cuts[0]]
     return path

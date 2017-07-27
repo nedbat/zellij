@@ -1,6 +1,7 @@
 import collections
 import itertools
 import math
+import random
 
 import cairo
 
@@ -243,7 +244,7 @@ def path_pieces(path, segs_to_points):
 if 1:
     from zellij.intersection import segment_intersections
 
-    TILEW = int(DWGW/4.5)
+    TILEW = int(DWGW/3)
     pt = PathTiler()
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_tile, (DWGW, DWGW), TILEW)
@@ -284,11 +285,15 @@ if 1:
         def __repr__(self):
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
 
-    STRAP_WIDTH = TILEW / 15
+    STRAP_WIDTH = TILEW / 30
+    RANDOM_FACTOR = 1.9
     class Strap:
         def __init__(self, path):
             self.path = path
-            self.sides = [offset_path(path, d) for d in [STRAP_WIDTH/2, -STRAP_WIDTH/2]]
+            width = STRAP_WIDTH
+            if RANDOM_FACTOR:
+                width *= (1 + random.random() * RANDOM_FACTOR)
+            self.sides = [offset_path(path, d) for d in [width/2, -width/2]]
 
     def pieces_under_over(path, segs_to_points, xings):
         """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
