@@ -24,4 +24,4 @@ def fbetween(a, b, c):
     if a <= b <= c or a >= b >= c:
         return True
     else:
-        return isclose(a, b) and isclose(b, c)
+        return isclose(a, b) or isclose(b, c)
