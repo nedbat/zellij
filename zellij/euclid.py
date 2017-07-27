@@ -5,11 +5,7 @@ Simple 2D Euclidean geometric primitives.
 from collections import namedtuple
 import math
 
-from .postulates import overlap
-
-
-def isclose(a, b):
-    return math.isclose(a, b, abs_tol=1e-8)
+from .postulates import overlap, fbetween, isclose
 
 
 class BadGeometry(Exception):
@@ -58,7 +54,8 @@ class Point(namedtuple("Point", ["x", "y"])):
 
 def line_collinear(x1, y1, x2, y2, x3, y3):
     """Are three points on the same line, regardless of order?"""
-    return math.isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2), abs_tol=1e-6)
+    # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
+    return isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2))
 
 
 def collinear(p1, p2, p3):
@@ -68,9 +65,8 @@ def collinear(p1, p2, p3):
     The points must be in order: p2 must be between p1 and p3 for this to
     return True.
     """
-    # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
     (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
-    if ((x1 <= x2 <= x3) or (x1 >= x2 >= x3)) and ((y1 <= y2 <= y3) or (y1 >= y2 >= y3)):
+    if fbetween(x1, x2, x3) and fbetween(y1, y2, y3):
         return line_collinear(x1, y1, x2, y2, x3, y3)
     else:
         return False
