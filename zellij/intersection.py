@@ -9,19 +9,26 @@ from .euclid import Segment
 
 def segment_intersections(segments):
     """Returns a dict mapping points to lists of segments."""
-    dfz = Defuzzer()
+    defuzz = Defuzzer().defuzz
     for s in segments:
-        dfz.defuzz(s[0])
-        dfz.defuzz(s[1])
+        defuzz(s[0])
+        defuzz(s[1])
 
-    rot = affine.Affine.rotation(2)
-    rotsegs = [(rot * s[0], rot * s[1]) for s in segments]
-    pt_segments = poly_point_isect.isect_segments_include_segments(rotsegs)
+    # poly_point_isect can fail with AssertionErrors.  Rotating all the
+    # segments avoids them, but different angles work for different sets of
+    # segments.  Try a few until we succeed.  This is super-lame...
+    for angle in [x/2 for x in range(4, 20)]:
+        rot = affine.Affine.rotation(angle)
+        rotsegs = [(rot * s[0], rot * s[1]) for s in segments]
+        try:
+            pt_segments = poly_point_isect.isect_segments_include_segments(rotsegs)
+        except AssertionError:
+            continue
 
-    rot = affine.Affine.rotation(-2)
-    intersections = {}
-    for pt, segs in pt_segments:
-        rotsegs = [Segment(dfz.defuzz(rot * s[0]), dfz.defuzz(rot * s[1])) for s in segs]
-        intersections[rot * pt] = rotsegs
+        rot = affine.Affine.rotation(-angle)
+        intersections = {}
+        for pt, segs in pt_segments:
+            rotsegs = [Segment(defuzz(rot * s[0]), defuzz(rot * s[1])) for s in segs]
+            intersections[rot * pt] = rotsegs
 
-    return intersections
+        return intersections
