@@ -26,10 +26,7 @@ class Point(namedtuple("Point", ["x", "y"])):
     """A point in 2D."""
 
     def __repr__(self):
-        return f"<{self.x:.1f}, {self.y:.1f}>"
-
-    def fullrepr(self):
-        return  f"<{self.x}, {self.y}>"
+        return  f"Point({self.x}, {self.y})"
 
     def is_close(self, other):
         """Are two points close enough to be considered the same?"""
