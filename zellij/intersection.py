@@ -7,6 +7,10 @@ from .defuzz import Defuzzer
 from .euclid import Segment
 
 
+class IntersectionFailure(Exception):
+    pass
+
+
 def segment_intersections(segments):
     """Returns a dict mapping points to lists of segments."""
     defuzz = Defuzzer().defuzz
@@ -17,7 +21,7 @@ def segment_intersections(segments):
     # poly_point_isect can fail with AssertionErrors.  Rotating all the
     # segments avoids them, but different angles work for different sets of
     # segments.  Try a few until we succeed.  This is super-lame...
-    for angle in [x/2 for x in range(4, 20)]:
+    for angle in [x/6 for x in range(6*2, 6*10)]:
         rot = affine.Affine.rotation(angle)
         rotsegs = [(rot * s[0], rot * s[1]) for s in segments]
         try:
@@ -32,3 +36,5 @@ def segment_intersections(segments):
             intersections[rot * pt] = rotsegs
 
         return intersections
+
+    raise IntersectionFailure()
