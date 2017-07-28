@@ -149,8 +149,9 @@ def test_segment_intersection(p1, p2, p3, p4, isect):
 @pytest.mark.parametrize("p1, p2, p3, p4, err", [
     # lines are coincident, segments do overlap.
     ((0, 1), (2, 1),  (1, 1), (3, 1),  CoincidentLines),
+    ((1, -5), (-1, -5), (-5, -5), (0, -5),  CoincidentLines),
 ])
-def test_segment_intersection_error(p1, p2, p3, p4, err):
+def test_segment_intersect_error(p1, p2, p3, p4, err):
     with pytest.raises(err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
 
