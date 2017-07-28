@@ -16,6 +16,10 @@ def adjacent_pairs(seq):
 def overlap(start1, end1, start2, end2):
     """Does the range (start1, end1) overlap with (start2, end2)?"""
     # https://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html
+    if start1 > end1:
+        start1, end1 = end1, start1
+    if start2 > end2:
+        start2, end2 = end2, start2
     return end1 >= start2 and end2 >= start1
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from zellij.postulates import fbetween
+from zellij.postulates import fbetween, overlap
 
 
 @pytest.mark.parametrize("a, b, c, result", [
@@ -16,3 +16,18 @@ from zellij.postulates import fbetween
 ])
 def test_fbetween(a, b, c, result):
     assert fbetween(a, b, c) == result
+
+
+@pytest.mark.parametrize("s1, e1, s2, e2, result", [
+    # Simple cases.
+    (0, 5, 1, 6, True),
+    (0, 5, 10, 15, False),
+    # start and end might be reversed.
+    (5, 0, 1, 6, True),
+    (0, 5, 6, 1, True),
+    (5, 0, 6, 1, True),
+    # Ranges touch.
+    (0, 5, 5, 10, True),
+])
+def test_overlap(s1, e1, s2, e2, result):
+    assert overlap(s1, e1, s2, e2) == result
