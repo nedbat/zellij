@@ -1,4 +1,3 @@
-import itertools
 import math
 import os.path
 import sys
@@ -10,6 +9,7 @@ from hypothesis.strategies import builds, lists, integers, tuples
 from zellij.defuzz import Defuzzer
 from zellij.euclid import collinear, Segment, BadGeometry
 from zellij.intersection import segment_intersections
+from zellij.postulates import all_pairs
 
 
 nums = integers(min_value=-1000, max_value=1000)
@@ -23,7 +23,7 @@ def test_intersections(segments):
     # Check that none of our segment pairs are pathological, and collect the
     # true answers the hard way, by checking pair-wise.
     true = set()
-    for s1, s2 in itertools.combinations(segments, 2):
+    for s1, s2 in all_pairs(segments):
         try:
             ipt = s1.intersect(s2)
             if ipt is not None:

@@ -13,6 +13,11 @@ def adjacent_pairs(seq):
     return zip(seq, itertools.islice(seq, 1, None))
 
 
+def all_pairs(seq):
+    """Produce all pairs from seq, but not (a, a)"""
+    return itertools.combinations(seq, 2)
+
+
 def overlap(start1, end1, start2, end2):
     """Does the range (start1, end1) overlap with (start2, end2)?"""
     # https://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html

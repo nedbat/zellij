@@ -14,7 +14,7 @@ from zellij.euclid import (
     along_the_way, collinear,
     CoincidentLines, ParallelLines,
 )
-from zellij.postulates import adjacent_pairs, isclose
+from zellij.postulates import adjacent_pairs, all_pairs, isclose
 
 from .hypo_helpers import fpoints, ipoints, t_zero_one
 
@@ -169,7 +169,7 @@ def test_segment_sort_along(p1, p2, tvals):
     # Calculate the smallest distance between any pair of points.  If we get
     # the wrong answer from sort_along, then the total distance will be off by
     # at least twice this.
-    min_gap = min(q1.distance(q2) for q1, q2 in itertools.combinations(points + [p1, p2], 2))
+    min_gap = min(q1.distance(q2) for q1, q2 in all_pairs(points + [p1, p2]))
 
     seg = Segment(p1, p2)
     spoints = seg.sort_along(points)

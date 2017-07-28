@@ -2,6 +2,7 @@ import itertools
 import math
 
 from zellij.defuzz import Defuzzer
+from zellij.postulates import all_pairs
 
 from hypothesis import given, example
 from hypothesis.strategies import floats, integers, lists, tuples
@@ -30,7 +31,7 @@ def test_hypo(points):
 
     # No two unequal output values should be too close together.
     if len(points) > 1:
-        for a, b in itertools.combinations(dfz_points, 2):
+        for a, b in all_pairs(dfz_points):
             if a == b:
                 continue
             distance = math.hypot(a[0] - b[0], a[1] - b[1])
