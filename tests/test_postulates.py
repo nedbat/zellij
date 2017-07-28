@@ -1,6 +1,17 @@
 import pytest
 
-from zellij.postulates import fbetween, overlap
+from zellij.postulates import adjacent_pairs, fbetween, overlap
+
+
+@pytest.mark.parametrize("seq, result", [
+    ([1, 2, 3, 4], [(1, 2), (2, 3), (3, 4)]),
+    ([1, 2, 3], [(1, 2), (2, 3)]),
+    ([1, 2], [(1, 2)]),
+    ([1], []),
+    ([], []),
+])
+def test_adjacent_pairs(seq, result):
+    assert list(adjacent_pairs(seq)) == result
 
 
 @pytest.mark.parametrize("a, b, c, result", [
