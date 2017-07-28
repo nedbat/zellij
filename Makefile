@@ -15,6 +15,7 @@ htmlcov: coverage
 clean:
 	-rm -rf __pycache__ */__pycache__ */*/__pycache__ */*/*/__pycache__ */*/*/*/__pycache__ */*/*/*/*/__pycache__
 	-rm -f .coverage
+	-rm -rf htmlcov
 
 sterile: clean
 	-rm -rf .cache .hypothesis *.egg-info
