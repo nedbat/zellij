@@ -285,8 +285,12 @@ if 1:
         def __repr__(self):
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
 
-    STRAP_WIDTH = TILEW / 30
-    RANDOM_FACTOR = 1.9
+    if 0:
+        STRAP_WIDTH = TILEW / 30
+        RANDOM_FACTOR = 1.9
+    else:
+        STRAP_WIDTH = TILEW / 15
+        RANDOM_FACTOR = 0  # 1.9 works
     class Strap:
         def __init__(self, path):
             self.path = path
