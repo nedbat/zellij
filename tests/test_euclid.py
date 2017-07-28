@@ -5,8 +5,8 @@ Test euclid.py
 import itertools
 import math
 
-from hypothesis import example, given
-from hypothesis.strategies import lists, floats
+from hypothesis import assume, example, given
+from hypothesis.strategies import lists, floats, integers
 import pytest
 
 from zellij.euclid import (
@@ -156,12 +156,21 @@ def test_segment_intersect_error(p1, p2, p3, p4, err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
 
 
-@given(fpoints, fpoints, lists(floats(min_value=0.01, max_value=0.99), min_size=1, max_size=5))
-@example(p1=Point(-9999.999999998867, 5.59552404411079e-09), p2=Point(-9999.999999998865, 0.0), tvals=[0.01, 0.8673137385253227])
+@given(ipoints, ipoints, lists(integers(min_value=1, max_value=99), min_size=1, max_size=5, unique=True))
 def test_segment_sort_along(p1, p2, tvals):
+    # Get rid of pathological cases.
+    assume(p1.distance(p2) > 0.001)
+
+    tvals = [t / 100 for t in tvals]
     fuzz = [1e-10, -1e-10]
     points = [along_the_way(p1, p2, t) for t in tvals]
     points = [Point(x+f, y+f) for (x, y), f in zip(points, itertools.cycle(fuzz))]
+
+    # Calculate the smallest distance between any pair of points.  If we get
+    # the wrong answer from sort_along, then the total distance will be off by
+    # at least twice this.
+    min_gap = min(q1.distance(q2) for q1, q2 in itertools.combinations(points + [p1, p2], 2))
+
     seg = Segment(p1, p2)
     spoints = seg.sort_along(points)
 
@@ -174,4 +183,5 @@ def test_segment_sort_along(p1, p2, tvals):
         sum(Point(*p).distance(Point(*q)) for p, q in adjacent_pairs(spoints)) +
         Point(*spoints[-1]).distance(Point(*p2))
     )
-    assert isclose(total, original)
+    # The total distance will be wrong by at least 2*min_gap if it is wrong.
+    assert total - original < 2 * min_gap
