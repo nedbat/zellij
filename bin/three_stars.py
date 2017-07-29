@@ -286,8 +286,8 @@ if 1:
             return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
 
     if 0:
-        STRAP_WIDTH = TILEW / 30
-        RANDOM_FACTOR = 1.9
+        STRAP_WIDTH = TILEW / 60
+        RANDOM_FACTOR = 4.9
     else:
         STRAP_WIDTH = TILEW / 15
         RANDOM_FACTOR = 0  # 1.9 works
