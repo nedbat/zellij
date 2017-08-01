@@ -37,8 +37,9 @@ class Drawing:
             assert width is not None
             assert height is not None
 
-        self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        self.surface = cairo.ImageSurface(cairo.Format.RGB24, width, height)
         self.ctx = cairo.Context(self.surface)
+        self.ctx.set_antialias(cairo.Antialias.BEST)
 
         if paths:
             self.translate(-llx, -lly)
