@@ -136,20 +136,20 @@ if 0:
 DWGW = 800
 
 def talk_pictures():
-    # 883 x 683
+    size = (883, 683)
     TILEW = int(DWGW/3)
 
-    dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+    dwg = Drawing(*size, bg=(.85, .85, .85))
     draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_0.png')
 
 
-    dwg = Drawing(DWGW, DWGW)
+    dwg = Drawing(*size)
     draw_it(TILEW, dwg, fat=False)
     dwg.write_to_png('three_stars_1_thin.png')
 
 
-    dwg = Drawing(DWGW, DWGW)
+    dwg = Drawing(*size)
     draw_it(TILEW, dwg, fat=False, color=(.8, .8, .8))
 
     pt = PathTiler()
@@ -170,12 +170,12 @@ def talk_pictures():
     dwg.write_to_png('three_stars_2_lined.png')
 
 
-    dwg = Drawing(DWGW, DWGW)
+    dwg = Drawing(*size)
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=False, line_width=8)
     dwg.write_to_png('three_stars_3_chaos.png')
 
 
-    dwg = Drawing(DWGW, DWGW)
+    dwg = Drawing(*size)
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.write_to_png('three_stars_4_joined.png')
 
@@ -214,21 +214,24 @@ if 1:
             CasaCeramica.Red,
             CasaCeramica.NavyBlue,
         ]
-        dwg = Drawing(DWGW, DWGW, name="straps.png")
+        dwg = Drawing(DWGW, DWGW, name="straps.png", bg=(.8, .8, .8))
         if 0:
             with dwg.style(rgb=(0, 0, 0), width=1):
                 for path in paths:
                     replay_path(path, dwg)
                     dwg.stroke()
-        with dwg.style(rgb=(0, 0, 0), width=1):
-            for strap in straps:
-                if 0:
-                    with dwg.style(rgb=colors[len(strap.path) % len(colors)]):
-                        replay_path(strap.sides[0], dwg)
-                        replay_path(strap.sides[1][::-1], dwg, start=False)
-                        dwg.close_path()
-                        dwg.fill()
 
+        #with dwg.style(rgb=colors[len(strap.path) % len(colors)]):
+        with dwg.style(rgb=(1, 1, 1)):
+            for strap in straps:
+                if 1:
+                    replay_path(strap.sides[0], dwg)
+                    replay_path(strap.sides[1][::-1], dwg, start=False)
+                    dwg.close_path()
+                    dwg.fill()
+
+        with dwg.style(rgb=(0, 0, 0), width=2):
+            for strap in straps:
                 for side in strap.sides:
                     replay_path(side, dwg)
                     dwg.stroke()
