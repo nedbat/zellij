@@ -24,14 +24,28 @@ class Design:
         pass
 
 
-class Draw:
+class P6mDesign(Design):
     def __init__(self, tilew):
         self.tilew = tilew
+
+    def draw(self, pt, dwg_size, tiler_arg):
+        pt.tile_p6m(self.draw_tile, dwg_size, tiler_arg)
 
     def three_points(self):
         self.top = Point(0, 0)
         self.bottom = Point(0, -self.tilew)
         self.belly = Point(self.tilew * SQRT3 / 4, -self.tilew * .75)
+
+    def draw_triangle(self, dwg):
+        self.three_points()
+        dwg.move_to(*self.top)
+        dwg.line_to(*self.bottom)
+        dwg.line_to(*self.belly)
+        dwg.close_path()
+
+
+class ThreeStarsDesign(P6mDesign):
+    description = "A tiling from Real Alcázar de Sevilla."
 
     def draw_tile(self, dwg):
         self.three_points()
@@ -80,18 +94,11 @@ class Draw:
         dwg.line_to(*foot_top)
         dwg.line_to(*foot_bottom)
 
-    def draw_triangle(self, dwg):
-        self.three_points()
-        dwg.move_to(*self.top)
-        dwg.line_to(*self.bottom)
-        dwg.line_to(*self.belly)
-        dwg.close_path()
-
 
 def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, offset=None):
     pt = PathTiler()
-    draw = Draw(TILEW)
-    pt.tile_p6m(draw.draw_tile, dwg.get_size(), TILEW)
+    draw = ThreeStarsDesign(TILEW)
+    draw.draw(pt, dwg.get_size(), TILEW)
     paths = pt.paths
     if combined:
         paths = combine_paths(pt.paths)
@@ -146,7 +153,7 @@ def talk_pictures():
     draw_it(TILEW, dwg, fat=False, color=(.8, .8, .8))
 
     pt = PathTiler()
-    draw = Draw(TILEW)
+    draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, 0, 0), width=2, dash=[5, 5]):
         pt.replay_paths(dwg)
@@ -155,7 +162,7 @@ def talk_pictures():
     pt = PathTiler()
     pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
     pt.reflect_xy(0, 0)
-    draw.draw_tile(pt, ())
+    draw.draw_tile(pt)
     with dwg.style(rgb=(0, 0, 0), width=6):
         pt.replay_paths(dwg)
         dwg.stroke()
@@ -172,7 +179,7 @@ def talk_pictures():
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.write_to_png('three_stars_4_joined.png')
 
-#talk_pictures()
+talk_pictures()
 
 def final():
     TILEW = int(DWGW/5)
@@ -181,7 +188,7 @@ def final():
     draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_final.png')
 
-#final()
+final()
 
 
 if 1:
@@ -192,8 +199,8 @@ if 1:
         strap_kwargs = dict(width=TILEW / 15, random_factor=0)
 
     pt = PathTiler()
-    draw = Draw(TILEW)
-    pt.tile_p6m(draw.draw_tile, (DWGW, DWGW), TILEW)
+    draw = ThreeStarsDesign(TILEW)
+    draw.draw(pt, (DWGW, DWGW), TILEW)
     paths = pt.paths
     paths = combine_paths(pt.paths)
     paths = [tuple(path) for path in paths]
