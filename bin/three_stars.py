@@ -17,6 +17,13 @@ SQRT2 = math.sqrt(2)
 SQRT3 = math.sqrt(3)
 
 
+class Design:
+    description = None
+
+    def draw(self, dwg):
+        pass
+
+
 class Draw:
     def __init__(self, tilew):
         self.tilew = tilew
@@ -26,7 +33,7 @@ class Draw:
         self.bottom = Point(0, -self.tilew)
         self.belly = Point(self.tilew * SQRT3 / 4, -self.tilew * .75)
 
-    def draw_tile(self, dwg, args):
+    def draw_tile(self, dwg):
         self.three_points()
         border_side = Line(self.top, self.bottom)
         border_shoulder = Line(self.top, self.belly)
@@ -73,7 +80,7 @@ class Draw:
         dwg.line_to(*foot_top)
         dwg.line_to(*foot_bottom)
 
-    def draw_triangle(self, dwg, args):
+    def draw_triangle(self, dwg):
         self.three_points()
         dwg.move_to(*self.top)
         dwg.line_to(*self.bottom)
