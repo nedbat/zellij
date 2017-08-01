@@ -1,6 +1,6 @@
 """Zellij-specific helpers for Hypothesis."""
 
-from hypothesis.strategies import builds, floats, integers, one_of, tuples
+from hypothesis.strategies import builds, floats, integers, one_of
 
 from zellij.euclid import Point
 

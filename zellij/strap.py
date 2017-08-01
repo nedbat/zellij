@@ -195,7 +195,6 @@ def strapify(paths, **strap_kwargs):
     ###- straps, xings
 
     for strap in straps:
-        sides = strap.sides
         for end in [0, -1]:
             xing = xings.get(strap.path[end])
             if xing is not None:

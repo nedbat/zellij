@@ -5,7 +5,7 @@ from zellij.defuzz import Defuzzer
 from zellij.postulates import all_pairs
 
 from hypothesis import given, example
-from hypothesis.strategies import floats, integers, lists, tuples
+from hypothesis.strategies import integers, lists, tuples
 
 from .hypo_helpers import f
 

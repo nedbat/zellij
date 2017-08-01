@@ -5,8 +5,8 @@ Test euclid.py
 import itertools
 import math
 
-from hypothesis import assume, example, given
-from hypothesis.strategies import lists, floats, integers
+from hypothesis import assume, given
+from hypothesis.strategies import lists, integers
 import pytest
 
 from zellij.euclid import (
@@ -14,9 +14,9 @@ from zellij.euclid import (
     along_the_way, collinear,
     CoincidentLines, ParallelLines,
 )
-from zellij.postulates import adjacent_pairs, all_pairs, isclose
+from zellij.postulates import adjacent_pairs, all_pairs
 
-from .hypo_helpers import fpoints, ipoints, t_zero_one
+from .hypo_helpers import ipoints, t_zero_one
 
 
 # Points

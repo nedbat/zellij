@@ -1,15 +1,12 @@
 import itertools
 import math
 
-import cairo
-
 from zellij.color import random_color, CasaCeramica
 from zellij.drawing import Drawing
 from zellij.euclid import Line, Point
-from zellij.path_tiler import PathTiler
 from zellij.path_tiler import (
     combine_paths, replay_path, path_in_box, offset_path,
-    show_path,
+    PathTiler,
 )
 from zellij.strap import strapify
 
@@ -179,7 +176,7 @@ def talk_pictures():
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.write_to_png('three_stars_4_joined.png')
 
-talk_pictures()
+#talk_pictures()
 
 def final():
     TILEW = int(DWGW/5)
@@ -188,7 +185,7 @@ def final():
     draw_it(TILEW, dwg)
     dwg.write_to_png('three_stars_final.png')
 
-final()
+#final()
 
 
 if 1:
