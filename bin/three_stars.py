@@ -274,7 +274,8 @@ if 1:
 
     print(f"{len(isect_points)} intersections")
 
-    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
+    if 0:
+        debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
 
     class Xing:
         def __init__(self, under=None, over=None):
@@ -388,8 +389,9 @@ if 1:
                         xing.over = path
                     xing.over_piece = strap
 
-    bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
-    debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
+    if 0:
+        bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
+        debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
 
     for strap in straps:
         sides = strap.sides
