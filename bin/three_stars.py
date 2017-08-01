@@ -90,7 +90,6 @@ def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, 
         paths = combine_paths(pt.paths)
     if offset is not None:
         paths = [offset_path(p, offset) for p in paths]
-    dwg.set_line_cap(cairo.LineCap.ROUND)
 
     if fat:
         LINE_WIDTH = TILEW / 12
@@ -123,6 +122,7 @@ if 0:
 DWGW = 800
 
 def talk_pictures():
+    # 883 x 683
     TILEW = int(DWGW/3)
 
     dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))

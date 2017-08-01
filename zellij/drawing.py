@@ -40,6 +40,8 @@ class Drawing:
         self.surface = cairo.ImageSurface(cairo.Format.RGB24, width, height)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_antialias(cairo.Antialias.BEST)
+        self.ctx.set_line_cap(cairo.LineCap.ROUND)
+        self.ctx.set_line_join(cairo.LineJoin.MITER)
 
         if paths:
             self.translate(-llx, -lly)
