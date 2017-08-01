@@ -58,6 +58,31 @@ class Drawing:
         except AttributeError:
             return getattr(self.surface, name)
 
+    def _fix_coord(self, v):
+        """Adjust a coordinate to get uniformly drawn lines."""
+        width = self.get_line_width()
+        if width == int(width):
+            if width % 2:
+                return math.floor(v) + 0.5
+            else:
+                return round(v)
+        else:
+            return (math.floor(2 * v) + 0.5) / 2
+
+    def _fix_point(self, x, y):
+        """Adjust a point to get uniformly drawn lines."""
+        dx, dy = self.ctx.user_to_device(x, y)
+        dx = self._fix_coord(dx)
+        dy = self._fix_coord(dy)
+        x, y = self.ctx.device_to_user(dx, dy)
+        return x, y
+
+    def move_to(self, x, y):
+        self.ctx.move_to(*self._fix_point(x, y))
+
+    def line_to(self, x, y):
+        self.ctx.line_to(*self._fix_point(x, y))
+
     @contextlib.contextmanager
     def saved(self):
         self.ctx.save()
