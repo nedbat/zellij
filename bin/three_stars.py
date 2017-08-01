@@ -241,16 +241,42 @@ def path_pieces(path, segs_to_points):
         piece = join_paths(piece, head)
     yield piece
 
+
+class Xing:
+    def __init__(self, under=None, over=None):
+        self.under = under
+        self.over = over
+        self.over_piece = None
+
+    def __repr__(self):
+        return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
+
+class Strap:
+    def __init__(self, path, width, random_factor=0):
+        self.path = path
+        if random_factor:
+            width *= (1 + random.random() * random_factor)
+        self.sides = [offset_path(path, d) for d in [width/2, -width/2]]
+
 if 1:
     from zellij.intersection import segment_intersections
 
+    ###- start
+
     TILEW = int(DWGW/3)
+    if 0:
+        strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
+    else:
+        strap_kwargs = dict(width=TILEW / 15, random_factor=0)
+
     pt = PathTiler()
     draw = Draw(TILEW)
     pt.tile_p6m(draw.draw_tile, (DWGW, DWGW), TILEW)
     paths = pt.paths
     paths = combine_paths(pt.paths)
     paths = [tuple(path) for path in paths]
+
+    ###- paths
 
     segments = []
     segs_to_paths = {}
@@ -272,33 +298,12 @@ if 1:
         for seg in segs:
             points_to_paths[isect].append(segs_to_paths[seg])
 
+    ###- paths, segs_to_points, points_to_paths
+
     print(f"{len(isect_points)} intersections")
 
     if 0:
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
-
-    class Xing:
-        def __init__(self, under=None, over=None):
-            self.under = under
-            self.over = over
-            self.over_piece = None
-
-        def __repr__(self):
-            return f"<Xing under={show_path(self.under)} over={show_path(self.over)}>"
-
-    if 0:
-        STRAP_WIDTH = TILEW / 60
-        RANDOM_FACTOR = 4.9
-    else:
-        STRAP_WIDTH = TILEW / 15
-        RANDOM_FACTOR = 0  # 1.9 works
-    class Strap:
-        def __init__(self, path):
-            self.path = path
-            width = STRAP_WIDTH
-            if RANDOM_FACTOR:
-                width *= (1 + random.random() * RANDOM_FACTOR)
-            self.sides = [offset_path(path, d) for d in [width/2, -width/2]]
 
     def pieces_under_over(path, segs_to_points, xings):
         """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
@@ -356,7 +361,7 @@ if 1:
                     if prev_piece:
                         cut = prev_piece[-1]
                         assert cut == piece[0]
-                        strap = Strap(join_paths(prev_piece, piece))
+                        strap = Strap(join_paths(prev_piece, piece), **strap_kwargs)
                         straps.append(strap)
                         xing = xings.get(cut)
                         if xing is None:
@@ -367,7 +372,7 @@ if 1:
                             xing.over = path
                         xing.over_piece = strap
                     else:
-                        straps.append(Strap(piece))
+                        straps.append(Strap(piece, **strap_kwargs))
                     last_cut = piece[-1]
                     prev_piece = None
                 if cut:
@@ -376,7 +381,7 @@ if 1:
                             paths_to_do.remove(next_path)
                             next_paths.add(next_path)
             if prev_piece:
-                strap = Strap(prev_piece)
+                strap = Strap(prev_piece, **strap_kwargs)
                 straps.append(strap)
                 closed = (path[0] == path[-1])
                 if closed:
@@ -393,6 +398,8 @@ if 1:
         bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
 
+    ###- straps, xings
+
     for strap in straps:
         sides = strap.sides
         for end in [0, -1]:
@@ -400,6 +407,8 @@ if 1:
             if xing is not None:
                 trimmers = xing.over_piece.sides
                 strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
+
+    ###- straps
 
     if 1:
         colors = [
