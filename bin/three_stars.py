@@ -204,33 +204,19 @@ if 1:
 
     straps = strapify(paths, **strap_kwargs)
 
-    if 1:
-        colors = [
-            CasaCeramica.DarkGreen,
-            CasaCeramica.Yellow,
-            CasaCeramica.Red,
-            CasaCeramica.NavyBlue,
-        ]
-        dwg = Drawing(DWGW, DWGW, name="straps.png", bg=(.8, .8, .8))
-        if 0:
-            with dwg.style(rgb=(0, 0, 0), width=1):
-                for path in paths:
-                    replay_path(path, dwg)
-                    dwg.stroke()
+    dwg = Drawing(DWGW, DWGW, name="straps.png", bg=(.8, .8, .8))
 
-        #with dwg.style(rgb=colors[len(strap.path) % len(colors)]):
-        with dwg.style(rgb=(1, 1, 1)):
-            for strap in straps:
-                if 1:
-                    replay_path(strap.sides[0], dwg)
-                    replay_path(strap.sides[1][::-1], dwg, start=False)
-                    dwg.close_path()
-                    dwg.fill()
+    with dwg.style(rgb=(1, 1, 1)):
+        for strap in straps:
+            replay_path(strap.sides[0], dwg)
+            replay_path(strap.sides[1][::-1], dwg, start=False)
+            dwg.close_path()
+            dwg.fill()
 
-        with dwg.style(rgb=(0, 0, 0), width=2):
-            for strap in straps:
-                for side in strap.sides:
-                    replay_path(side, dwg)
-                    dwg.stroke()
+    with dwg.style(rgb=(0, 0, 0), width=2):
+        for strap in straps:
+            for side in strap.sides:
+                replay_path(side, dwg)
+                dwg.stroke()
 
-        dwg.write()
+    dwg.write()
