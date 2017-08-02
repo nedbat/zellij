@@ -19,4 +19,9 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
     ],
+    install_requires=[
+        'affine',
+        #'git+https://github.com/pygobject/pycairo.git',
+        #'git+https://github.com/ideasman42/isect_segments-bentley_ottmann.git',
+    ],
 )
