@@ -37,7 +37,13 @@ class Drawing:
             assert width is not None
             assert height is not None
 
-        self.surface = cairo.ImageSurface(cairo.Format.RGB24, width, height)
+        self.name = name
+
+        self.format = 'svg'
+        if self.format == 'png':
+            self.surface = cairo.ImageSurface(cairo.Format.RGB24, width, height)
+        elif self.format == 'svg':
+            self.surface = cairo.SVGSurface(f"{self.name}.svg", width, height)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_antialias(cairo.Antialias.BEST)
         self.ctx.set_line_cap(cairo.LineCap.ROUND)
@@ -48,11 +54,9 @@ class Drawing:
 
         # Start with a solid-color canvas.
         if bg is not None:
-            self.set_source_rgb(*bg)
-            self.set_operator(cairo.OPERATOR_SOURCE)
-            self.paint()
-
-        self.name = name
+            with self.style(rgb=bg):
+                self.rectangle(0, 0, width, height)
+                self.fill()
 
     def __getattr__(self, name):
         """Use the drawing like a context, or a surface."""
@@ -112,7 +116,11 @@ class Drawing:
                 self.stroke()
 
     def finish(self):
-        self.write_to_png(f"{self.name}.png")
+        if self.format == 'png':
+            self.write_to_png(f"{self.name}.png")
+        elif self.format == 'svg':
+            self.surface.flush()
+            self.surface.finish()
 
     @contextlib.contextmanager
     def style(self, rgb=None, width=None, dash=None):
