@@ -6,7 +6,7 @@ test:
 	pytest
 
 coverage:
-	coverage run --branch --source=zellij,tests -m py.test
+	-coverage run --branch --source=zellij,tests -m py.test
 	coverage report -m
 
 htmlcov: coverage
