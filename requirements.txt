@@ -2,3 +2,4 @@ git+https://github.com/pygobject/pycairo.git
 affine
 pytest
 hypothesis
+pytest-sugar
