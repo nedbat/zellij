@@ -3,3 +3,5 @@ git+https://github.com/ideasman42/isect_segments-bentley_ottmann.git
 pytest
 hypothesis
 pytest-sugar
+pylint
+coverage
