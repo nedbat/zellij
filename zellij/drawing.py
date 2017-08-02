@@ -37,13 +37,15 @@ class Drawing:
             assert width is not None
             assert height is not None
 
+        self.width, self.height = width, height
+
         self.name = name
 
         self.format = 'svg'
         if self.format == 'png':
-            self.surface = cairo.ImageSurface(cairo.Format.RGB24, width, height)
+            self.surface = cairo.ImageSurface(cairo.Format.RGB24, self.width, self.height)
         elif self.format == 'svg':
-            self.surface = cairo.SVGSurface(f"{self.name}.svg", width, height)
+            self.surface = cairo.SVGSurface(f"{self.name}.svg", self.width, self.height)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_antialias(cairo.Antialias.BEST)
         self.ctx.set_line_cap(cairo.LineCap.ROUND)
@@ -55,7 +57,7 @@ class Drawing:
         # Start with a solid-color canvas.
         if bg is not None:
             with self.style(rgb=bg):
-                self.rectangle(0, 0, width, height)
+                self.rectangle(0, 0, self.width, self.height)
                 self.fill()
 
     def __getattr__(self, name):
@@ -99,7 +101,7 @@ class Drawing:
             self.ctx.restore()
 
     def get_size(self):
-        return (self.get_width(), self.get_height())
+        return (self.width, self.height)
 
     def circle(self, xc, yc, radius):
         self.arc(xc, yc, radius, 0, math.pi * 2)
