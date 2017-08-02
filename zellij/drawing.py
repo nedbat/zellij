@@ -111,8 +111,8 @@ class Drawing:
                     self.set_source_rgb(*color)
                 self.stroke()
 
-    def write(self):
-        self.write_to_png(self.name)
+    def finish(self):
+        self.write_to_png(f"{self.name}.png")
 
     @contextlib.contextmanager
     def style(self, rgb=None, width=None, dash=None):

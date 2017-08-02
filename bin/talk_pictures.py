@@ -36,17 +36,17 @@ def talk_pictures():
     size = (883, 683)
     TILEW = int(DWGW/3)
 
-    dwg = Drawing(*size, bg=(.85, .85, .85))
+    dwg = Drawing(*size, name='three_stars_0', bg=(.85, .85, .85))
     draw_it(TILEW, dwg)
-    dwg.write_to_png('three_stars_0.png')
+    dwg.finish()
 
 
-    dwg = Drawing(*size)
+    dwg = Drawing(*size, name='three_stars_1_thin')
     draw_it(TILEW, dwg, fat=False)
-    dwg.write_to_png('three_stars_1_thin.png')
+    dwg.finish()
 
 
-    dwg = Drawing(*size)
+    dwg = Drawing(*size, name='three_stars_2_lined')
     draw_it(TILEW, dwg, fat=False, color=(.8, .8, .8))
 
     pt = PathTiler()
@@ -64,24 +64,24 @@ def talk_pictures():
         pt.replay_paths(dwg)
         dwg.stroke()
 
-    dwg.write_to_png('three_stars_2_lined.png')
+    dwg.finish()
 
 
-    dwg = Drawing(*size)
+    dwg = Drawing(*size, name='three_stars_3_chaos')
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=False, line_width=8)
-    dwg.write_to_png('three_stars_3_chaos.png')
+    dwg.finish()
 
 
-    dwg = Drawing(*size)
+    dwg = Drawing(*size, name='three_stars_4_joined')
     draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
-    dwg.write_to_png('three_stars_4_joined.png')
+    dwg.finish()
 
 def final():
     TILEW = int(DWGW/5)
 
-    dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85))
+    dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85), name='three_stars_final')
     draw_it(TILEW, dwg)
-    dwg.write_to_png('three_stars_final.png')
+    dwg.finish()
 
 
 if __name__ == '__main__':

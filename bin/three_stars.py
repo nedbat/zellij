@@ -22,7 +22,7 @@ paths = [tuple(path) for path in paths]
 
 straps = strapify(paths, **strap_kwargs)
 
-dwg = Drawing(DWGW, DWGW, name="straps.png", bg=(.8, .8, .8))
+dwg = Drawing(DWGW, DWGW, name="straps", bg=(.8, .8, .8))
 
 with dwg.style(rgb=(1, 1, 1)):
     for strap in straps:
@@ -37,4 +37,4 @@ with dwg.style(rgb=(0, 0, 0), width=2):
             replay_path(side, dwg)
             dwg.stroke()
 
-dwg.write()
+dwg.finish()
