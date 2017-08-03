@@ -38,10 +38,9 @@ class Drawing:
             assert height is not None
 
         self.width, self.height = width, height
-
         self.name = name
-
         self.format = format
+
         if self.format == 'png':
             self.surface = cairo.ImageSurface(cairo.Format.RGB24, self.width, self.height)
         elif self.format == 'svg':
