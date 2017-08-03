@@ -31,18 +31,16 @@ class BreathDesign(PmmDesign):
         dwg.line_to(*ssw)
         dwg.line_to(*south)
 
-dwg = Drawing(DWGW, DWGW)
+dwg = Drawing(DWGW, DWGW, name="breathing")
 pt = PathTiler()
 draw = BreathDesign(TILEW)
 draw.draw(pt, dwg.get_size())
-
 paths = combine_paths(pt.paths)
 
-dwg.set_line_cap(cairo.LineCap.ROUND)
 dwg.multi_stroke(paths, [
     #(LINE_WIDTH, (0, 0, 0)),
     (LINE_WIDTH-2, random_color),
     #(7, (0, 0, 0)),
     (5, (1, 1, 1)),
 ])
-dwg.write_to_png('breathing.png')
+dwg.finish()

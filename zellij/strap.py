@@ -70,6 +70,8 @@ def path_pieces(path, segs_to_points):
 def strapify(paths, **strap_kwargs):
     """Turn paths intro straps."""
 
+    paths = [tuple(path) for path in paths]
+
     ###- paths
 
     segments = []

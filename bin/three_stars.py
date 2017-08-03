@@ -18,15 +18,14 @@ def main(strap_width):
     else:
         strap_kwargs = dict(width=TILEW * strap_width / 100, random_factor=0)
 
+    dwg = Drawing(DWGW, DWGW, name="straps", bg=(.8, .8, .8))
     pt = PathTiler()
     draw = ThreeStarsDesign(TILEW)
-    draw.draw(pt, (DWGW, DWGW))
+    draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
-    paths = [tuple(path) for path in paths]
 
     straps = strapify(paths, **strap_kwargs)
 
-    dwg = Drawing(DWGW, DWGW, name="straps", bg=(.8, .8, .8))
 
     with dwg.style(rgb=(1, 1, 1)):
         for strap in straps:
