@@ -31,7 +31,7 @@ def main(strap_width):
     with dwg.style(rgb=(1, 1, 1)):
         for strap in straps:
             replay_path(strap.sides[0], dwg)
-            replay_path(strap.sides[1][::-1], dwg, start=False)
+            replay_path(strap.sides[1][::-1], dwg, append=True)
             dwg.close_path()
             dwg.fill()
 
