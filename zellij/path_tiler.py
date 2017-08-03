@@ -5,7 +5,7 @@ import math
 from affine import Affine
 
 from .defuzz import Defuzzer
-from .euclid import collinear, Point, Line, Segment, along_the_way
+from .euclid import collinear, Point, Line, Segment
 from .postulates import adjacent_pairs
 
 
@@ -161,24 +161,16 @@ class PathTiler:
             replay_path(path, ctx)
 
 
-def replay_path(path, ctx, gap=0, append=False):
-    if gap:
-        p0 = along_the_way(path[0], path[1], gap)
-    else:
-        p0 = path[0]
+def replay_path(path, ctx, append=False):
+    (ctx.line_to if append else ctx.move_to)(*path[0])
 
-    (ctx.line_to if append else ctx.move_to)(*p0)
     for pt in path[1:-1]:
         ctx.line_to(*pt)
 
-    if path[-1] == path[0] and not gap:
+    if path[-1] == path[0]:
         ctx.close_path()
     else:
-        if gap:
-            plast = along_the_way(path[-2], path[-1], 1-gap)
-        else:
-            plast = path[-1]
-        ctx.line_to(*plast)
+        ctx.line_to(*path[-1])
 
 
 def path_in_box(path, ll, ur):
