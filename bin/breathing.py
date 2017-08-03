@@ -1,40 +1,40 @@
+import cairo
+
 from zellij.color import random_color
+from zellij.design.base import PmmDesign
 from zellij.drawing import Drawing
 from zellij.euclid import Line, Point
 from zellij.path_tiler import PathTiler
 from zellij.path_tiler import combine_paths
 
-import cairo
-
 
 DWGW = 800
-TILEW = int(DWGW/5)
+TILEW = int(DWGW/8)
 LINE_WIDTH = TILEW/4
 
-def draw_tile(dwg, args):
-    TILEW, = args
-    t2 = TILEW/2
-    west = Point(0, t2)
-    south = Point(t2, 0)
-    sqw = west.distance(south)
-    southwest = Point(t2-sqw/2, t2-sqw/2)
-    diagonal = Line(west, south)
-    vert = Line(Point(t2-sqw/2, 0), southwest)
-    horz = Line(southwest, Point(0, t2-sqw/2))
+class BreathDesign(PmmDesign):
+    def draw_tile(self, dwg):
+        west = Point(0, self.tilew)
+        south = Point(self.tilew, 0)
+        sqw = west.distance(south)
+        southwest = Point(self.tilew-sqw/2, self.tilew-sqw/2)
+        diagonal = Line(west, south)
+        vert = Line(Point(self.tilew-sqw/2, 0), southwest)
+        horz = Line(southwest, Point(0, self.tilew-sqw/2))
 
-    wsw = diagonal.intersect(vert)
-    ssw = diagonal.intersect(horz)
+        wsw = diagonal.intersect(vert)
+        ssw = diagonal.intersect(horz)
 
-    dwg.move_to(*west)
-    dwg.line_to(*wsw)
-    dwg.line_to(*southwest)
-    dwg.line_to(*ssw)
-    dwg.line_to(*south)
+        dwg.move_to(*west)
+        dwg.line_to(*wsw)
+        dwg.line_to(*southwest)
+        dwg.line_to(*ssw)
+        dwg.line_to(*south)
 
 dwg = Drawing(DWGW, DWGW)
 pt = PathTiler()
-
-pt.tile_pmm(draw_tile, dwg.get_size(), TILEW//2, TILEW//2, args=(TILEW,))
+draw = BreathDesign(TILEW)
+draw.draw(pt, dwg.get_size())
 
 paths = combine_paths(pt.paths)
 

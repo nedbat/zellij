@@ -20,7 +20,7 @@ def main(strap_width):
 
     pt = PathTiler()
     draw = ThreeStarsDesign(TILEW)
-    draw.draw(pt, (DWGW, DWGW), TILEW)
+    draw.draw(pt, (DWGW, DWGW))
     paths = combine_paths(pt.paths)
     paths = [tuple(path) for path in paths]
 

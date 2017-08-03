@@ -12,12 +12,26 @@ class Design:
         pass
 
 
-class P6mDesign(Design):
+class PmmDesign(Design):
+    """A design with four-fold reflection symmetry."""
     def __init__(self, tilew):
         self.tilew = tilew
 
-    def draw(self, pt, dwg_size, tiler_arg):
-        pt.tile_p6m(self.draw_tile, dwg_size, tiler_arg)
+    def tileh(self):
+        return self.tilew
+
+    def draw(self, pt, dwg_size):
+        pt.tile_pmm(self.draw_tile, dwg_size, self.tilew, self.tileh())
+
+
+class P6mDesign(Design):
+    """A design with six-fold rotational symmetry."""
+
+    def __init__(self, tilew):
+        self.tilew = tilew
+
+    def draw(self, pt, dwg_size):
+        pt.tile_p6m(self.draw_tile, dwg_size, self.tilew)
 
     def three_points(self):
         self.top = Point(0, 0)
