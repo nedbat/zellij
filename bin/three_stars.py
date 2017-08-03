@@ -4,7 +4,7 @@ from zellij.drawing import Drawing
 from zellij.path_tiler import combine_paths, replay_path, PathTiler
 from zellij.strap import strapify
 
-from zellij.design.threestars import ThreeStarsDesign
+from zellij.design import get_design
 
 
 @click.command()
@@ -20,7 +20,8 @@ def main(strap_width):
 
     dwg = Drawing(DWGW, DWGW, name="straps", bg=(.8, .8, .8))
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
+    design_class = get_design('threestars')
+    draw = design_class(TILEW)
     draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
 
