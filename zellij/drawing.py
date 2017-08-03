@@ -13,7 +13,7 @@ from .path_tiler import replay_path, paths_box
 
 
 class Drawing:
-    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1)):
+    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1), format='png'):
         """Create a new Cairo drawing.
 
         If `paths` is provided, the drawing is sized and positioned so that all
@@ -41,7 +41,7 @@ class Drawing:
 
         self.name = name
 
-        self.format = 'svg'
+        self.format = format
         if self.format == 'png':
             self.surface = cairo.ImageSurface(cairo.Format.RGB24, self.width, self.height)
         elif self.format == 'svg':
