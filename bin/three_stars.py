@@ -8,14 +8,15 @@ from zellij.design.threestars import ThreeStarsDesign
 
 
 @click.command()
-def main():
+@click.option("--strap-width", type=float, default=6)
+def main(strap_width):
     DWGW = 800
 
     TILEW = int(DWGW/3)
     if 0:
         strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
     else:
-        strap_kwargs = dict(width=TILEW / 15, random_factor=0)
+        strap_kwargs = dict(width=TILEW * strap_width / 100, random_factor=0)
 
     pt = PathTiler()
     draw = ThreeStarsDesign(TILEW)

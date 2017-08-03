@@ -17,7 +17,7 @@ class ThreeStarsDesign(P6mDesign):
         border_shoulder = Line(self.top, self.belly)
         border_foot = Line(self.belly, self.bottom)
 
-        offset = self.tilew/8
+        offset = self.tilew / 8
         side_line = border_side.offset(-offset)
         shoulder_line = border_shoulder.offset(offset)
         foot_line = border_foot.offset(offset)
