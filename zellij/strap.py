@@ -67,6 +67,32 @@ def path_pieces(path, segs_to_points):
     yield piece
 
 
+def pieces_under_over(path, segs_to_points, xings):
+    """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
+    pieces = list(path_pieces(path, segs_to_points))
+    for i, piece in enumerate(pieces):
+        xing = xings.get(piece[-1])
+        if xing is None:
+            continue
+        if xing.under == path:
+            over = False
+        elif xing.over == path:
+            over = True
+        elif xing.under is not None:
+            over = True
+        else:
+            assert xing.over is not None
+            over = False
+        ou = [over, not over]
+        if i % 2:
+            ou = ou[::-1]
+        break
+    else:
+        ou = [True, False]
+
+    yield from zip(pieces, itertools.cycle(ou))
+
+
 def strapify(paths, **strap_kwargs):
     """Turn paths intro straps."""
 
@@ -100,31 +126,6 @@ def strapify(paths, **strap_kwargs):
 
     if 0:
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
-
-    def pieces_under_over(path, segs_to_points, xings):
-        """Produce all the pieces of the path, with a bool indicating if each leads to under or over."""
-        pieces = list(path_pieces(path, segs_to_points))
-        for i, piece in enumerate(pieces):
-            xing = xings.get(piece[-1])
-            if xing is None:
-                continue
-            if xing.under == path:
-                over = False
-            elif xing.over == path:
-                over = True
-            elif xing.under is not None:
-                over = True
-            else:
-                assert xing.over is not None
-                over = False
-            ou = [over, not over]
-            if i % 2:
-                ou = ou[::-1]
-            break
-        else:
-            ou = [True, False]
-
-        yield from zip(pieces, itertools.cycle(ou))
 
     paths_to_do = set(paths)
     xings = {}      # pt -> xing
