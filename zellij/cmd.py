@@ -32,12 +32,12 @@ def main():
 
 @main.command()
 @common_options('drawing')
-@click.option("--strap-width", type=float, default=6)
+@click.option("--strap-width", type=float, default=6, help='Width of the strap, in tile-percent')
 def straps(**opt):
     DWGW = 800
 
     TILEW = int(DWGW/opt['tiles'])
-    if 0:
+    if opt['strap_width'] < 0:
         strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
     else:
         strap_kwargs = dict(width=TILEW * opt['strap_width'] / 100, random_factor=0)
