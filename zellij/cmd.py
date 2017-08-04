@@ -8,11 +8,20 @@ from zellij.path_tiler import combine_paths, replay_path, PathTiler
 from zellij.strap import strapify
 
 
+def size_type(s):
+    """For specifying the size: either WxH, or W (square)"""
+    if 'x' in s:
+        width, height = s.split('x')
+    else:
+        width = height = s
+
+    return int(width.strip()), int(height.strip())
+
 _common_options = {
     'drawing': [
         click.option('--output', default='drawing.png', help='File name to write to'),
-        click.option('--tiles', type=float, default=4, help='How many tiles to fit in the drawing'),
-        click.option('--size', default='dsize'),
+        click.option('--tiles', type=float, default=3, help='How many tiles to fit in the drawing'),
+        click.option('--size', type=size_type, default='800', help='Size of the output'),
         click.option('--format', default='png'),
         click.argument('design'),
     ],
@@ -34,15 +43,15 @@ def main():
 @common_options('drawing')
 @click.option("--strap-width", type=float, default=6, help='Width of the strap, in tile-percent')
 def straps(**opt):
-    DWGW = 800
+    width, height = opt['size']
 
-    TILEW = int(DWGW/opt['tiles'])
+    TILEW = int(width/opt['tiles'])
     if opt['strap_width'] < 0:
         strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
     else:
         strap_kwargs = dict(width=TILEW * opt['strap_width'] / 100, random_factor=0)
 
-    dwg = Drawing(DWGW, DWGW, name="straps", bg=(.8, .8, .8))
+    dwg = Drawing(width, height, name="straps", bg=(.8, .8, .8))
     pt = PathTiler()
     design_class = get_design(opt['design'])
     draw = design_class(TILEW)
