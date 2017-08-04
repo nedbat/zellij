@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name='zellij',
     version='0.1.0',
-    license='MIT',
+    license='Apache 2',
     description='Islamic tiling toy',
     author='Ned Batchelder',
     author_email='ned@nedbatchelder.com',
