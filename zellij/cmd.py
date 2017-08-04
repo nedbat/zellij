@@ -41,15 +41,15 @@ def main():
 
 @main.command()
 @common_options('drawing')
-@click.option("--strap-width", type=float, default=6, help='Width of the strap, in tile-percent')
+@click.option("--strap-width", type=float, default=6, help='Width of the straps, in tile-percent')
 def straps(**opt):
     width, height = opt['size']
 
     TILEW = int(width/opt['tiles'])
-    if opt['strap_width'] < 0:
-        strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
-    else:
+    if opt['strap_width'] > 0:
         strap_kwargs = dict(width=TILEW * opt['strap_width'] / 100, random_factor=0)
+    else:
+        strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
 
     dwg = Drawing(width, height, name="straps", bg=(.8, .8, .8))
     pt = PathTiler()
