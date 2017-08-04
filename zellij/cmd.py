@@ -68,6 +68,5 @@ def straps(**opt):
 
 @main.command()
 @common_options('drawing')
-def two(**kwargs):
-    print(kwargs)
-    print('two')
+def show_opts(**opt):
+    print(opt)
