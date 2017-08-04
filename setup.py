@@ -25,4 +25,8 @@ setup(
         #'git+https://github.com/pygobject/pycairo.git',
         #'git+https://github.com/ideasman42/isect_segments-bentley_ottmann.git',
     ],
+    entry_points='''
+        [console_scripts]
+        zellij=zellij.cmd:main
+    ''',
 )
