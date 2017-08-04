@@ -2,6 +2,7 @@
 
 import click
 
+from zellij.color import random_color
 from zellij.design import get_design
 from zellij.drawing import Drawing
 from zellij.path_tiler import combine_paths, replay_path, PathTiler
@@ -74,6 +75,31 @@ def straps(**opt):
                 dwg.stroke()
 
     dwg.finish()
+
+@main.command()
+@common_options('drawing')
+def candystripe(**opt):
+    width, height = opt['size']
+
+    TILEW = int(width/opt['tiles'])
+
+    dwg = Drawing(width, height, name="candy")
+    pt = PathTiler()
+    design_class = get_design(opt['design'])
+    draw = design_class(TILEW)
+    draw.draw(pt, dwg.get_size())
+    paths = combine_paths(pt.paths)
+
+    LINE_WIDTH = TILEW/4
+
+    dwg.multi_stroke(paths, [
+        #(LINE_WIDTH, (0, 0, 0)),
+        (LINE_WIDTH-2, random_color),
+        #(7, (0, 0, 0)),
+        (5, (1, 1, 1)),
+    ])
+    dwg.finish()
+
 
 @main.command()
 @common_options('drawing')
