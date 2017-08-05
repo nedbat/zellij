@@ -37,10 +37,10 @@ def common_options(category):
     return _wrapper
 
 @click.group()
-def main():
+def clickmain():
     pass
 
-@main.command()
+@clickmain.command()
 @common_options('drawing')
 @click.option("--strap-width", type=float, default=6, help='Width of the straps, in tile-percent')
 def straps(**opt):
@@ -76,7 +76,7 @@ def straps(**opt):
 
     dwg.finish()
 
-@main.command()
+@clickmain.command()
 @common_options('drawing')
 def candystripe(**opt):
     width, height = opt['size']
@@ -101,7 +101,16 @@ def candystripe(**opt):
     dwg.finish()
 
 
-@main.command()
+@clickmain.command()
 @common_options('drawing')
 def show_opts(**opt):
     print(opt)
+
+
+def main():
+    # A Python main so we can eventually do some clean top-level exception handling.
+    try:
+        clickmain()
+    except:
+        #print("Whoops!")
+        raise
