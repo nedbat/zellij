@@ -115,22 +115,6 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         return Line(Point(x1 + offx, y1 + offy), Point(x2 + offx, y2 + offy))
 
 
-def point_cmp(p1, p2):
-    """Compare two points, returning -1, 0, or 1.
-
-    $(*&#$%@! float fuzziness is going to be the death of me.
-    """
-    (x1, y1), (x2, y2) = p1, p2
-    if isclose(x1, x2):
-        if isclose(y1, y2):
-            return 0
-        else:
-            return 1 if y1 > y2 else -1
-    else:
-        return 1 if x1 > x2 else -1
-
-point_key = functools.cmp_to_key(point_cmp)
-
 class Segment(namedtuple('Segment', 'p1 p2')):
     def __eq__(self, other):
         return sorted(self) == sorted(other)
@@ -167,4 +151,4 @@ class Segment(namedtuple('Segment', 'p1 p2')):
         Assumes that `points` lie on the Segment, but makes no check that they
         do.
         """
-        return sorted(points, reverse=(point_cmp(self.p1, self.p2) == 1), key=point_key)
+        return sorted(points, key=lambda p: self.p1.distance(p))
