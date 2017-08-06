@@ -4,7 +4,7 @@ import affine
 import poly_point_isect
 
 from .defuzz import Defuzzer
-from .euclid import Segment
+from .euclid import Point, Segment
 
 
 class IntersectionFailure(Exception):
@@ -33,7 +33,7 @@ def segment_intersections(segments):
         intersections = {}
         for pt, segs in pt_segments:
             rotsegs = [Segment(defuzz(rot * s[0]), defuzz(rot * s[1])) for s in segs]
-            intersections[rot * pt] = rotsegs
+            intersections[Point(*(rot * pt))] = rotsegs
 
         return intersections
 
