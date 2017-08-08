@@ -114,3 +114,7 @@ def main():
     except:
         #print("Whoops!")
         raise
+
+
+if __name__ == '__main__':
+    main()
