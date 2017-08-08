@@ -36,6 +36,7 @@ class Drawing:
         else:
             assert width is not None
             assert height is not None
+            llx = lly = 0
 
         self.width, self.height = width, height
         self.name = name
@@ -56,7 +57,7 @@ class Drawing:
         # Start with a solid-color canvas.
         if bg is not None:
             with self.style(rgb=bg):
-                self.rectangle(0, 0, self.width, self.height)
+                self.rectangle(llx, lly, self.width, self.height)
                 self.fill()
 
     def __getattr__(self, name):
