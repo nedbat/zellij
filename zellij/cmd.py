@@ -57,6 +57,15 @@ def common_options(category):
 def clickmain():
     pass
 
+def debug_world(paths, width, height):
+    dwg = Drawing(paths=paths, name="debug_world")
+    with dwg.style(rgb=(.95, .95, .95)):
+        dwg.rectangle(0, 0, width, height)
+        dwg.fill()
+    dwg.draw_paths(paths, width=1, rgb=(1, 0, 0))
+    dwg.finish()
+    print("Wrote debug_world.png")
+
 @clickmain.command()
 @common_options('common')
 @common_options('drawing')
@@ -76,6 +85,9 @@ def straps(**opt):
     draw = design_class(TILEW)
     draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
+
+    if 'world' in opt['debug']:
+        debug_world(paths, width, height)
 
     straps = strapify(paths, **strap_kwargs)
 
