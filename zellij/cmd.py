@@ -1,5 +1,8 @@
 """Command-line interface for Zellij."""
 
+import pprint
+import re
+
 import click
 
 from zellij.color import random_color
@@ -18,7 +21,21 @@ def size_type(s):
 
     return int(width.strip()), int(height.strip())
 
+DEBUGS = ['opts', 'world']
+
+def debug_type(s):
+    # I am certain there's a better way to get click to do this...
+    debugs = [sp.strip() for sp in re.split(r"[ ,;]+", s)]
+    for d in debugs:
+        if d not in DEBUGS:
+            raise click.BadOptionUsage(f"--debug={d}??")
+    return debugs
+
+
 _common_options = {
+    'common':[
+        click.option('--debug', type=debug_type),
+    ],
     'drawing': [
         click.option('--output', default='drawing.png', help='File name to write to'),
         click.option('--tiles', type=float, default=3, help='How many tiles to fit in the drawing'),
@@ -41,6 +58,7 @@ def clickmain():
     pass
 
 @clickmain.command()
+@common_options('common')
 @common_options('drawing')
 @click.option("--strap-width", type=float, default=6, help='Width of the straps, in tile-percent')
 def straps(**opt):
@@ -77,6 +95,7 @@ def straps(**opt):
     dwg.finish()
 
 @clickmain.command()
+@common_options('common')
 @common_options('drawing')
 def candystripe(**opt):
     width, height = opt['size']
@@ -102,9 +121,10 @@ def candystripe(**opt):
 
 
 @clickmain.command()
+@common_options('common')
 @common_options('drawing')
 def show_opts(**opt):
-    print(opt)
+    pprint.pprint(opt)
 
 
 def main():
