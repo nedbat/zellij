@@ -43,7 +43,7 @@ class Drawing:
         self.format = format
 
         if self.format == 'png':
-            self.surface = cairo.ImageSurface(cairo.Format.RGB24, self.width, self.height)
+            self.surface = cairo.ImageSurface(cairo.Format.ARGB32, self.width, self.height)
         elif self.format == 'svg':
             self.surface = cairo.SVGSurface(f"{self.name}.svg", self.width, self.height)
         self.ctx = cairo.Context(self.surface)

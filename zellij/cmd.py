@@ -59,7 +59,7 @@ def clickmain():
     pass
 
 def debug_world(paths, width, height):
-    dwg = Drawing(paths=paths, name="debug_world")
+    dwg = Drawing(paths=paths, name="debug_world", bg=None)
     with dwg.style(rgb=(.95, .95, .95)):
         dwg.rectangle(0, 0, width, height)
         dwg.fill()
