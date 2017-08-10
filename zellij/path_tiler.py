@@ -235,7 +235,7 @@ def show_paths(paths):
     ret += "]"
     return ret
 
-def combine_paths(paths):
+def defuzz_paths(paths):
     dfz = Defuzzer()
     dfpaths = []
     for path in paths:
@@ -243,8 +243,10 @@ def combine_paths(paths):
         for pt in path:
             dfpath.append(Point(*dfz.defuzz(pt)))
         dfpaths.append(dfpath)
-    paths = dfpaths
+    return dfpaths
 
+def combine_paths(paths):
+    paths = defuzz_paths(paths)
     pm = collections.defaultdict(list)
     for path in paths:
         pm[path[0]].append(path)
@@ -327,7 +329,7 @@ def equal_path(path1, path2):
 
 def canonicalize_paths(paths):
     """Canonicalize a list of paths."""
-    paths = list(canonicalize_path(p) for p in paths)
+    paths = [canonicalize_path(p) for p in paths]
     paths.sort()
     return paths
 
