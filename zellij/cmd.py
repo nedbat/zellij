@@ -26,15 +26,16 @@ DEBUGS = ['opts', 'world']
 def debug_type(s):
     # I am certain there's a better way to get click to do this...
     debugs = [sp.strip() for sp in re.split(r"[ ,;]+", s)]
+    debugs = [d for d in debugs if d]
     for d in debugs:
         if d not in DEBUGS:
-            raise click.BadOptionUsage(f"--debug={d}??")
+            raise click.BadOptionUsage(f"--debug={d}?? Choose from {', '.join(DEBUGS)}")
     return debugs
 
 
 _common_options = {
     'common':[
-        click.option('--debug', type=debug_type),
+        click.option('--debug', type=debug_type, default=""),
     ],
     'drawing': [
         click.option('--output', default='drawing.png', help='File name to write to'),
