@@ -137,7 +137,7 @@ class Segment(namedtuple('Segment', 'p1 p2')):
         except CoincidentLines:
             # If the segments overlap, BadGeometry, else, None
             if overlap(self.p1[0], self.p2[0], other.p1[0], other.p2[0]):
-                raise CoincidentLines("Segments overlap")
+                raise CoincidentLines("Segments overlap", self, other)
             else:
                 return None
         if collinear(self.p1, p, self.p2) and collinear(other.p1, p, other.p2):
