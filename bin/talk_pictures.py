@@ -55,7 +55,7 @@ def talk_pictures():
     pt = PathTiler()
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
-    with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
+    with dwg.style(rgb=(1, .15, .15), width=1, dash=[5, 5]):
         pt.replay_paths(dwg)
         dwg.stroke()
     dwg.finish()
