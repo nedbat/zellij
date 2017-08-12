@@ -38,6 +38,7 @@ class Drawing:
             assert height is not None
             llx = lly = 0
 
+        self.llx, self.lly = llx, lly
         self.width, self.height = width, height
         self.name = name
         self.format = format
@@ -52,12 +53,12 @@ class Drawing:
         self.ctx.set_line_join(cairo.LineJoin.MITER)
 
         if paths:
-            self.translate(-llx, -lly)
+            self.translate(-self.llx, -self.lly)
 
         # Start with a solid-color canvas.
         if bg is not None:
             with self.style(rgb=bg):
-                self.rectangle(llx, lly, self.width, self.height)
+                self.rectangle(self.llx, self.lly, self.width, self.height)
                 self.fill()
 
     def __getattr__(self, name):
@@ -125,7 +126,7 @@ class Drawing:
             self.surface.finish()
 
     @contextlib.contextmanager
-    def style(self, rgb=None, width=None, dash=None):
+    def style(self, rgb=None, width=None, dash=None, dash_offset=0):
         """Set and restore the drawing style."""
         o_source = self.get_source()
         o_width = self.get_line_width()
@@ -136,7 +137,7 @@ class Drawing:
             if width is not None:
                 self.set_line_width(width)
             if dash is not None:
-                self.set_dash(dash)
+                self.set_dash(dash, dash_offset)
             yield
         finally:
             self.set_source(o_source)
