@@ -3,7 +3,6 @@ Simple 2D Euclidean geometric primitives.
 """
 
 from collections import namedtuple
-import functools
 import math
 
 from .postulates import overlap, fbetween, isclose
