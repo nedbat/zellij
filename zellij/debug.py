@@ -1,7 +1,31 @@
 """Debug helpers."""
 
+import re
+
+import click
+
 from zellij.drawing import Drawing
 from zellij.euclid import Point
+
+
+VALID_DEBUGS = ['opts', 'world']
+DEBUGS = []
+
+def debug_type(s):
+    # I am certain there's a better way to get click to do this...
+    global DEBUGS
+    debugs = [sp.strip() for sp in re.split(r"[ ,;]+", s)]
+    debugs = [d for d in debugs if d]
+    for d in debugs:
+        if d not in VALID_DEBUGS:
+            raise click.BadOptionUsage(f"--debug={d}?? Choose from {', '.join(VALID_DEBUGS)}")
+    DEBUGS = debugs
+    return debugs
+
+
+def should_debug(opt):
+    """Is `opt` one of the --debug switches provided?"""
+    return opt in DEBUGS
 
 
 def tick_range(lo, hi, step):

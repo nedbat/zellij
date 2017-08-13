@@ -1,12 +1,11 @@
 """Command-line interface for Zellij."""
 
 import pprint
-import re
 
 import click
 
 from zellij.color import random_color
-from zellij.debug import debug_world
+from zellij.debug import debug_world, debug_type, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
 from zellij.path_tiler import combine_paths, replay_path, PathTiler
@@ -21,17 +20,6 @@ def size_type(s):
         width = height = s
 
     return int(width.strip()), int(height.strip())
-
-DEBUGS = ['opts', 'world']
-
-def debug_type(s):
-    # I am certain there's a better way to get click to do this...
-    debugs = [sp.strip() for sp in re.split(r"[ ,;]+", s)]
-    debugs = [d for d in debugs if d]
-    for d in debugs:
-        if d not in DEBUGS:
-            raise click.BadOptionUsage(f"--debug={d}?? Choose from {', '.join(DEBUGS)}")
-    return debugs
 
 
 _common_options = {
@@ -80,7 +68,7 @@ def straps(**opt):
     draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
 
-    if 'world' in opt['debug']:
+    if should_debug('world'):
         debug_world(paths, width, height)
 
     straps = strapify(paths, **strap_kwargs)
