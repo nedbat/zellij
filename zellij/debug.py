@@ -23,6 +23,10 @@ def debug_type(s):
     return debugs
 
 
+debug_click_options = [
+    click.option('--debug', type=debug_type, default=""),
+]
+
 def should_debug(opt):
     """Is `opt` one of the --debug switches provided?"""
     return opt in DEBUGS

@@ -5,7 +5,7 @@ import pprint
 import click
 
 from zellij.color import random_color
-from zellij.debug import debug_world, debug_type, should_debug
+from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
 from zellij.path_tiler import combine_paths, replay_path, PathTiler
@@ -24,7 +24,7 @@ def size_type(s):
 
 _common_options = {
     'common':[
-        click.option('--debug', type=debug_type, default=""),
+        *debug_click_options,
     ],
     'drawing': [
         click.option('--output', default='drawing.png', help='File name to write to'),
