@@ -4,6 +4,8 @@ import collections
 import itertools
 import random
 
+from zellij.debug import should_debug
+from zellij.drawing import Drawing, DrawingSequence
 from zellij.euclid import Point, Segment
 from zellij.intersection import segment_intersections
 from zellij.path_tiler import join_paths, offset_path, path_segments, trim_path
@@ -98,8 +100,6 @@ def strapify(paths, **strap_kwargs):
 
     paths = [tuple(path) for path in paths]
 
-    ###- paths
-
     segments = []
     segs_to_paths = {}
     for path in paths:
@@ -120,14 +120,17 @@ def strapify(paths, **strap_kwargs):
         for seg in segs:
             points_to_paths[isect].append(segs_to_paths[seg])
 
-    ###- paths, segs_to_points, points_to_paths
-
     print(f"{len(isect_points)} intersections")
 
     if 0:
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
 
+    debug = should_debug("strapify")
+    if debug:
+        dbgdwgs = iter(DrawingSequence(name="debugs_", paths=paths))
+
     paths_to_do = set(paths)
+    paths_done = set()
     xings = {}      # pt -> xing
     straps = []     # new smaller paths, ending at unders.
     path = None
@@ -135,11 +138,38 @@ def strapify(paths, **strap_kwargs):
         next_paths = set()
         next_paths.add(paths_to_do.pop())
         while next_paths:
+            previous_path = path
             path = next_paths.pop()
+
+            if debug:
+                dwg = next(dbgdwgs)
+                dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
+                dwg.draw_paths(paths_done, rgb=(0, 0, 0), width=3)
+                dwg.draw_paths(next_paths, rgb=(.7, .7, 0), width=9)
+                if previous_path:
+                    dwg.draw_path(previous_path, rgb=(1, 0, 0), width=10, dash=[30, 30])
+                dwg.draw_path(path, rgb=(1, 0, 0), width=15)
+                dwg.fill_points([path[0]], rgb=(1, 0, 0), radius=15*3/2)
+                dwg.fill_points([path[1]], rgb=(1, 0, 0), radius=15*2/2)
+                partial_over = [pt for pt, xing in xings.items() if xing.under is None]
+                partial_under = [pt for pt, xing in xings.items() if xing.over is None]
+                dwg.circle_points(partial_over, rgb=(.8, 0, 0), radius=21, width=9)
+                dwg.circle_points(partial_under, rgb=(0, 0, .8), radius=21, width=9)
+                done = [pt for pt, xing in xings.items() if xing.under is not None and xing.over is not None]
+                dwg.circle_points(done, rgb=(0, .8, 0), radius=15, width=3)
 
             prev_piece = None
             last_cut = None
+            first_piece = True
             for piece, over in pieces_under_over(path, segs_to_points, xings):
+                if first_piece and debug:
+                    dwg.cross_points([piece[0], piece[-1]], radius=20, rgb=(1, 0, 0), width=5)
+                    dwg.finish()
+                    if 0 and dwg.num > 10:
+                        print()
+                        import sys; sys.exit()
+                    first_piece = False
+
                 cut = None
                 if over:
                     assert prev_piece is None
@@ -191,11 +221,17 @@ def strapify(paths, **strap_kwargs):
                         xing.over = path
                     xing.over_piece = strap
 
+            paths_done.add(path)
+            if debug:
+                dwg.cross_points([piece[0], piece[-1]], radius=20, rotate=45, rgb=(0, 0, 1), width=5)
+                dwg.finish()
+                if 0 and dwg.num > 10:
+                    print()
+                    import sys; sys.exit()
+
     if 0:
         bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
-
-    ###- straps, xings
 
     for strap in straps:
         for end in [0, -1]:
@@ -203,8 +239,6 @@ def strapify(paths, **strap_kwargs):
             if xing is not None:
                 trimmers = xing.over_piece.sides
                 strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
-
-    ###- straps
 
     return straps
 
@@ -229,4 +263,4 @@ def debug_output(dwgw=None, paths=None, segments=None, isects=None):
     if isects is not None:
         dwg.circle_points(isects, radius=9, rgb=(0, .5, 0), width=3)
 
-    dwg.write()
+    dwg.finish()

@@ -8,7 +8,7 @@ from zellij.drawing import Drawing
 from zellij.euclid import Point
 
 
-VALID_DEBUGS = ['opts', 'world']
+VALID_DEBUGS = ['opts', 'world', 'strapify']
 DEBUGS = []
 
 def debug_type(s):
