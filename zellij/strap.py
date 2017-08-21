@@ -27,6 +27,9 @@ class Strap:
             width *= (1 + random.random() * random_factor)
         self.sides = [offset_path(path, d) for d in [width/2, -width/2]]
 
+    def __repr__(self):
+        return f"<Strap path={self.path}>"
+
 
 def path_pieces(path, segs_to_points):
     """Produce a new series of paths, split at intersection points.
