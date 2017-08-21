@@ -93,6 +93,10 @@ class Drawing:
     def line_to(self, x, y):
         self.ctx.line_to(*self._fix_point(x, y))
 
+    def rotate(self, degrees):
+        # Cairo uses radians, let's be more convenient.
+        self.ctx.rotate(degrees * math.pi / 180)
+
     @contextlib.contextmanager
     def saved(self):
         self.ctx.save()
@@ -179,7 +183,7 @@ class Drawing:
             for x, y in points:
                 with self.saved():
                     self.translate(x, y)
-                    self.rotate(rotate)
+                    self.rotate(-rotate)
                     self.move_to(radius, 0)
                     self.line_to(2 * radius, 0)
                     self.move_to(-radius, 0)

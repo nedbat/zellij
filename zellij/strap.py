@@ -226,7 +226,7 @@ def strapify(paths, **strap_kwargs):
 
             paths_done.add(path)
             if debug:
-                dwg.cross_points([piece[0], piece[-1]], radius=20, rotate=45, rgb=(0, 0, 1), width=5)
+                dwg.cross_points([piece[0], piece[-1]], radius=30, rotate=30, rgb=(0, 0, 1), width=5)
                 dwg.finish()
                 if 0 and dwg.num > 10:
                     print()
