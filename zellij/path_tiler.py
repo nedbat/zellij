@@ -276,9 +276,38 @@ def combine_paths(paths):
                     break
 
         used.add(id(path))
-        combined.append(path)
+        combined.append(clean_path(path))
 
     return combined
+
+def triple_points(path):
+    """Iterate over the triples of consecutive points along the path."""
+    # Take care to include the triples across the ends if the path is a loop.
+    if path[0] == path[-1]:
+        path = path + path[1:2]
+    return zip(path, path[1:], path[2:])
+
+def clean_path(path):
+    """Remove unneeded points from a path."""
+    if len(path) <= 2:
+        return path
+
+    # Points are unneeded if they are collinear with their neighbors.
+    closed = (path[0] == path[-1])
+    new_path = []
+    if not closed:
+        new_path.append(path[0])
+
+    for a, b, c in triple_points(path):
+        if not collinear(a, b, c):
+            new_path.append(b)
+
+    if closed:
+        new_path.append(new_path[0])
+    else:
+        new_path.append(path[-1])
+
+    return new_path
 
 
 def offset_path(path, offset):

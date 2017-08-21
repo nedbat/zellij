@@ -7,8 +7,11 @@ from hypothesis import given
 from hypothesis.strategies import lists, randoms, composite, one_of
 import pytest
 
-from zellij.euclid import Point
-from zellij.path_tiler import PathTiler, combine_paths, equal_path, equal_paths, join_paths, paths_length
+from zellij.euclid import Point, collinear
+from zellij.path_tiler import (
+    PathTiler, combine_paths, equal_path, equal_paths, join_paths,
+    paths_length, triple_points, clean_path,
+)
 from .hypo_helpers import ipoints
 
 
@@ -132,6 +135,18 @@ def test_join_paths(p1, p2, result):
     assert same(join_paths(p1[::-1], p2[::-1]), result)
 
 
+@pytest.mark.parametrize("path, result", [
+    ([Point(0, 0), Point(0, 1), Point(0, 2)],
+        [Point(0, 0), Point(0, 2)]),
+    ([Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 0)],
+        [Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 0)]),
+    ([Point(0, 0), Point(1, 0), Point(0, 1), Point(-1, 0), Point(0, 0)],
+        [Point(-1, 0), Point(1, 0), Point(0, 1), Point(-1, 0)]),
+])
+def test_clean_path(path, result):
+    assert equal_path(clean_path(path), result)
+
+
 def point_set(paths):
     """The set of points in all these paths."""
     return set(pt for path in paths for pt in path)
@@ -150,6 +165,20 @@ def endpoints(paths):
         if path[0] != path[-1]:
             endpoints.append(path[-1])
     return endpoints
+
+@pytest.mark.parametrize("path, result", [
+    ("abcde", ["abc", "bcd", "cde"]),
+    ("abcdea", ["abc", "bcd", "cde", "dea", "eab"]),
+    ("ab", []),
+    ("abc", ["abc"]),
+    ("aba", ["aba", "bab"]),
+])
+def test_triple_points(path, result):
+    assert list("".join(them) for them in triple_points(list(path))) == result
+
+def any_collinear(path):
+    """Are any of the parts of this path collinear?"""
+    return any(collinear(*them) for them in triple_points(path))
 
 @composite
 def combinable_paths_no_loops(draw):
@@ -228,6 +257,9 @@ def test_combine_paths(paths):
     # Property: the combined paths should have the same total length as the
     # original paths.
     assert math.isclose(paths_length(paths), paths_length(combined))
+
+    # Property: there should be no collinear triples in any path.
+    assert not any(any_collinear(path) for path in combined)
 
 @given(combinable_paths)
 def test_combine_paths_recursive(paths):
