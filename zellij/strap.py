@@ -236,8 +236,8 @@ def strapify(paths, **strap_kwargs):
         bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
         debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
 
-    for strap in straps:
-        if debug:
+    if debug:
+        for strap in straps:
             dwg = next(dbgdwgs)
             dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
             dwg.draw_path(strap.path, rgb=(1, 0, 0), width=3)
