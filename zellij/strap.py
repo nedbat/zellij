@@ -98,6 +98,21 @@ def pieces_under_over(path, segs_to_points, xings):
     yield from zip(pieces, itertools.cycle(ou))
 
 
+def set_xing(xings, pt, under=None, over=None):
+    xing = xings.get(pt)
+    if xing is None:
+        xing = Xing(under=under, over=over)
+        xings[pt] = xing
+    elif under is not None:
+        assert xing.under is None or xing.under == under
+        xing.under = under
+    else:
+        assert over is not None
+        assert xing.over is None or xing.over == over
+        xing.over = over
+    return xing
+
+
 def strapify(paths, **strap_kwargs):
     """Turn paths intro straps."""
 
@@ -183,13 +198,7 @@ def strapify(paths, **strap_kwargs):
                     prev_piece = piece
                     if last_cut:
                         cut = last_cut
-                        xing = xings.get(cut)
-                        if xing is None:
-                            xing = Xing(under=path)
-                            xings[cut] = xing
-                        else:
-                            assert xing.under is None or xing.under == path
-                            xing.under = path
+                        set_xing(xings, cut, under=path)
                         last_cut = None
                 else:
                     if prev_piece:
@@ -197,13 +206,7 @@ def strapify(paths, **strap_kwargs):
                         assert cut == piece[0]
                         strap = Strap(join_paths(prev_piece, piece), **strap_kwargs)
                         straps.append(strap)
-                        xing = xings.get(cut)
-                        if xing is None:
-                            xing = Xing(over=path)
-                            xings[cut] = xing
-                        else:
-                            assert xing.over is None or xing.over == path
-                            xing.over = path
+                        xing = set_xing(xings, cut, over=path)
                         xing.over_piece = strap
                     else:
                         # First piece leads to an under: if this is a closed
@@ -228,21 +231,11 @@ def strapify(paths, **strap_kwargs):
                 straps.append(strap)
                 if closed:
                     cut = prev_piece[-1]
-                    xing = xings.get(cut)
-                    if xing is None:
-                        xing = Xing(over=path)
-                        xings[cut] = xing
-                    else:
-                        xing.over = path
+                    xing = set_xing(xings, cut, over=path)
                     xing.over_piece = strap
             elif closed:
                 assert last_cut is not None
-                xing = xings.get(last_cut)
-                if xing is None:
-                    xing = Xing(under=path)
-                    xings[last_cut] = xing
-                else:
-                    xing.under = path
+                set_xing(xings, last_cut, under=path)
 
             paths_done.add(path)
             if debug:
