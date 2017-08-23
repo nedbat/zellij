@@ -143,6 +143,7 @@ def strapify(paths, **strap_kwargs):
         while next_paths:
             previous_path = path
             path = next_paths.pop()
+            closed = (path[0] == path[-1])
 
             if debug:
                 dwg = next(dbgdwgs)
@@ -164,6 +165,8 @@ def strapify(paths, **strap_kwargs):
             prev_piece = None
             last_cut = None
             first_piece = True
+            piece_for_the_end = None
+
             for piece, over in pieces_under_over(path, segs_to_points, xings):
                 if first_piece and debug:
                     dwg.cross_points([piece[0]], radius=20, rgb=(1, 0, 0), width=5)
@@ -203,7 +206,12 @@ def strapify(paths, **strap_kwargs):
                             xing.over = path
                         xing.over_piece = strap
                     else:
-                        straps.append(Strap(piece, **strap_kwargs))
+                        # First piece leads to an under: if this is a closed
+                        # path, save for the end. Else make a small strap.
+                        if closed:
+                            piece_for_the_end = piece
+                        else:
+                            straps.append(Strap(piece, **strap_kwargs))
                     last_cut = piece[-1]
                     prev_piece = None
                 if cut:
@@ -211,10 +219,13 @@ def strapify(paths, **strap_kwargs):
                         if next_path in paths_to_do:
                             paths_to_do.remove(next_path)
                             next_paths.add(next_path)
+
             if prev_piece:
-                strap = Strap(prev_piece, **strap_kwargs)
+                if piece_for_the_end is not None:
+                    strap = Strap(join_paths(prev_piece, piece_for_the_end), **strap_kwargs)
+                else:
+                    strap = Strap(prev_piece, **strap_kwargs)
                 straps.append(strap)
-                closed = (path[0] == path[-1])
                 if closed:
                     cut = prev_piece[-1]
                     xing = xings.get(cut)
@@ -224,6 +235,14 @@ def strapify(paths, **strap_kwargs):
                     else:
                         xing.over = path
                     xing.over_piece = strap
+            elif closed:
+                assert last_cut is not None
+                xing = xings.get(last_cut)
+                if xing is None:
+                    xing = Xing(under=path)
+                    xings[last_cut] = xing
+                else:
+                    xing.under = path
 
             paths_done.add(path)
             if debug:
