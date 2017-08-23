@@ -166,7 +166,8 @@ def strapify(paths, **strap_kwargs):
             first_piece = True
             for piece, over in pieces_under_over(path, segs_to_points, xings):
                 if first_piece and debug:
-                    dwg.cross_points([piece[0], piece[-1]], radius=20, rgb=(1, 0, 0), width=5)
+                    dwg.cross_points([piece[0]], radius=20, rgb=(1, 0, 0), width=5)
+                    dwg.cross_points([piece[-1]], radius=15, rgb=(1, 0, 0), width=5)
                     dwg.finish()
                     if 0 and dwg.num > 10:
                         print()
@@ -226,7 +227,8 @@ def strapify(paths, **strap_kwargs):
 
             paths_done.add(path)
             if debug:
-                dwg.cross_points([piece[0], piece[-1]], radius=30, rotate=30, rgb=(0, 0, 1), width=5)
+                dwg.cross_points([piece[0]], radius=20, rotate=30, rgb=(0, 0, 1), width=5)
+                dwg.cross_points([piece[-1]], radius=15, rotate=30, rgb=(0, 0, 1), width=5)
                 dwg.finish()
                 if 0 and dwg.num > 10:
                     print()
