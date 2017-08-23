@@ -140,9 +140,6 @@ def strapify(paths, **strap_kwargs):
 
     print(f"{len(isect_points)} intersections")
 
-    if 0:
-        debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=isect_points)
-
     debug = should_debug("strapify")
     if debug:
         dbgdwgs = iter(DrawingSequence(name="debugs_", paths=paths))
@@ -246,10 +243,6 @@ def strapify(paths, **strap_kwargs):
                     print()
                     import sys; sys.exit()
 
-    if 0:
-        bad = [pt for pt, xing in xings.items() if xing.over_piece is None]
-        debug_output(dwgw=DWGW, paths=paths, segments=segments, isects=bad)
-
     if debug:
         for strap in straps:
             dwg = next(dbgdwgs)
@@ -267,26 +260,3 @@ def strapify(paths, **strap_kwargs):
                 strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
 
     return straps
-
-
-def debug_output(dwgw=None, paths=None, segments=None, isects=None):
-    dwg = Drawing(paths=paths, name="debug.png")
-    dwg.draw_segments(segments, rgb=(0, 0, 0), width=1)
-
-    dup_segments = []
-    segments.sort()
-    for s1, s2 in zip(segments, segments[1:]):
-        if s1 == s2:
-            dup_segments.append(s1)
-
-    dwg.draw_segments(dup_segments, rgb=(1, 0, 0), width=7)
-
-    if dwgw is not None:
-        with dwg.style(rgb=(0, 0, 1), width=2, dash=[5, 5]):
-            dwg.rectangle(0, 0, dwgw, dwgw)
-            dwg.stroke()
-
-    if isects is not None:
-        dwg.circle_points(isects, radius=9, rgb=(0, .5, 0), width=3)
-
-    dwg.finish()
