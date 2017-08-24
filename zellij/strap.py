@@ -8,7 +8,7 @@ from zellij.debug import should_debug
 from zellij.drawing import Drawing, DrawingSequence
 from zellij.euclid import Point, Segment
 from zellij.intersection import segment_intersections
-from zellij.path_tiler import join_paths, offset_path, path_segments, trim_path
+from zellij.path_tiler import join_paths, offset_path, path_segments, trim_path, replay_path
 
 
 class Xing:
@@ -174,70 +174,60 @@ def strapify(paths, **strap_kwargs):
                 done = [pt for pt, xing in xings.items() if xing.under is not None and xing.over is not None]
                 dwg.circle_points(done, rgb=(0, .8, 0), radius=15, width=3)
 
-            prev_piece = None
-            last_cut = None
-            first_piece = True
-            piece_for_the_end = None
+            # This code works, but is still too convoluted. pieces_under_over
+            # generates a whole sequence of pieces and under/over bools, but we
+            # really only use the first under/over.  And we don't need to
+            # process the pieces in order.  We could combine pieces_under_over,
+            # and this loop here, to deal with the straps in a less complicated
+            # way.
 
-            for piece, over in pieces_under_over(path, segs_to_points, xings):
-                if first_piece and debug:
-                    dwg.cross_points([piece[0]], radius=20, rgb=(1, 0, 0), width=5)
-                    dwg.cross_points([piece[-1]], radius=15, rgb=(1, 0, 0), width=5)
-                    dwg.finish()
-                    if 0 and dwg.num > 10:
-                        print()
-                        import sys; sys.exit()
-                    first_piece = False
+            cuts = []
 
-                cut = None
-                if over:
-                    assert prev_piece is None
-                    prev_piece = piece
-                    if last_cut:
-                        cut = last_cut
-                        set_xing(xings, cut, under=path)
-                        last_cut = None
+            # Get the pieces of the path, and rearrange them.
+            piece_overs = list(pieces_under_over(path, segs_to_points, xings))
+            if closed:
+                cuts.extend(piece_over[0][0] for piece_over in piece_overs)
+                if not piece_overs[0][1]:
+                    # It starts over, heading to under. Rotate by one.
+                    piece_overs = piece_overs[1:] + piece_overs[:1]
+                strap_pieces = [(piece_overs[i][0], piece_overs[i+1][0]) for i in range(0, len(piece_overs), 2)]
+                # Now strap_pieces is a list of pairs, pieces that make
+                # under-over-under straps.
+            else:
+                cuts.extend(piece_over[0][0] for piece_over in piece_overs[1:])
+                strap_pieces = []
+                if not piece_overs[0][1]:
+                    # First piece heads to under. Reverse it, and add it as a
+                    # single-piece strap.
+                    strap_pieces.append((piece_overs[0][0][::-1],))
+                    piece_overs = piece_overs[1:]
+                strap_pieces.extend([(piece_overs[i][0], piece_overs[i+1][0]) for i in range(0, len(piece_overs)//2*2, 2)])
+                if len(piece_overs) % 2:
+                    # There's a piece left. It must head to an over. Add it as
+                    # a single-piece strap.
+                    strap_pieces.append((piece_overs[-1][0],))
+
+            for strap_piece in strap_pieces:
+                set_xing(xings, strap_piece[0][0], under=path)
+                over_xing = set_xing(xings, strap_piece[0][-1], over=path)
+                if len(strap_piece) == 2:
+                    # An under-over-under strap
+                    strap = Strap(join_paths(*strap_piece), **strap_kwargs)
+                    set_xing(xings, strap_piece[1][-1], under=path)
                 else:
-                    if prev_piece:
-                        cut = prev_piece[-1]
-                        assert cut == piece[0]
-                        strap = Strap(join_paths(prev_piece, piece), **strap_kwargs)
-                        straps.append(strap)
-                        xing = set_xing(xings, cut, over=path)
-                        xing.over_piece = strap
-                    else:
-                        # First piece leads to an under: if this is a closed
-                        # path, save for the end. Else make a small strap.
-                        if closed:
-                            piece_for_the_end = piece
-                        else:
-                            straps.append(Strap(piece, **strap_kwargs))
-                    last_cut = piece[-1]
-                    prev_piece = None
-                if cut:
-                    for next_path in points_to_paths[cut]:
-                        if next_path in paths_to_do:
-                            paths_to_do.remove(next_path)
-                            next_paths.add(next_path)
-
-            if prev_piece:
-                if piece_for_the_end is not None:
-                    strap = Strap(join_paths(prev_piece, piece_for_the_end), **strap_kwargs)
-                else:
-                    strap = Strap(prev_piece, **strap_kwargs)
+                    # An under-to-over strap
+                    strap = Strap(strap_piece[0], **strap_kwargs)
+                over_xing.over_piece = strap
                 straps.append(strap)
-                if closed:
-                    cut = prev_piece[-1]
-                    xing = set_xing(xings, cut, over=path)
-                    xing.over_piece = strap
-            elif closed:
-                assert last_cut is not None
-                set_xing(xings, last_cut, under=path)
+
+            for cut in cuts:
+                for next_path in points_to_paths[cut]:
+                    if next_path in paths_to_do:
+                        paths_to_do.remove(next_path)
+                        next_paths.add(next_path)
 
             paths_done.add(path)
             if debug:
-                dwg.cross_points([piece[0]], radius=20, rotate=30, rgb=(0, 0, 1), width=5)
-                dwg.cross_points([piece[-1]], radius=15, rotate=30, rgb=(0, 0, 1), width=5)
                 dwg.finish()
                 if 0 and dwg.num > 10:
                     print()
@@ -255,7 +245,7 @@ def strapify(paths, **strap_kwargs):
     for strap in straps:
         for end in [0, -1]:
             xing = xings.get(strap.path[end])
-            if xing is not None:
+            if xing is not None and xing.over_piece is not None and xing.over_piece is not strap:
                 trimmers = xing.over_piece.sides
                 strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
 
