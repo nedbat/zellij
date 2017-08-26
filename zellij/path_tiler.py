@@ -11,22 +11,26 @@ from .path import replay_path
 
 class PathTiler:
     def __init__(self):
-        self.paths = []
+        self.path_pts = []
         self.transform = Affine.identity()
         self.curpt = None
         self.saved_state = []
 
     # Path creation.
 
+    @property
+    def paths(self):
+        return self.path_pts
+
     def move_to(self, x, y):
         x, y = self.transform * (x, y)
-        self.paths.append([])
-        self.paths[-1].append(Point(x, y))
+        self.path_pts.append([])
+        self.path_pts[-1].append(Point(x, y))
         self.curpt = x, y
 
     def line_to(self, x, y):
         x, y = self.transform * (x, y)
-        self.paths[-1].append(Point(x, y))
+        self.path_pts[-1].append(Point(x, y))
         self.curpt = x, y
 
     def rel_line_to(self, dx, dy):
@@ -34,7 +38,7 @@ class PathTiler:
         self.line_to(x + dx, y + dy)
 
     def close_path(self):
-        self.paths[-1].append(self.paths[-1][0])
+        self.path_pts[-1].append(self.path_pts[-1][0])
         self.curpt = None
 
     def in_device(self, x, y):
