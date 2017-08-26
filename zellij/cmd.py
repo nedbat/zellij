@@ -8,7 +8,8 @@ from zellij.color import random_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
-from zellij.path_tiler import combine_paths, replay_path, PathTiler
+from zellij.path import combine_paths, replay_path
+from zellij.path_tiler import PathTiler
 from zellij.strap import strapify
 
 

@@ -1,9 +1,12 @@
+"""Produce the pictures for the presentation about Zellij."""
+
 import itertools
 import math
 
 from zellij.color import random_color, CasaCeramica
 from zellij.drawing import Drawing
-from zellij.path_tiler import combine_paths, offset_path, PathTiler
+from zellij.path import combine_paths, offset_path
+from zellij.path_tiler import PathTiler
 
 from zellij.design.threestars import ThreeStarsDesign
 

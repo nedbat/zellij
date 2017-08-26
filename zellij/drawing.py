@@ -9,7 +9,7 @@ import sys
 
 import cairo
 
-from .path_tiler import replay_path, paths_box
+from .path import replay_path, paths_box
 
 
 class Drawing:
