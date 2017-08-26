@@ -5,7 +5,7 @@ import math
 
 from zellij.color import random_color, CasaCeramica
 from zellij.drawing import Drawing
-from zellij.path import combine_paths, offset_path
+from zellij.path import combine_paths, offset_path, replay_paths
 from zellij.path_tiler import PathTiler
 
 from zellij.design.threestars import ThreeStarsDesign
@@ -59,7 +59,7 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .15, .15), width=1, dash=[5, 5]):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -74,12 +74,12 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_triangle(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -88,17 +88,17 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_triangle(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_tile(pt)
     with dwg.style(rgb=(0, 0, 0), width=6):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -110,13 +110,13 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
 
     pt = single_tiler()
     draw.draw_tile(pt)
     with dwg.style(rgb=(0, 0, 0), width=6):
-        pt.replay_paths(dwg)
+        replay_paths(pt.paths, dwg)
         dwg.stroke()
 
     dwg.finish()

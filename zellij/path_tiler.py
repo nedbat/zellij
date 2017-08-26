@@ -153,9 +153,3 @@ class PathTiler:
                 draw_func(pt)
 
         self.tile_p6(draw_mirrored, dwg_size, triw)
-
-    # More stuff.
-
-    def replay_paths(self, ctx):
-        for path in self.paths:
-            replay_path(path, ctx)

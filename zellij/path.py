@@ -63,6 +63,11 @@ def replay_path(path, ctx, append=False):
         ctx.line_to(*path[-1])
 
 
+def replay_paths(paths, ctx):
+    for path in paths:
+        replay_path(path, ctx)
+
+
 def path_in_box(path, ll, ur):
     return all(pt.in_box(ll, ur) for pt in path)
 
