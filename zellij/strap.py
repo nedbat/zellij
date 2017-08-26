@@ -8,7 +8,7 @@ from zellij.debug import should_debug
 from zellij.drawing import Drawing, DrawingSequence
 from zellij.euclid import Point, Segment
 from zellij.intersection import segment_intersections
-from zellij.path import join_paths, offset_path, path_segments, trim_path, replay_path
+from zellij.path import join_paths, offset_path, path_segments, trim_path, replay_path, show_path
 
 
 class Xing:
