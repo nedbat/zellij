@@ -1,5 +1,6 @@
 """Command-line interface for Zellij."""
 
+import math
 import pprint
 
 import click
@@ -8,7 +9,7 @@ from zellij.color import random_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
-from zellij.path import combine_paths
+from zellij.path import combine_paths, draw_paths
 from zellij.path_tiler import PathTiler
 from zellij.strap import strapify
 
@@ -94,7 +95,6 @@ def straps(**opt):
 @common_options('drawing')
 def candystripe(**opt):
     width, height = opt['size']
-
     tilew = int(width/opt['tiles'])
 
     dwg = Drawing(width, height, name="candy")
@@ -114,6 +114,54 @@ def candystripe(**opt):
     ])
     dwg.finish()
 
+
+@clickmain.command()
+@common_options('common')
+@common_options('drawing')
+def diagram(**opt):
+    width, height = opt['size']
+    tilew = int(width/opt['tiles'])
+
+    dwg = Drawing(width, height, name="diagram")
+    design_class = get_design(opt['design'])
+    draw = design_class(tilew)
+
+    # The full pattern.
+    pt = PathTiler()
+    draw.draw(pt, dwg.get_size())
+    with dwg.style(rgb=(.5, .5, .5)):
+        draw_paths(pt.paths, dwg)
+        dwg.stroke()
+
+    # The symmetry.
+    pt = PathTiler()
+    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
+        draw_paths(pt.paths, dwg)
+        dwg.stroke()
+
+    def single_tiler():
+        pt = PathTiler()
+        # TODO: make this work for other symmetries
+        pt.translate(2 * tilew * math.sqrt(3) / 2, tilew)
+        pt.reflect_xy(0, 0)
+        return pt
+
+    # The tiler unit.
+    pt = single_tiler()
+    draw.draw_tiler_unit(pt)
+    with dwg.style(rgb=(1, 0, 0), width=3):
+        draw_paths(pt.paths, dwg)
+        dwg.stroke()
+
+    # The design.
+    pt = single_tiler()
+    draw.draw_tile(pt)
+    with dwg.style(rgb=(0, 0, 0), width=6):
+        draw_paths(pt.paths, dwg)
+        dwg.stroke()
+
+    dwg.finish()
 
 @clickmain.command()
 @common_options('common')
