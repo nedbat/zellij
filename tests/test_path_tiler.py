@@ -4,6 +4,7 @@ import pytest
 
 from zellij.euclid import Point, collinear
 from zellij.path_tiler import PathTiler
+from zellij.path import Path
 
 
 def test_do_nothing():
@@ -19,8 +20,8 @@ def test_two_segments():
     pt.rel_line_to(100, 200)
     pt.close_path()
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(150.0, 200.0)],
-        [Point(17.0, 17.0), Point(117.0, 217.0), Point(17.0, 17.0)],
+        Path([Point(100.0, 100.0), Point(150.0, 200.0)]),
+        Path([Point(17.0, 17.0), Point(117.0, 217.0), Point(17.0, 17.0)]),
     ]
 
 
@@ -30,7 +31,7 @@ def test_translation():
     pt.translate(1000, 2000)
     pt.line_to(10, 20)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(1010.0, 2020.0)],
+        Path([Point(100.0, 100.0), Point(1010.0, 2020.0)]),
     ]
 
 
@@ -40,7 +41,7 @@ def test_reflect_x():
     pt.reflect_x(1000)
     pt.line_to(200, 200)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(1800, 200)],
+        Path([Point(100.0, 100.0), Point(1800, 200)]),
     ]
 
 
@@ -50,7 +51,7 @@ def test_reflect_y():
     pt.reflect_y(1000)
     pt.line_to(200, 200)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(200, 1800)],
+        Path([Point(100.0, 100.0), Point(200, 1800)]),
     ]
 
 
@@ -60,7 +61,7 @@ def test_reflect_xy():
     pt.reflect_xy(1000, 2000)
     pt.line_to(200, 200)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(1800, 3800)],
+        Path([Point(100.0, 100.0), Point(1800, 3800)]),
     ]
 
 
@@ -71,7 +72,7 @@ def test_reflect_line():
     pt.line_to(100, 50)
     pt.line_to(100, 100)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(150, 0), Point(200, 0)],
+        Path([Point(100.0, 100.0), Point(150, 0), Point(200, 0)]),
     ]
 
 
@@ -88,9 +89,9 @@ def test_save_restore():
     pt.move_to(1, 2)
     pt.line_to(2, 4)
     assert pt.paths == [
-        [Point(100.0, 100.0), Point(1010.0, 2020.0)],
-        [Point(1002.0, 2004.0), Point(1003.0, 2006.0)],
-        [Point(1001.0, 2002.0), Point(1002.0, 2004.0)],
+        Path([Point(100.0, 100.0), Point(1010.0, 2020.0)]),
+        Path([Point(1002.0, 2004.0), Point(1003.0, 2006.0)]),
+        Path([Point(1001.0, 2002.0), Point(1002.0, 2004.0)]),
     ]
 
 
@@ -100,5 +101,5 @@ def test_rel_line_to():
     pt.move_to(0, 0)
     pt.rel_line_to(100, 200)
     assert pt.paths == [
-        [Point(1000.0, 2000.0), Point(1100.0, 2200.0)],
+        Path([Point(1000.0, 2000.0), Point(1100.0, 2200.0)]),
     ]

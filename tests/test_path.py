@@ -3,18 +3,44 @@
 import collections
 import math
 
-from zellij.path import (
-    combine_paths, equal_path, equal_paths, join_paths,
-    paths_length, triple_points, clean_path,
-)
+from zellij.path import Path, combine_paths, equal_path, equal_paths, paths_length
 
 from hypothesis import given
 from hypothesis.strategies import lists, randoms, composite, one_of
 import pytest
 
-from zellij.euclid import collinear, Point
+from zellij.euclid import Point
 
 from .hypo_helpers import ipoints
+
+
+def P(twodigits):
+    """Helper for compact points: P(34) --> Point(3, 4)"""
+    return Point(*divmod(twodigits, 10))
+
+@pytest.mark.parametrize("compact, result", [
+    (P(34), Point(3, 4)),
+    (P(20), Point(2, 0)),
+])
+def test_p(compact, result):
+    assert compact == result
+
+@pytest.mark.parametrize("p1, p2, result", [
+    # Identical paths.
+    ([P(11), P(22)], [P(11), P(22)], True),
+    # Completely different.
+    ([P(11), P(22)], [P(11), P(33)], False),
+    # Same, but reversed.
+    ([P(11), P(22)], [P(22), P(11)], True),
+    # Circular, same.
+    ([P(11), P(20), P(33), P(11)], [P(11), P(20), P(33), P(11)], True),
+    # Circular, different starting points.
+    ([P(11), P(20), P(33), P(11)], [P(20), P(33), P(11), P(20)], True),
+    # Circular, reversed.
+    ([P(11), P(20), P(33), P(11)], [P(11), P(33), P(20), P(11)], True),
+])
+def test_equal_path(p1, p2, result):
+    assert equal_path(Path(p1), Path(p2)) == result
 
 
 @pytest.mark.parametrize("p1, p2, result", [
@@ -26,6 +52,10 @@ from .hypo_helpers import ipoints
             [Point(0, 0), Point(2, 2), Point(3, 0)]),
 ])
 def test_join_paths(p1, p2, result):
+    pth1, pth2 = Path(p1), Path(p2)
+    pth1r, pth2r = Path(p1[::-1]), Path(p2[::-1])
+    if result is not None:
+        result = Path(result)
     def same(p1, p2):
         if p1 is None and p2 is None:
             return True
@@ -33,10 +63,10 @@ def test_join_paths(p1, p2, result):
             return False
         else:
             return equal_path(p1, p2)
-    assert same(join_paths(p1, p2), result)
-    assert same(join_paths(p1[::-1], p2), result)
-    assert same(join_paths(p1, p2[::-1]), result)
-    assert same(join_paths(p1[::-1], p2[::-1]), result)
+    assert same(pth1.join(pth2), result)
+    assert same(pth1r.join(pth2), result)
+    assert same(pth1.join(pth2r), result)
+    assert same(pth1r.join(pth2r), result)
 
 
 @pytest.mark.parametrize("path, result", [
@@ -48,7 +78,18 @@ def test_join_paths(p1, p2, result):
         [Point(-1, 0), Point(1, 0), Point(0, 1), Point(-1, 0)]),
 ])
 def test_clean_path(path, result):
-    assert equal_path(clean_path(path), result)
+    assert equal_path(Path(path).clean(), Path(result))
+
+
+@pytest.mark.parametrize("points, result", [
+    ([P(11), P(22), P(34)], False),
+    ([P(11), P(22), P(34), P(11)], False),
+    ([P(11), P(22), P(33)], True),
+    ([P(11), P(22), P(33), P(10), P(11)], True),
+    ([P(22), P(33), P(10), P(11), P(22)], True),
+])
+def test_any_collinear(points, result):
+    assert Path(points).any_collinear() == result
 
 
 def point_set(paths):
@@ -69,20 +110,6 @@ def endpoints(paths):
         if path[0] != path[-1]:
             endpoints.append(path[-1])
     return endpoints
-
-@pytest.mark.parametrize("path, result", [
-    ("abcde", ["abc", "bcd", "cde"]),
-    ("abcdea", ["abc", "bcd", "cde", "dea", "eab"]),
-    ("ab", []),
-    ("abc", ["abc"]),
-    ("aba", ["aba", "bab"]),
-])
-def test_triple_points(path, result):
-    assert list("".join(them) for them in triple_points(list(path))) == result
-
-def any_collinear(path):
-    """Are any of the parts of this path collinear?"""
-    return any(collinear(*them) for them in triple_points(path))
 
 @composite
 def combinable_paths_no_loops(draw):
@@ -106,7 +133,7 @@ def combinable_paths_no_loops(draw):
         paths.pop()
 
     rand.shuffle(paths)
-    return paths
+    return [Path(p) for p in paths]
 
 @composite
 def combinable_paths_maybe_loops(draw):
@@ -138,7 +165,7 @@ def combinable_paths_maybe_loops(draw):
         if point_use[b] == 2:
             endpoints.remove(b)
 
-    return list(paths)
+    return [Path(p) for p in paths]
 
 combinable_paths = one_of(combinable_paths_no_loops(), combinable_paths_maybe_loops())
 
@@ -163,7 +190,7 @@ def test_combine_paths(paths):
     assert math.isclose(paths_length(paths), paths_length(combined))
 
     # Property: there should be no collinear triples in any path.
-    assert not any(any_collinear(path) for path in combined)
+    assert not any(path.any_collinear() for path in combined)
 
 @given(combinable_paths)
 def test_combine_paths_recursive(paths):

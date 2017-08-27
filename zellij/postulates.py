@@ -18,6 +18,14 @@ def all_pairs(seq):
     return itertools.combinations(seq, 2)
 
 
+def triples(seq):
+    """Iterate over the triples of consecutive elements in seq (possibly circular)."""
+    # Take care to include the triples across the ends if the sequence is a loop.
+    if seq[0] == seq[-1]:
+        seq = seq + seq[1:2]
+    return zip(seq, seq[1:], seq[2:])
+
+
 def overlap(start1, end1, start2, end2):
     """Does the range (start1, end1) overlap with (start2, end2)?"""
     # https://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html

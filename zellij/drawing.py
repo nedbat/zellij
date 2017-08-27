@@ -9,7 +9,7 @@ import sys
 
 import cairo
 
-from .path import replay_path, paths_box
+from .path import paths_box
 
 
 class Drawing:
@@ -115,7 +115,7 @@ class Drawing:
         for width, color in styles:
             self.set_line_width(width)
             for path in paths:
-                replay_path(path, self)
+                path.draw(self)
                 if callable(color):
                     self.set_source_rgb(*color())
                 else:
@@ -150,13 +150,13 @@ class Drawing:
 
     def draw_path(self, path, **style_kwargs):
         with self.style(**style_kwargs):
-            replay_path(path, self)
+            path.draw(self)
             self.stroke()
 
     def draw_paths(self, paths, **style_kwargs):
         with self.style(**style_kwargs):
             for path in paths:
-                replay_path(path, self)
+                path.draw(self)
             self.stroke()
 
     def draw_segments(self, segments, **style_kwargs):

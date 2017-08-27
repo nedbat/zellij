@@ -6,7 +6,7 @@ import math
 from affine import Affine
 
 from .euclid import collinear, Point, Line, Segment
-from .path import replay_path
+from .path import Path
 
 
 class PathTiler:
@@ -20,7 +20,7 @@ class PathTiler:
 
     @property
     def paths(self):
-        return self.path_pts
+        return [Path(pts) for pts in self.path_pts]
 
     def move_to(self, x, y):
         x, y = self.transform * (x, y)

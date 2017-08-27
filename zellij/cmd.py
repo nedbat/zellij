@@ -8,7 +8,7 @@ from zellij.color import random_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
-from zellij.path import combine_paths, replay_path
+from zellij.path import combine_paths
 from zellij.path_tiler import PathTiler
 from zellij.strap import strapify
 
@@ -76,15 +76,15 @@ def straps(**opt):
 
     with dwg.style(rgb=(1, 1, 1)):
         for strap in straps:
-            replay_path(strap.sides[0], dwg)
-            replay_path(strap.sides[1][::-1], dwg, append=True)
+            strap.sides[0].draw(dwg)
+            strap.sides[1].draw(dwg, append=True, reverse=True)
             dwg.close_path()
             dwg.fill()
 
     with dwg.style(rgb=(0, 0, 0), width=2):
         for strap in straps:
             for side in strap.sides:
-                replay_path(side, dwg)
+                side.draw(dwg)
                 dwg.stroke()
 
     dwg.finish()

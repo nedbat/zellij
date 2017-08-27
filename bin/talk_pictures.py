@@ -5,7 +5,7 @@ import math
 
 from zellij.color import random_color, CasaCeramica
 from zellij.drawing import Drawing
-from zellij.path import combine_paths, offset_path, replay_paths
+from zellij.path import combine_paths, draw_paths
 from zellij.path_tiler import PathTiler
 
 from zellij.design.threestars import ThreeStarsDesign
@@ -21,7 +21,7 @@ def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, 
     if combined:
         paths = combine_paths(pt.paths)
     if offset is not None:
-        paths = [offset_path(p, offset) for p in paths]
+        paths = [p.offset_path(offset) for p in paths]
 
     if fat:
         LINE_WIDTH = TILEW / 12
@@ -59,7 +59,7 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .15, .15), width=1, dash=[5, 5]):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -74,12 +74,12 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_triangle(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -88,17 +88,17 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_triangle(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
     draw.draw_tile(pt)
     with dwg.style(rgb=(0, 0, 0), width=6):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
@@ -110,13 +110,13 @@ def talk_pictures():
     draw = ThreeStarsDesign(TILEW)
     pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
     with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
 
     pt = single_tiler()
     draw.draw_tile(pt)
     with dwg.style(rgb=(0, 0, 0), width=6):
-        replay_paths(pt.paths, dwg)
+        draw_paths(pt.paths, dwg)
         dwg.stroke()
 
     dwg.finish()

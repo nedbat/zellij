@@ -8,7 +8,7 @@ from zellij.debug import should_debug
 from zellij.drawing import Drawing, DrawingSequence
 from zellij.euclid import Point, Segment
 from zellij.intersection import segment_intersections
-from zellij.path import join_paths, offset_path, path_segments, trim_path, replay_path, show_path
+from zellij.path import Path, show_path
 
 
 class Xing:
@@ -25,7 +25,7 @@ class Strap:
         self.path = path
         if random_factor:
             width *= (1 + random.random() * random_factor)
-        self.sides = [offset_path(path, d) for d in [width/2, -width/2]]
+        self.sides = [path.offset_path(d) for d in [width/2, -width/2]]
 
     def __repr__(self):
         return f"<Strap path={self.path}>"
@@ -44,7 +44,7 @@ def path_pieces(path, segs_to_points):
     """
     # If path is circular, then the first piece we collect has to be added to
     # the last piece, so save it for later.
-    collecting_head = (path[0] == path[-1])
+    collecting_head = path.closed
     head = None
 
     piece = []
@@ -63,12 +63,13 @@ def path_pieces(path, segs_to_points):
                         head = piece
                         collecting_head = False
                     else:
-                        yield piece
+                        yield Path(piece)
                     piece = [ptcut]
             piece.append(pt)
 
+    piece = Path(piece)
     if head:
-        piece = join_paths(piece, head)
+        piece = piece.join(Path(head))
     yield piece
 
 
@@ -79,15 +80,11 @@ def pieces_under_over(path, segs_to_points, xings):
         xing = xings.get(piece[-1])
         if xing is None:
             continue
-        if xing.under == path:
-            over = False
-        elif xing.over == path:
-            over = True
-        elif xing.under is not None:
-            over = True
+        if xing.under is not None:
+            over = (xing.under != path)
         else:
             assert xing.over is not None
-            over = False
+            over = (xing.over == path)
         ou = [over, not over]
         if i % 2:
             ou = ou[::-1]
@@ -116,12 +113,10 @@ def set_xing(xings, pt, under=None, over=None):
 def strapify(paths, **strap_kwargs):
     """Turn paths intro straps."""
 
-    paths = [tuple(path) for path in paths]
-
     segments = []
     segs_to_paths = {}
     for path in paths:
-        for segment in path_segments(path):
+        for segment in path.segments():
             segments.append(segment)
             segs_to_paths[segment] = path
 
@@ -199,7 +194,7 @@ def strapify(paths, **strap_kwargs):
                 if not piece_overs[0][1]:
                     # First piece heads to under. Reverse it, and add it as a
                     # single-piece strap.
-                    strap_pieces.append((piece_overs[0][0][::-1],))
+                    strap_pieces.append((piece_overs[0][0].reversed(),))
                     piece_overs = piece_overs[1:]
                 strap_pieces.extend([(piece_overs[i][0], piece_overs[i+1][0]) for i in range(0, len(piece_overs)//2*2, 2)])
                 if len(piece_overs) % 2:
@@ -212,7 +207,7 @@ def strapify(paths, **strap_kwargs):
                 over_xing = set_xing(xings, strap_piece[0][-1], over=path)
                 if len(strap_piece) == 2:
                     # An under-over-under strap
-                    strap = Strap(join_paths(*strap_piece), **strap_kwargs)
+                    strap = Strap(strap_piece[0].join(strap_piece[1]), **strap_kwargs)
                     set_xing(xings, strap_piece[1][-1], under=path)
                 else:
                     # An under-to-over strap
@@ -247,6 +242,6 @@ def strapify(paths, **strap_kwargs):
             xing = xings.get(strap.path[end])
             if xing is not None and xing.over_piece is not None and xing.over_piece is not strap:
                 trimmers = xing.over_piece.sides
-                strap.sides = [trim_path(s, end, trimmers) for s in strap.sides]
+                strap.sides = [s.trim(end, trimmers) for s in strap.sides]
 
     return straps

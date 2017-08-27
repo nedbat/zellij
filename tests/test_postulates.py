@@ -1,6 +1,6 @@
 import pytest
 
-from zellij.postulates import adjacent_pairs, fbetween, overlap
+from zellij.postulates import adjacent_pairs, fbetween, overlap, triples
 
 
 @pytest.mark.parametrize("seq, result", [
@@ -42,3 +42,14 @@ def test_fbetween(a, b, c, result):
 ])
 def test_overlap(s1, e1, s2, e2, result):
     assert overlap(s1, e1, s2, e2) == result
+
+
+@pytest.mark.parametrize("seq, result", [
+    ("abcde", ["abc", "bcd", "cde"]),
+    ("abcdea", ["abc", "bcd", "cde", "dea", "eab"]),
+    ("ab", []),
+    ("abc", ["abc"]),
+    ("aba", ["aba", "bab"]),
+])
+def test_triples(seq, result):
+    assert list("".join(them) for them in triples(list(seq))) == result
