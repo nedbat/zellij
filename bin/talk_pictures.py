@@ -13,9 +13,9 @@ from zellij.design.threestars import ThreeStarsDesign
 SQRT3 = math.sqrt(3)
 
 
-def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, offset=None):
+def draw_it(tilew, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, offset=None):
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
+    draw = ThreeStarsDesign(tilew)
     draw.draw(pt, dwg.get_size())
     paths = pt.paths
     if combined:
@@ -24,10 +24,10 @@ def draw_it(TILEW, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, 
         paths = [p.offset_path(offset) for p in paths]
 
     if fat:
-        LINE_WIDTH = TILEW / 12
+        line_width = tilew / 12
         styles = [
-            (LINE_WIDTH, (0, 0, 0)),
-            (LINE_WIDTH*.7, (1, 1, 1)),
+            (line_width, (0, 0, 0)),
+            (line_width*.7, (1, 1, 1)),
         ]
     else:
         styles = [(line_width, color)]
@@ -38,26 +38,26 @@ DWGW = 800
 
 def talk_pictures():
     size = (883, 683)
-    TILEW = int(DWGW/3)
+    tilew = int(DWGW/3)
 
     dwgnum = iter(itertools.count())
     def dwg_name(slug):
         return f'three_stars_{next(dwgnum):03d}_{slug}'
 
     dwg = Drawing(*size, name=dwg_name('start'), bg=(.85, .85, .85))
-    draw_it(TILEW, dwg)
+    draw_it(tilew, dwg)
     dwg.finish()
 
 
     dwg = Drawing(*size, name=dwg_name('thin'))
-    draw_it(TILEW, dwg, fat=False)
+    draw_it(tilew, dwg, fat=False)
     dwg.finish()
 
 
     dwg = Drawing(*size, name=dwg_name('symmetry'))
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
-    pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+    draw = ThreeStarsDesign(tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
     with dwg.style(rgb=(1, .15, .15), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -65,19 +65,19 @@ def talk_pictures():
 
     def single_tiler():
         pt = PathTiler()
-        pt.translate(2 * TILEW * SQRT3 / 2, TILEW)
+        pt.translate(2 * tilew * SQRT3 / 2, tilew)
         pt.reflect_xy(0, 0)
         return pt
 
     dwg = Drawing(*size, name=dwg_name('triangle'))
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
-    pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+    draw = ThreeStarsDesign(tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
-    draw.draw_triangle(pt)
+    draw.draw_tiler_unit(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -85,13 +85,13 @@ def talk_pictures():
 
     dwg = Drawing(*size, name=dwg_name('design'))
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
-    pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+    draw = ThreeStarsDesign(tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
-    draw.draw_triangle(pt)
+    draw.draw_tiler_unit(pt)
     with dwg.style(rgb=(1, 0, 0), width=3):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -104,11 +104,11 @@ def talk_pictures():
 
 
     dwg = Drawing(*size, name=dwg_name('lined'))
-    draw_it(TILEW, dwg, fat=False, color=(.5, .5, .5))
+    draw_it(tilew, dwg, fat=False, color=(.5, .5, .5))
 
     pt = PathTiler()
-    draw = ThreeStarsDesign(TILEW)
-    pt.tile_p6m(draw.draw_triangle, dwg.get_size(), TILEW)
+    draw = ThreeStarsDesign(tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
     with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -123,19 +123,19 @@ def talk_pictures():
 
 
     dwg = Drawing(*size, name=dwg_name('chaos'))
-    draw_it(TILEW, dwg, fat=False, color=random_color, combined=False, line_width=8)
+    draw_it(tilew, dwg, fat=False, color=random_color, combined=False, line_width=8)
     dwg.finish()
 
 
     dwg = Drawing(*size, name=dwg_name('joined'))
-    draw_it(TILEW, dwg, fat=False, color=random_color, combined=True, line_width=8)
+    draw_it(tilew, dwg, fat=False, color=random_color, combined=True, line_width=8)
     dwg.finish()
 
 def final():
-    TILEW = int(DWGW/5)
+    tilew = int(DWGW/5)
 
     dwg = Drawing(DWGW, DWGW, bg=(.85, .85, .85), name='three_stars_final')
-    draw_it(TILEW, dwg)
+    draw_it(tilew, dwg)
     dwg.finish()
 
 

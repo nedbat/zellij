@@ -56,16 +56,16 @@ def clickmain():
 def straps(**opt):
     width, height = opt['size']
 
-    TILEW = int(width/opt['tiles'])
+    tilew = int(width/opt['tiles'])
     if opt['strap_width'] > 0:
-        strap_kwargs = dict(width=TILEW * opt['strap_width'] / 100, random_factor=0)
+        strap_kwargs = dict(width=tilew * opt['strap_width'] / 100, random_factor=0)
     else:
-        strap_kwargs = dict(width=TILEW / 60, random_factor=4.9)
+        strap_kwargs = dict(width=tilew / 60, random_factor=4.9)
 
     dwg = Drawing(width, height, name="straps", bg=(.8, .8, .8))
     pt = PathTiler()
     design_class = get_design(opt['design'])
-    draw = design_class(TILEW)
+    draw = design_class(tilew)
     draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
 
@@ -95,16 +95,16 @@ def straps(**opt):
 def candystripe(**opt):
     width, height = opt['size']
 
-    TILEW = int(width/opt['tiles'])
+    tilew = int(width/opt['tiles'])
 
     dwg = Drawing(width, height, name="candy")
     pt = PathTiler()
     design_class = get_design(opt['design'])
-    draw = design_class(TILEW)
+    draw = design_class(tilew)
     draw.draw(pt, dwg.get_size())
     paths = combine_paths(pt.paths)
 
-    LINE_WIDTH = TILEW/4
+    LINE_WIDTH = tilew/4
 
     dwg.multi_stroke(paths, [
         #(LINE_WIDTH, (0, 0, 0)),

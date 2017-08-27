@@ -38,7 +38,7 @@ class P6mDesign(Design):
         self.bottom = Point(0, -self.tilew)
         self.belly = Point(self.tilew * SQRT3 / 4, -self.tilew * .75)
 
-    def draw_triangle(self, dwg):
+    def draw_tiler_unit(self, dwg):
         self.three_points()
         dwg.move_to(*self.top)
         dwg.line_to(*self.bottom)
