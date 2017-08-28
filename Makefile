@@ -22,3 +22,6 @@ sterile: clean
 
 cloc:
 	cloc --vcs=git .
+
+lint:
+	pylint bin tests zellij/ *.py
