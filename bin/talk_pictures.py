@@ -3,7 +3,7 @@
 import itertools
 import math
 
-from zellij.color import random_color, CasaCeramica
+from zellij.color import random_color
 from zellij.drawing import Drawing
 from zellij.path import combine_paths, draw_paths
 from zellij.path_tiler import PathTiler

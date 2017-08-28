@@ -1,8 +1,6 @@
 """Test path_tiler.py"""
 
-import pytest
-
-from zellij.euclid import Point, collinear
+from zellij.euclid import Point
 from zellij.path_tiler import PathTiler
 from zellij.path import Path
 

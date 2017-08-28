@@ -3,13 +3,12 @@
 import collections
 import math
 
+from zellij.euclid import Point
 from zellij.path import Path, combine_paths, equal_path, equal_paths, paths_length
 
 from hypothesis import given
 from hypothesis.strategies import lists, randoms, composite, one_of
 import pytest
-
-from zellij.euclid import Point
 
 from .hypo_helpers import ipoints
 

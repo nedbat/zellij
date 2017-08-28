@@ -5,7 +5,7 @@ import math
 
 from affine import Affine
 
-from .euclid import collinear, Point, Line, Segment
+from .euclid import Point
 from .path import Path
 
 
