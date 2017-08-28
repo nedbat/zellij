@@ -32,6 +32,7 @@ class Defuzzer:
             yield tuple(round(v + j, ndigits=self.ndigits) for v, j in zip(pt, jitter))
 
     def defuzz(self, pt):
+        """Return a tuple close to `pt` that has been defuzz'd before, or `pt`."""
         if pt in self.points:
             return pt
 

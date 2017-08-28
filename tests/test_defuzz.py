@@ -1,3 +1,5 @@
+"""Test zellij/defuzz.py"""
+
 import itertools
 import math
 
