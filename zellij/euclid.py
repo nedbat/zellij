@@ -150,4 +150,4 @@ class Segment(namedtuple('Segment', 'p1 p2')):
         Assumes that `points` lie on the Segment, but makes no check that they
         do.
         """
-        return sorted(points, key=lambda p: self.p1.distance(p))
+        return sorted(points, key=self.p1.distance)
