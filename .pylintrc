@@ -126,6 +126,9 @@ disable=
     too-many-locals,
     too-few-public-methods,
     too-many-instance-attributes,
+    too-many-arguments,
+    no-else-return,
+    bad-whitespace,
     global-statement
 
 # Enable the message, report, category or checker with the given id(s). You can
