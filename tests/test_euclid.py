@@ -97,6 +97,16 @@ def test_hypo_points_not_collinear(p1, p2, t):
 
 # Lines
 
+@pytest.mark.parametrize("p1, p2, angle", [
+    ((0, 0), (1, 0), 0),
+    ((0, 0), (0, 1), 90),
+    ((10, 10), (0, 20), 135),
+])
+def test_line_angle(p1, p2, angle):
+    l = Line(Point(*p1), Point(*p2))
+    assert math.isclose(l.angle(), angle)
+
+
 @pytest.mark.parametrize("p1, p2, p3, p4, pi", [
     ((-1, 0), (1, 0),  (0, -1), (0, 1),  (0, 0)),
     ((17, 34), (23, 42),   (100, 200), (300, 350),  (194.85714285, 271.14285714)),

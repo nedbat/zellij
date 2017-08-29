@@ -77,6 +77,11 @@ def along_the_way(p1, p2, t):
 class Line(namedtuple("Line", ["p1", "p2"])):
     """A line in 2D, defined by two Points."""
 
+    def angle(self):
+        """The angle in degrees this line makes to the horizontal."""
+        (x1, y1), (x2, y2) = self
+        return math.degrees(math.atan2(y2 - y1, x2 - x1))
+
     def intersect(self, other):
         """
         Find the point where this Line and another intersect.
