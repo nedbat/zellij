@@ -5,6 +5,7 @@ import math
 
 
 def isclose(a, b):
+    """Are two floats close together, even near zero."""
     return math.isclose(a, b, abs_tol=1e-8)
 
 
