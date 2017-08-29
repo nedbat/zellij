@@ -120,6 +120,8 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
 
 class Segment(namedtuple('Segment', 'p1 p2')):
+    """A segment of a line, from p1 to p2."""
+
     def __eq__(self, other):
         return sorted(self) == sorted(other)
 
