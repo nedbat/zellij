@@ -49,8 +49,9 @@ class Point(namedtuple("Point", ["x", "y"])):
         return (llx <= x <= urx) and (lly <= y <= ury)
 
 
-def line_collinear(x1, y1, x2, y2, x3, y3):
+def line_collinear(p1, p2, p3):
     """Are three points on the same line, regardless of order?"""
+    (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
     # https://stackoverflow.com/questions/3813681/checking-to-see-if-3-points-are-on-the-same-line
     return isclose((y1 - y2) * (x1 - x3), (y1 - y3) * (x1 - x2))
 
@@ -64,7 +65,7 @@ def collinear(p1, p2, p3):
     """
     (x1, y1), (x2, y2), (x3, y3) = p1, p2, p3
     if fbetween(x1, x2, x3) and fbetween(y1, y2, y3):
-        return line_collinear(x1, y1, x2, y2, x3, y3)
+        return line_collinear(p1, p2, p3)
     else:
         return False
 
@@ -95,7 +96,7 @@ class Line(namedtuple("Line", ["p1", "p2"])):
 
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
         if isclose(denom, 0):
-            if line_collinear(x1, y1, x2, y2, x3, y3):
+            if line_collinear(self.p1, self.p2, other.p1):
                 raise CoincidentLines("No intersection of identical lines")
             else:
                 raise ParallelLines("No intersection of parallel lines")
@@ -117,6 +118,29 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         offx = dy / hyp * distance
         offy = -dx / hyp * distance
         return Line(Point(x1 + offx, y1 + offy), Point(x2 + offx, y2 + offy))
+
+    def foot(self, point):
+        """What point on this line is the perpendicular foot of `point`?"""
+        (x1, y1), (x2, y2) = self
+        x3, y3 = point
+
+        # https://stackoverflow.com/a/1811636/14343
+        k = ((y2-y1) * (x3-x1) - (x2-x1) * (y3-y1)) / ((y2-y1) ** 2 + (x2-x1) ** 2)
+        x4 = x3 - k * (y2-y1)
+        y4 = y3 + k * (x2-x1)
+        return Point(x4, y4)
+
+    def perpendicular(self, thru):
+        """Create another Line perpendicular to this one, through `thru`."""
+        # We want to return Line(thru, self.foot(thru)), but if thru is on the
+        # line, then this is degenerate. Compute a new point off the line.
+        (x1, y1), (x2, y2) = self
+        dx = x2 - x1
+        dy = y2 - y1
+        (x3, y3) = foot = self.foot(thru)
+        x4 = x3 + dy
+        y4 = y3 - dx
+        return Line(foot, Point(x4, y4))
 
     def parallel(self, thru):
         """Create another Line parallel to this one, through `thru`."""

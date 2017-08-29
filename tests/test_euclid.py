@@ -11,7 +11,7 @@ import pytest
 
 from zellij.euclid import (
     Line, Point, Segment,
-    along_the_way, collinear,
+    along_the_way, collinear, line_collinear,
     CoincidentLines, ParallelLines,
 )
 from zellij.postulates import adjacent_pairs, all_pairs
@@ -139,7 +139,7 @@ def test_offset():
 
 
 @given(ipoints, ipoints, ipoints)
-def test_hypo_parallel(p1, p2, p3):
+def test_parallel(p1, p2, p3):
     # Make a line, and another line parallel to it through p3.
     l = Line(p1, p2)
     lpar = l.parallel(p3)
@@ -149,6 +149,25 @@ def test_hypo_parallel(p1, p2, p3):
 
     # Property: l and lpar should have the same angle.
     assert lpar.angle() == l.angle()
+
+@given(ipoints, ipoints, ipoints)
+def test_perpendicular(p1, p2, p3):
+    assume(p1 != p2)
+    l = Line(p1, p2)
+    foot = l.foot(p3)
+    perp = l.perpendicular(p3)
+    print(foot)
+    print(perp)
+
+    # Property: foot should be on l.
+    assert line_collinear(p1, p2, foot)
+
+    # Property: foot should be on perp.
+    assert line_collinear(perp.p1, perp.p2, foot)
+
+    # Property: perp's angle should be 90 degrees from l's.
+    angle_between = l.angle() - perp.angle()
+    assert math.isclose(angle_between % 180, 90)
 
 
 # Segments
