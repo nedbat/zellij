@@ -138,6 +138,19 @@ def test_offset():
     assert l2.p2 == Point(21, 8)
 
 
+@given(ipoints, ipoints, ipoints)
+def test_hypo_parallel(p1, p2, p3):
+    # Make a line, and another line parallel to it through p3.
+    l = Line(p1, p2)
+    lpar = l.parallel(p3)
+
+    # Property: lpar should go through p3.
+    assert lpar.p1 == p3
+
+    # Property: l and lpar should have the same angle.
+    assert lpar.angle() == l.angle()
+
+
 # Segments
 
 @pytest.mark.parametrize("p1, p2, p3, p4, isect", [

@@ -118,6 +118,14 @@ class Line(namedtuple("Line", ["p1", "p2"])):
         offy = -dx / hyp * distance
         return Line(Point(x1 + offx, y1 + offy), Point(x2 + offx, y2 + offy))
 
+    def parallel(self, thru):
+        """Create another Line parallel to this one, through `thru`."""
+        (x1, y1), (x2, y2) = self
+        x3, y3 = thru
+        x4 = (x2 - x1) + x3
+        y4 = (y2 - y1) + y3
+        return Line(thru, Point(x4, y4))
+
 
 class Segment(namedtuple('Segment', 'p1 p2')):
     """A segment of a line, from p1 to p2."""
