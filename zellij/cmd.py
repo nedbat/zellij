@@ -39,15 +39,17 @@ _common_options = {
 }
 
 def common_options(category):
-    def _wrapper(func):
+    """Provide a set of common options to a click command."""
+    def _wrapped(func):
         # from: https://github.com/pallets/click/issues/108#issuecomment-194465429
         for option in reversed(_common_options[category]):
             func = option(func)
         return func
-    return _wrapper
+    return _wrapped
 
 @click.group()
 def clickmain():
+    """Make Islamic-inspired geometric art."""
     pass
 
 
@@ -56,6 +58,7 @@ def clickmain():
 @common_options('drawing')
 @click.option("--strap-width", type=float, default=6, help='Width of the straps, in tile-percent')
 def straps(**opt):
+    """Draw with over-under straps"""
     width, height = opt['size']
 
     tilew = int(width/opt['tiles'])
@@ -99,6 +102,7 @@ def straps(**opt):
 @common_options('common')
 @common_options('drawing')
 def candystripe(**opt):
+    """Draw with crazy colors and a white stripe"""
     width, height = opt['size']
     tilew = int(width/opt['tiles'])
 
@@ -124,6 +128,7 @@ def candystripe(**opt):
 @common_options('common')
 @common_options('drawing')
 def diagram(**opt):
+    """Draw the underlying structure of a design"""
     width, height = opt['size']
     tilew = int(width/opt['tiles'])
 
@@ -146,6 +151,7 @@ def diagram(**opt):
         dwg.stroke()
 
     def single_tiler():
+        """Make a PathTiler right for drawing just one unit."""
         pt = PathTiler()
         # TODO: make this work for other symmetries
         pt.translate(2 * tilew * math.sqrt(3) / 2, tilew)
@@ -172,11 +178,12 @@ def diagram(**opt):
 @common_options('common')
 @common_options('drawing')
 def show_opts(**opt):
+    """Dump the provided options"""
     pprint.pprint(opt)
 
 
 def main():
-    # A Python main so we can eventually do some clean top-level exception handling.
+    """The main Zellij entry point."""
     try:
         clickmain()
     except:
