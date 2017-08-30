@@ -50,10 +50,13 @@ def debug_world(dwg0, paths):
 
     # Gray rectangle: the desired visible canvas.
     with dwg.style(rgb=(.95, .95, .95)):
-        dwg.move_to(*dwg0.device_to_user(0, 0))
-        dwg.line_to(*dwg0.device_to_user(dwg0.width, 0))
-        dwg.line_to(*dwg0.device_to_user(dwg0.width, dwg0.height))
-        dwg.line_to(*dwg0.device_to_user(0, dwg0.height))
+        llx, lly = dwg0.llx, dwg0.lly
+        urx = llx + dwg0.width
+        ury = lly + dwg0.height
+        dwg.move_to(*dwg0.device_to_user(llx, lly))
+        dwg.line_to(*dwg0.device_to_user(urx, lly))
+        dwg.line_to(*dwg0.device_to_user(urx, ury))
+        dwg.line_to(*dwg0.device_to_user(llx, ury))
         dwg.close_path()
         dwg.fill()
 
