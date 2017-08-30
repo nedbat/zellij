@@ -38,12 +38,23 @@ def tick_range(lo, hi, step):
     hi = ((hi // step) + 1) * step
     return range(lo, hi, step)
 
-def debug_world(paths, width, height):
+def debug_world(dwg0, paths):
+    """Draw a picture of the entire world.
+
+    `dwg0` is the Drawing we're really making.
+
+    `paths` are the paths that comprise the world.
+    """
+
     dwg = Drawing(paths=paths, name="debug_world", bg=None)
 
     # Gray rectangle: the desired visible canvas.
     with dwg.style(rgb=(.95, .95, .95)):
-        dwg.rectangle(0, 0, width, height)
+        dwg.move_to(*dwg0.device_to_user(0, 0))
+        dwg.line_to(*dwg0.device_to_user(dwg0.width, 0))
+        dwg.line_to(*dwg0.device_to_user(dwg0.width, dwg0.height))
+        dwg.line_to(*dwg0.device_to_user(0, dwg0.height))
+        dwg.close_path()
         dwg.fill()
 
     # Reference grid.

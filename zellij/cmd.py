@@ -84,7 +84,7 @@ def straps(**opt):
     paths = combine_paths(pt.paths)
 
     if should_debug('world'):
-        debug_world(paths, dwg.width, dwg.height)
+        debug_world(dwg, paths)
 
     straps = strapify(paths, **strap_kwargs)
 
