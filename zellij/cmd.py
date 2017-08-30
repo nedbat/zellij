@@ -47,6 +47,16 @@ def common_options(category):
         return func
     return _wrapped
 
+
+def start_drawing(opt, **drawing_args):
+    """Make a Drawing based on the options passed."""
+    width, height = opt['size']
+    dwg = Drawing(width, height, **drawing_args)
+    dwg.translate(width/2, height/2)
+    dwg.rotate(opt['rotate'])
+    dwg.translate(-width/2, -height/2)
+    return dwg
+
 @click.group()
 def clickmain():
     """Make Islamic-inspired geometric art."""
@@ -59,18 +69,13 @@ def clickmain():
 @click.option("--strap-width", type=float, default=6, help='Width of the straps, in tile-percent')
 def straps(**opt):
     """Draw with over-under straps"""
-    width, height = opt['size']
+    dwg = start_drawing(opt, name="straps", bg=(.8, .8, .8))
 
-    tilew = int(width/opt['tiles'])
+    tilew = int(dwg.width/opt['tiles'])
     if opt['strap_width'] > 0:
         strap_kwargs = dict(width=tilew * opt['strap_width'] / 100, random_factor=0)
     else:
         strap_kwargs = dict(width=tilew / 60, random_factor=4.9)
-
-    dwg = Drawing(width, height, name="straps", bg=(.8, .8, .8))
-    dwg.translate(width/2, height/2)
-    dwg.rotate(opt['rotate'])
-    dwg.translate(-width/2, -height/2)
 
     pt = PathTiler()
     design_class = get_design(opt['design'])
@@ -79,7 +84,7 @@ def straps(**opt):
     paths = combine_paths(pt.paths)
 
     if should_debug('world'):
-        debug_world(paths, width, height)
+        debug_world(paths, dwg.width, dwg.height)
 
     straps = strapify(paths, **strap_kwargs)
 
@@ -103,10 +108,9 @@ def straps(**opt):
 @common_options('drawing')
 def candystripe(**opt):
     """Draw with crazy colors and a white stripe"""
-    width, height = opt['size']
-    tilew = int(width/opt['tiles'])
+    dwg = start_drawing(opt, name="candy")
+    tilew = int(dwg.width/opt['tiles'])
 
-    dwg = Drawing(width, height, name="candy")
     pt = PathTiler()
     design_class = get_design(opt['design'])
     draw = design_class(tilew)
