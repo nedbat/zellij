@@ -5,3 +5,4 @@ hypothesis
 pytest-sugar
 pylint
 coverage
+webcolors

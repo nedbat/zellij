@@ -5,6 +5,8 @@ Color support for Zellij.
 import colorsys
 import random
 
+import webcolors
+
 
 def rgb255(r, g, b):
     """Define an RGB color with three values 0..255."""
@@ -24,6 +26,23 @@ def random_color():
         random.choice(range(3, 7))/10,
         random.choice(range(6, 11))/10,
     )
+
+
+def parse_color(s):
+    """Parse a string, and return a color, possibly None.
+
+    The color is a tuple of floats 0..1
+    """
+    if s.lower() == "none":
+        return None
+
+    try:
+        return rgb255(*webcolors.name_to_rgb(s))
+    except ValueError:
+        try:
+            return rgb255(*webcolors.hex_to_rgb(s))
+        except ValueError:
+            return "foo"
 
 
 # Some classic tile colors.
