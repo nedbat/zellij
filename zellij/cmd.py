@@ -5,7 +5,7 @@ import pprint
 
 import click
 
-from zellij.color import random_color
+from zellij.color import random_color, parse_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
@@ -33,6 +33,7 @@ _common_options = {
         click.option('--tiles', type=float, default=3, help='How many tiles to fit in the drawing'),
         click.option('--size', type=size_type, default='800', help='Size of the output'),
         click.option('--rotate', type=float, default=0, help='Angle to rotate the drawing'),
+        click.option('--background', type=parse_color, help='The color of the background'),
         click.option('--format', default='png'),
         click.argument('design'),
     ],
@@ -51,7 +52,11 @@ def common_options(category):
 def start_drawing(opt, **drawing_args):
     """Make a Drawing based on the options passed."""
     width, height = opt['size']
-    dwg = Drawing(width, height, **drawing_args)
+    bg = opt['background']
+    def_bg = drawing_args.pop('bg')
+    if bg is None:
+        bg = def_bg
+    dwg = Drawing(width, height, bg=bg, **drawing_args)
     dwg.translate(width/2, height/2)
     dwg.rotate(opt['rotate'])
     dwg.translate(-width/2, -height/2)

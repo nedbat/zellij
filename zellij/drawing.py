@@ -56,7 +56,7 @@ class Drawing:
             self.translate(-self.llx, -self.lly)
 
         # Start with a solid-color canvas.
-        if bg is not None:
+        if bg:
             with self.style(rgb=bg):
                 self.rectangle(self.llx, self.lly, self.width, self.height)
                 self.fill()

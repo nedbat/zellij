@@ -29,12 +29,14 @@ def random_color():
 
 
 def parse_color(s):
-    """Parse a string, and return a color, possibly None.
+    """Parse a string, and return a color.
+
+    As a special case, "none" returns an empty tuple ().
 
     The color is a tuple of floats 0..1
     """
     if s.lower() == "none":
-        return None
+        return ()
 
     try:
         return rgb255(*webcolors.name_to_rgb(s))

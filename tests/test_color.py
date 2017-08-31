@@ -17,7 +17,7 @@ def test_rgb255(r, g, b, result):
 
 
 @pytest.mark.parametrize("s, result", [
-    ("none", None),
+    ("none", ()),
     ("white", (1, 1, 1)),
     ("red", (1, 0, 0)),
     ("green", (0, HALF, 0)),
