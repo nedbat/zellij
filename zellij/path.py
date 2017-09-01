@@ -180,11 +180,8 @@ class Path:
 
 
 def defuzz_paths(paths):
-    dfz = Defuzzer()
-    dfpaths = []
-    for path in paths:
-        dfpaths.append(path.defuzz(dfz.defuzz))
-    return dfpaths
+    defuzz = Defuzzer().defuzz
+    return [path.defuzz(defuzz) for path in paths]
 
 def combine_paths(paths):
     paths = defuzz_paths(paths)
