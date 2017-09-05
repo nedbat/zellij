@@ -5,6 +5,7 @@ A convenience wrapper around Cairo.
 import contextlib
 import itertools
 import math
+import os.path
 import sys
 
 import cairo
@@ -12,8 +13,29 @@ import cairo
 from .path import paths_box
 
 
+def name_and_format(name, format):
+    """Resolve the filename and format of a drawing.
+
+    `format` is 'png', 'svg', or None. If None, then the file extension of
+    `name` is used, or 'png' if there is no extension.
+
+    If `name` is extensionless, then the format is used as the extension.
+
+    """
+    name_base, name_ext = os.path.splitext(name)
+    if format is None:
+        if name_ext:
+            format = name_ext.lstrip('.')
+        else:
+            format = "png"
+    if not name_ext:
+        name_ext = f".{format}"
+    name = name_base + name_ext
+    return name, format
+
+
 class Drawing:
-    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1), format='png'):
+    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1), format=None):
         """Create a new Cairo drawing.
 
         If `paths` is provided, the drawing is sized and positioned so that all
@@ -40,13 +62,13 @@ class Drawing:
 
         self.llx, self.lly = llx, lly
         self.width, self.height = width, height
-        self.name = name
-        self.format = format
+
+        self.name, self.format = name_and_format(name, format)
 
         if self.format == 'png':
             self.surface = cairo.ImageSurface(cairo.Format.ARGB32, self.width, self.height)
         elif self.format == 'svg':
-            self.surface = cairo.SVGSurface(f"{self.name}.svg", self.width, self.height)
+            self.surface = cairo.SVGSurface(self.name, self.width, self.height)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_antialias(cairo.Antialias.BEST)
         self.ctx.set_line_cap(cairo.LineCap.ROUND)
@@ -124,7 +146,7 @@ class Drawing:
 
     def finish(self):
         if self.format == 'png':
-            self.write_to_png(f"{self.name}.png")
+            self.write_to_png(self.name)
         elif self.format == 'svg':
             self.surface.flush()
             self.surface.finish()
