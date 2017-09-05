@@ -29,12 +29,12 @@ _common_options = {
         *debug_click_options,
     ],
     'drawing': [
-        click.option('--output', default='drawing.png', help='File name to write to'),
+        click.option('--output', help='File name to write to'),
         click.option('--tiles', type=float, default=3, help='How many tiles to fit in the drawing'),
         click.option('--size', type=size_type, default='800', help='Size of the output'),
         click.option('--rotate', type=float, default=0, help='Angle to rotate the drawing'),
         click.option('--background', type=parse_color, help='The color of the background'),
-        click.option('--format', default='png'),
+        click.option('--format', help='The output format, png or svg'),
         click.argument('design'),
     ],
 }
@@ -52,11 +52,17 @@ def common_options(category):
 def start_drawing(opt, **drawing_args):
     """Make a Drawing based on the options passed."""
     width, height = opt['size']
+
     bg = opt['background']
-    def_bg = drawing_args.pop('bg')
+    def_bg = drawing_args.pop('bg', (1, 1, 1))
     if bg is None:
         bg = def_bg
-    dwg = Drawing(width, height, bg=bg, **drawing_args)
+
+    name = opt['output']
+    def_name = drawing_args.pop('name', 'drawing')
+    format = opt['format']
+
+    dwg = Drawing(width, height, name=name or def_name, format=format, bg=bg, **drawing_args)
     dwg.translate(width/2, height/2)
     dwg.rotate(opt['rotate'])
     dwg.translate(-width/2, -height/2)
