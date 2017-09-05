@@ -160,8 +160,9 @@ def strapify(paths, **strap_kwargs):
                 if previous_path:
                     dwg.draw_path(previous_path, rgb=(1, 0, 0), width=10, dash=[30, 30])
                 dwg.draw_path(path, rgb=(1, 0, 0), width=15)
-                dwg.fill_points([path[0]], rgb=(1, 0, 0), radius=15*3/2)
-                dwg.fill_points([path[1]], rgb=(1, 0, 0), radius=15*2/2)
+                pt0, pt1 = list(path)[:2]
+                dwg.fill_points([pt0], rgb=(1, 0, 0), radius=15*3/2)
+                dwg.fill_points([pt1], rgb=(1, 0, 0), radius=15*2/2)
                 partial_over = [pt for pt, xing in xings.items() if xing.under is None]
                 partial_under = [pt for pt, xing in xings.items() if xing.over is None]
                 dwg.circle_points(partial_over, rgb=(.8, 0, 0), radius=21, width=9)
@@ -224,7 +225,7 @@ def strapify(paths, **strap_kwargs):
             paths_done.add(path)
             if debug:
                 dwg.finish()
-                if 0 and dwg.num > 10:
+                if dwg.num > 20:
                     print()
                     import sys; sys.exit()
 
