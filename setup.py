@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Install Zellij."""
 
 from setuptools import setup
 

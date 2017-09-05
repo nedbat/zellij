@@ -1,3 +1,8 @@
+"""Design support for Zellij.
+
+Different patterns are implemented as subclasses of Design.
+"""
+
 import importlib
 import inspect
 
