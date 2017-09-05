@@ -65,8 +65,8 @@ def talk_pictures():
 
     def single_tiler():
         pt = PathTiler(dwg)
-        pt.translate(2 * tilew * SQRT3 / 2, tilew)
-        pt.reflect_xy(0, 0)
+        pt.pc.translate(2 * tilew * SQRT3 / 2, tilew)
+        pt.pc.reflect_xy(0, 0)
         return pt
 
     dwg = Drawing(*size, name=dwg_name('triangle'))
@@ -77,7 +77,7 @@ def talk_pictures():
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
-    draw.draw_tiler_unit(pt)
+    draw.draw_tiler_unit(pt.pc)
     with dwg.style(rgb=(1, 0, 0), width=3):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -91,12 +91,12 @@ def talk_pictures():
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
-    draw.draw_tiler_unit(pt)
+    draw.draw_tiler_unit(pt.pc)
     with dwg.style(rgb=(1, 0, 0), width=3):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     pt = single_tiler()
-    draw.draw_tile(pt)
+    draw.draw_tile(pt.pc)
     with dwg.style(rgb=(0, 0, 0), width=6):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -114,7 +114,7 @@ def talk_pictures():
         dwg.stroke()
 
     pt = single_tiler()
-    draw.draw_tile(pt)
+    draw.draw_tile(pt.pc)
     with dwg.style(rgb=(0, 0, 0), width=6):
         draw_paths(pt.paths, dwg)
         dwg.stroke()

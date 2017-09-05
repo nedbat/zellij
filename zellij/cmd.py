@@ -169,20 +169,20 @@ def diagram(**opt):
         """Make a PathTiler right for drawing just one unit."""
         pt = PathTiler(dwg)
         # TODO: make this work for other symmetries
-        pt.translate(2 * tilew * math.sqrt(3) / 2, tilew)
-        pt.reflect_xy(0, 0)
+        pt.pc.translate(2 * tilew * math.sqrt(3) / 2, tilew)
+        pt.pc.reflect_xy(0, 0)
         return pt
 
     # The tiler unit.
     pt = single_tiler()
-    draw.draw_tiler_unit(pt)
+    draw.draw_tiler_unit(pt.pc)
     with dwg.style(rgb=(1, 0, 0), width=3):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
 
     # The design.
     pt = single_tiler()
-    draw.draw_tile(pt)
+    draw.draw_tile(pt.pc)
     with dwg.style(rgb=(0, 0, 0), width=6):
         draw_paths(pt.paths, dwg)
         dwg.stroke()

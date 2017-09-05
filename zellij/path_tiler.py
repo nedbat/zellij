@@ -9,10 +9,9 @@ from .euclid import Point
 from .path import Path
 
 
-class PathTiler:
-    def __init__(self, drawing):
-        self.drawing = drawing
-
+class PathCanvas:
+    """A drawable surface that produces paths as a result."""
+    def __init__(self):
         self.path_pts = []
         self.transform = Affine.identity()
         self.curpt = None
@@ -106,6 +105,18 @@ class PathTiler:
         finally:
             self.restore()
 
+
+class PathTiler:
+    """Apply kaleidoscopic symmetries to drawing functions."""
+
+    def __init__(self, drawing):
+        self.drawing = drawing
+        self.pc = PathCanvas()
+
+    @property
+    def paths(self):
+        return self.pc.paths
+
     # Tiling of draw functions.
     # http://www.quadibloc.com/math/images/wall17.gif
     # https://www.math.toronto.edu/drorbn/Gallery/Symmetry/Tilings/Sanderson/index.html
@@ -122,40 +133,40 @@ class PathTiler:
         tiles_down = int(dwgh // vry)
         for row in range(-buffer, tiles_across + buffer):
             for col in range(-buffer, tiles_down + buffer):
-                with self.saved():
-                    self.translate(row * vrx + col * vcx, row * vry + col * vcy)
-                    draw_func(self)
+                with self.pc.saved():
+                    self.pc.translate(row * vrx + col * vcx, row * vry + col * vcy)
+                    draw_func(self.pc)
 
     def tile_pmm(self, draw_func, dx, dy):
-        def four_mirror(pt):
-            draw_func(pt)
-            with pt.saved():
-                pt.reflect_x(dx)
-                draw_func(pt)
-            with pt.saved():
-                pt.reflect_xy(dx, dy)
-                draw_func(pt)
-            with pt.saved():
-                pt.reflect_y(dy)
-                draw_func(pt)
+        def four_mirror(pc):
+            draw_func(pc)
+            with pc.saved():
+                pc.reflect_x(dx)
+                draw_func(pc)
+            with pc.saved():
+                pc.reflect_xy(dx, dy)
+                draw_func(pc)
+            with pc.saved():
+                pc.reflect_y(dy)
+                draw_func(pc)
 
         self.tile_p1(four_mirror, (dx*2, 0), (0, dy*2), buffer=0)
 
     def tile_p6(self, draw_func, triw):
-        def six_triangles(pt):
-            pt.translate(0, triw)
+        def six_triangles(pc):
+            pc.translate(0, triw)
             for _ in range(6):
-                self.rotate(60)
-                draw_func(pt)
+                pc.rotate(60)
+                draw_func(pc)
 
         triw3 = triw * math.sqrt(3)
         self.tile_p1(six_triangles, (triw3, 0), (triw3 / 2, 1.5 * triw), buffer=2)
 
     def tile_p6m(self, draw_func, triw):
-        def draw_mirrored(pt):
-            draw_func(pt)
-            with pt.saved():
-                pt.reflect_x(0)
-                draw_func(pt)
+        def draw_mirrored(pc):
+            draw_func(pc)
+            with pc.saved():
+                pc.reflect_x(0)
+                draw_func(pc)
 
         self.tile_p6(draw_mirrored, triw)
