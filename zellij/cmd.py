@@ -88,10 +88,10 @@ def straps(**opt):
     else:
         strap_kwargs = dict(width=tilew / 60, random_factor=4.9)
 
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     design_class = get_design(opt['design'])
     draw = design_class(tilew)
-    draw.draw(pt, dwg.get_size())
+    draw.draw(pt)
     paths = combine_paths(pt.paths)
 
     if should_debug('world'):
@@ -122,10 +122,10 @@ def candystripe(**opt):
     dwg = start_drawing(opt, name="candy")
     tilew = int(dwg.width/opt['tiles'])
 
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     design_class = get_design(opt['design'])
     draw = design_class(tilew)
-    draw.draw(pt, dwg.get_size())
+    draw.draw(pt)
     paths = combine_paths(pt.paths)
 
     LINE_WIDTH = tilew/4
@@ -152,22 +152,22 @@ def diagram(**opt):
     draw = design_class(tilew)
 
     # The full pattern.
-    pt = PathTiler()
-    draw.draw(pt, dwg.get_size())
+    pt = PathTiler(dwg)
+    draw.draw(pt)
     with dwg.style(rgb=(.5, .5, .5)):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
 
     # The symmetry.
-    pt = PathTiler()
-    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    pt = PathTiler(dwg)
+    pt.tile_p6m(draw.draw_tiler_unit, tilew)
     with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
 
     def single_tiler():
         """Make a PathTiler right for drawing just one unit."""
-        pt = PathTiler()
+        pt = PathTiler(dwg)
         # TODO: make this work for other symmetries
         pt.translate(2 * tilew * math.sqrt(3) / 2, tilew)
         pt.reflect_xy(0, 0)

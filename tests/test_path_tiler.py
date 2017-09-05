@@ -6,12 +6,12 @@ from zellij.path import Path
 
 
 def test_do_nothing():
-    pt = PathTiler()
+    pt = PathTiler(None)
     assert pt.paths == []
 
 
 def test_two_segments():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.line_to(150, 200)
     pt.move_to(17, 17)
@@ -24,7 +24,7 @@ def test_two_segments():
 
 
 def test_translation():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.translate(1000, 2000)
     pt.line_to(10, 20)
@@ -34,7 +34,7 @@ def test_translation():
 
 
 def test_reflect_x():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.reflect_x(1000)
     pt.line_to(200, 200)
@@ -44,7 +44,7 @@ def test_reflect_x():
 
 
 def test_reflect_y():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.reflect_y(1000)
     pt.line_to(200, 200)
@@ -54,7 +54,7 @@ def test_reflect_y():
 
 
 def test_reflect_xy():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.reflect_xy(1000, 2000)
     pt.line_to(200, 200)
@@ -64,7 +64,7 @@ def test_reflect_xy():
 
 
 def test_reflect_line():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.reflect_line(Point(50, -50), Point(150, 50))
     pt.line_to(100, 50)
@@ -75,7 +75,7 @@ def test_reflect_line():
 
 
 def test_save_restore():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.move_to(100, 100)
     pt.translate(1000, 2000)
     pt.line_to(10, 20)
@@ -94,7 +94,7 @@ def test_save_restore():
 
 
 def test_rel_line_to():
-    pt = PathTiler()
+    pt = PathTiler(None)
     pt.translate(1000, 2000)
     pt.move_to(0, 0)
     pt.rel_line_to(100, 200)

@@ -31,3 +31,4 @@ samples:
 	python bin/talk_pictures.py
 	zellij straps threestars --tiles=2 --debug=strapify
 	zellij candystripe breath --tiles=6
+	zellij diagram threestars

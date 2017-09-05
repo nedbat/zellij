@@ -14,9 +14,9 @@ SQRT3 = math.sqrt(3)
 
 
 def draw_it(tilew, dwg, combined=True, fat=True, color=(0, 0, 0), line_width=2, offset=None):
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     draw = ThreeStarsDesign(tilew)
-    draw.draw(pt, dwg.get_size())
+    draw.draw(pt)
     paths = pt.paths
     if combined:
         paths = combine_paths(pt.paths)
@@ -55,24 +55,24 @@ def talk_pictures():
 
 
     dwg = Drawing(*size, name=dwg_name('symmetry'))
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     draw = ThreeStarsDesign(tilew)
-    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, tilew)
     with dwg.style(rgb=(1, .15, .15), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
     dwg.finish()
 
     def single_tiler():
-        pt = PathTiler()
+        pt = PathTiler(dwg)
         pt.translate(2 * tilew * SQRT3 / 2, tilew)
         pt.reflect_xy(0, 0)
         return pt
 
     dwg = Drawing(*size, name=dwg_name('triangle'))
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     draw = ThreeStarsDesign(tilew)
-    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, tilew)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -84,9 +84,9 @@ def talk_pictures():
     dwg.finish()
 
     dwg = Drawing(*size, name=dwg_name('design'))
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     draw = ThreeStarsDesign(tilew)
-    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, tilew)
     with dwg.style(rgb=(1, .5, .5), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()
@@ -106,9 +106,9 @@ def talk_pictures():
     dwg = Drawing(*size, name=dwg_name('lined'))
     draw_it(tilew, dwg, fat=False, color=(.5, .5, .5))
 
-    pt = PathTiler()
+    pt = PathTiler(dwg)
     draw = ThreeStarsDesign(tilew)
-    pt.tile_p6m(draw.draw_tiler_unit, dwg.get_size(), tilew)
+    pt.tile_p6m(draw.draw_tiler_unit, tilew)
     with dwg.style(rgb=(1, .75, .75), width=1, dash=[5, 5]):
         draw_paths(pt.paths, dwg)
         dwg.stroke()

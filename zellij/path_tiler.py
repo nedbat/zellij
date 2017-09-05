@@ -10,7 +10,9 @@ from .path import Path
 
 
 class PathTiler:
-    def __init__(self):
+    def __init__(self, drawing):
+        self.drawing = drawing
+
         self.path_pts = []
         self.transform = Affine.identity()
         self.curpt = None
@@ -108,13 +110,13 @@ class PathTiler:
     # http://www.quadibloc.com/math/images/wall17.gif
     # https://www.math.toronto.edu/drorbn/Gallery/Symmetry/Tilings/Sanderson/index.html
 
-    def tile_p1(self, draw_func, dwg_size, vcol, vrow, buffer=None):
+    def tile_p1(self, draw_func, vcol, vrow, buffer=None):
         """Repeatedly call draw_func to tile the drawing."""
         # Should compute exactly the grid of parallelograms needed, but I don't
         # know how yet.
         if buffer is None:
             buffer = 3
-        dwgw, dwgh = dwg_size
+        dwgw, dwgh = self.drawing.get_size()
         (vrx, vry), (vcx, vcy) = vrow, vcol
         tiles_across = int(dwgw // vcx)
         tiles_down = int(dwgh // vry)
@@ -124,7 +126,7 @@ class PathTiler:
                     self.translate(row * vrx + col * vcx, row * vry + col * vcy)
                     draw_func(self)
 
-    def tile_pmm(self, draw_func, dwg_size, dx, dy):
+    def tile_pmm(self, draw_func, dx, dy):
         def four_mirror(pt):
             draw_func(pt)
             with pt.saved():
@@ -137,9 +139,9 @@ class PathTiler:
                 pt.reflect_y(dy)
                 draw_func(pt)
 
-        self.tile_p1(four_mirror, dwg_size, (dx*2, 0), (0, dy*2), buffer=0)
+        self.tile_p1(four_mirror, (dx*2, 0), (0, dy*2), buffer=0)
 
-    def tile_p6(self, draw_func, dwg_size, triw):
+    def tile_p6(self, draw_func, triw):
         def six_triangles(pt):
             pt.translate(0, triw)
             for _ in range(6):
@@ -147,13 +149,13 @@ class PathTiler:
                 draw_func(pt)
 
         triw3 = triw * math.sqrt(3)
-        self.tile_p1(six_triangles, dwg_size, (triw3, 0), (triw3 / 2, 1.5 * triw), buffer=2)
+        self.tile_p1(six_triangles, (triw3, 0), (triw3 / 2, 1.5 * triw), buffer=2)
 
-    def tile_p6m(self, draw_func, dwg_size, triw):
+    def tile_p6m(self, draw_func, triw):
         def draw_mirrored(pt):
             draw_func(pt)
             with pt.saved():
                 pt.reflect_x(0)
                 draw_func(pt)
 
-        self.tile_p6(draw_mirrored, dwg_size, triw)
+        self.tile_p6(draw_mirrored, triw)
