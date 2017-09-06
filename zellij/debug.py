@@ -4,7 +4,7 @@ import re
 
 import click
 
-from zellij.drawing import Drawing
+from zellij.drawing import Drawing, path_bounds
 from zellij.euclid import Point
 
 
@@ -46,7 +46,7 @@ def debug_world(dwg0, paths):
     `paths` are the paths that comprise the world.
     """
 
-    dwg = Drawing(paths=paths, name="debug_world", bg=None)
+    dwg = Drawing(bounds=path_bounds(paths), name="debug_world", bg=None)
 
     # Gray rectangle: the desired visible canvas.
     with dwg.style(rgb=(.95, .95, .95)):

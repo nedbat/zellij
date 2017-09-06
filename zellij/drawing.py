@@ -34,34 +34,38 @@ def name_and_format(name, format):
     return name, format
 
 
+def path_bounds(paths):
+    """Return the (llx, lly, urx, ury) for nicely enclosing the paths."""
+    (llx, lly), (urx, ury) = paths_box(paths)
+    dx = urx - llx
+    dy = ury - lly
+    margin = max(dx, dy) * .02
+    urx += margin
+    ury += margin
+    llx -= margin
+    lly -= margin
+    return llx, lly, urx, ury
+
+
 class Drawing:
-    def __init__(self, width=None, height=None, name=None, paths=None, bg=(1, 1, 1), format=None):
+    def __init__(self, width=None, height=None, name=None, bounds=None, bg=(1, 1, 1), format=None):
         """Create a new Cairo drawing.
 
-        If `paths` is provided, the drawing is sized and positioned so that all
-        of the paths are included.  Otherwise, provide `width` and `height` to
+        If `bounds` is provided, it's a 4-tuple of (llx, lly, urx, ury) describing
+        the bounds of the drawing.  Otherwise, provide `width` and `height` to
         specify a size explicitly.
 
         `bg` is the background color to paint initially.
 
         """
-        if paths:
-            (llx, lly), (urx, ury) = paths_box(paths)
-            dx = urx - llx
-            dy = ury - lly
-            margin = max(dx, dy) * .02
-            urx += margin
-            ury += margin
-            llx -= margin
-            lly -= margin
-            width, height = int(urx - llx), int(ury - lly)
-        else:
+        if bounds is None:
             assert width is not None
             assert height is not None
-            llx = lly = 0
+            bounds = (0, 0, width, height)
 
-        self.llx, self.lly = llx, lly
-        self.width, self.height = width, height
+        self.llx, self.lly, urx, ury = bounds
+        self.width = int(urx - self.llx)
+        self.height = int(ury - self.lly)
 
         self.name, self.format = name_and_format(name, format)
 
@@ -74,8 +78,7 @@ class Drawing:
         self.ctx.set_line_cap(cairo.LineCap.ROUND)
         self.ctx.set_line_join(cairo.LineJoin.MITER)
 
-        if paths:
-            self.translate(-self.llx, -self.lly)
+        self.translate(-self.llx, -self.lly)
 
         # Start with a solid-color canvas.
         if bg:

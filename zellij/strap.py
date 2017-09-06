@@ -5,7 +5,7 @@ import itertools
 import random
 
 from zellij.debug import should_debug
-from zellij.drawing import DrawingSequence
+from zellij.drawing import DrawingSequence, path_bounds
 from zellij.euclid import Point, Segment
 from zellij.intersection import segment_intersections
 from zellij.path import Path, show_path
@@ -137,7 +137,7 @@ def strapify(paths, **strap_kwargs):
 
     debug = should_debug("strapify")
     if debug:
-        dbgdwgs = iter(DrawingSequence(name="debugs_", paths=paths))
+        dbgdwgs = iter(DrawingSequence(name="debugs_", bounds=path_bounds(paths)))
 
     paths_to_do = set(paths)
     paths_done = set()
