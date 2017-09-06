@@ -130,6 +130,9 @@ class Drawing:
     def get_size(self):
         return (self.width, self.height)
 
+    def corners(self):
+        return self.llx, self.lly, self.llx + self.width, self.lly + self.height
+
     def circle(self, xc, yc, radius):
         self.arc(xc, yc, radius, 0, math.pi * 2)
 

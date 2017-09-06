@@ -50,9 +50,7 @@ def debug_world(dwg0, paths):
 
     # Gray rectangle: the desired visible canvas.
     with dwg.style(rgb=(.95, .95, .95)):
-        llx, lly = dwg0.llx, dwg0.lly
-        urx = llx + dwg0.width
-        ury = lly + dwg0.height
+        llx, lly, urx, ury = dwg0.corners()
         dwg.move_to(*dwg0.device_to_user(llx, lly))
         dwg.line_to(*dwg0.device_to_user(urx, lly))
         dwg.line_to(*dwg0.device_to_user(urx, ury))
@@ -61,9 +59,7 @@ def debug_world(dwg0, paths):
         dwg.fill()
 
     # Reference grid.
-    llx, lly = dwg.llx, dwg.lly
-    urx = llx + dwg.width
-    ury = lly + dwg.height
+    llx, lly, urx, ury = dwg.corners()
     with dwg.style(rgb=(.5, 1, 1), width=1, dash=[5, 5], dash_offset=7.5):
         for xmin in tick_range(llx, urx, 20):
             dwg.move_to(xmin, lly)
