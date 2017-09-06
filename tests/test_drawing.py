@@ -20,4 +20,3 @@ def test_name_and_format(name_in, format_in, name_out, format_out):
     name_act, format_act = name_and_format(name_in, format_in)
     assert name_act == name_out
     assert format_act == format_out
-
