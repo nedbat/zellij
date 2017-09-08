@@ -190,3 +190,25 @@ class Segment(namedtuple('Segment', 'p1 p2')):
         do.
         """
         return sorted(points, key=self.p1.distance)
+
+
+class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
+    """A rectangle bounding something in the plane."""
+
+    @classmethod
+    def points(cls, pts):
+        """The Bounds for a collection of points."""
+        return cls(
+            min(pt.x for pt in pts),
+            min(pt.y for pt in pts),
+            max(pt.x for pt in pts),
+            max(pt.y for pt in pts),
+        )
+
+    def __or__(self, other):
+        return self.__class__(
+            min(self.llx, other.llx),
+            min(self.lly, other.lly),
+            max(self.urx, other.urx),
+            max(self.ury, other.ury),
+        )

@@ -10,7 +10,7 @@ from hypothesis.strategies import lists, integers
 import pytest
 
 from zellij.euclid import (
-    Line, Point, Segment,
+    Line, Point, Segment, Bounds,
     along_the_way, collinear, line_collinear,
     CoincidentLines, ParallelLines,
 )
@@ -227,3 +227,41 @@ def test_segment_sort_along(p1, p2, tvals):
     )
     # The total distance will be wrong by at least 2*min_gap if it is wrong.
     assert total - original < 2 * min_gap
+
+
+# Bounds
+
+@given(lists(ipoints, min_size=1))
+def test_bounds_points(pts):
+    bounds = Bounds.points(pts)
+    assert_good_bounds(bounds, pts)
+
+
+def assert_good_bounds(bounds, pts):
+    """Assert that `bounds` is the right bounds for `pts`."""
+    assert bounds.llx <= bounds.urx
+    assert bounds.lly <= bounds.ury
+
+    # The bounds must contain all the points.
+    assert all(bounds.llx <= pt.x for pt in pts)
+    assert all(bounds.lly <= pt.y for pt in pts)
+    assert all(bounds.urx >= pt.x for pt in pts)
+    assert all(bounds.ury >= pt.y for pt in pts)
+
+    # Each edge of the boundsounds must touch at least one point.
+    assert any(bounds.llx == pt.x for pt in pts)
+    assert any(bounds.lly == pt.y for pt in pts)
+    assert any(bounds.urx == pt.x for pt in pts)
+    assert any(bounds.ury == pt.y for pt in pts)
+
+
+@given(lists(ipoints, min_size=2))
+def test_bounds_union(pts):
+    # Compute the bounds of the even and odd separately.
+    b0 = Bounds.points(pts[::2])
+    b1 = Bounds.points(pts[1::2])
+
+    # The union should be correct.
+    b = b0 | b1
+
+    assert_good_bounds(b, pts)
