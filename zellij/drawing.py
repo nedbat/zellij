@@ -10,7 +10,8 @@ import sys
 
 import cairo
 
-from .path import paths_box
+from .euclid import Bounds
+from .path import paths_bounds
 
 
 def name_and_format(name, format):
@@ -34,26 +35,24 @@ def name_and_format(name, format):
     return name, format
 
 
-def path_bounds(paths):
+def nice_paths_bounds(paths):
     """Return the (llx, lly, urx, ury) for nicely enclosing the paths."""
-    (llx, lly), (urx, ury) = paths_box(paths)
-    dx = urx - llx
-    dy = ury - lly
-    margin = max(dx, dy) * .02
+    llx, lly, urx, ury = bounds = paths_bounds(paths)
+    margin = max(bounds.width, bounds.height) * .02
     urx += margin
     ury += margin
     llx -= margin
     lly -= margin
-    return llx, lly, urx, ury
+    return Bounds(llx, lly, urx, ury)
 
 
 class Drawing:
     def __init__(self, width=None, height=None, name=None, bounds=None, bg=(1, 1, 1), format=None):
         """Create a new Cairo drawing.
 
-        If `bounds` is provided, it's a 4-tuple of (llx, lly, urx, ury) describing
-        the bounds of the drawing.  Otherwise, provide `width` and `height` to
-        specify a size explicitly.
+        If `bounds` is provided, it's a Bounds describing the extend of the
+        drawing.  Otherwise, provide `width` and `height` to specify a size
+        explicitly.
 
         `bg` is the background color to paint initially.
 
@@ -61,11 +60,11 @@ class Drawing:
         if bounds is None:
             assert width is not None
             assert height is not None
-            bounds = (0, 0, width, height)
+            bounds = Bounds(0, 0, width, height)
+        self.bounds = bounds
 
-        self.llx, self.lly, urx, ury = bounds
-        self.width = int(urx - self.llx)
-        self.height = int(ury - self.lly)
+        self.width = int(self.bounds.width)
+        self.height = int(self.bounds.height)
 
         self.name, self.format = name_and_format(name, format)
 
@@ -78,12 +77,12 @@ class Drawing:
         self.ctx.set_line_cap(cairo.LineCap.ROUND)
         self.ctx.set_line_join(cairo.LineJoin.MITER)
 
-        self.translate(-self.llx, -self.lly)
+        self.translate(-self.bounds.llx, -self.bounds.lly)
 
         # Start with a solid-color canvas.
         if bg:
             with self.style(rgb=bg):
-                self.rectangle(self.llx, self.lly, self.width, self.height)
+                self.rectangle(self.bounds.llx, self.bounds.lly, self.width, self.height)
                 self.fill()
 
     def __getattr__(self, name):
@@ -132,9 +131,6 @@ class Drawing:
 
     def get_size(self):
         return (self.width, self.height)
-
-    def corners(self):
-        return self.llx, self.lly, self.llx + self.width, self.lly + self.height
 
     def circle(self, xc, yc, radius):
         self.arc(xc, yc, radius, 0, math.pi * 2)

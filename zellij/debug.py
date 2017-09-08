@@ -4,7 +4,7 @@ import re
 
 import click
 
-from zellij.drawing import Drawing, path_bounds
+from zellij.drawing import Drawing, nice_paths_bounds
 from zellij.euclid import Point
 
 
@@ -46,11 +46,11 @@ def debug_world(dwg0, paths):
     `paths` are the paths that comprise the world.
     """
 
-    dwg = Drawing(bounds=path_bounds(paths), name="debug_world", bg=None)
+    dwg = Drawing(bounds=nice_paths_bounds(paths), name="debug_world", bg=None)
 
     # Gray rectangle: the desired visible canvas.
     with dwg.style(rgb=(.95, .95, .95)):
-        llx, lly, urx, ury = dwg0.corners()
+        llx, lly, urx, ury = dwg0.bounds
         dwg.move_to(*dwg0.device_to_user(llx, lly))
         dwg.line_to(*dwg0.device_to_user(urx, lly))
         dwg.line_to(*dwg0.device_to_user(urx, ury))
@@ -59,7 +59,7 @@ def debug_world(dwg0, paths):
         dwg.fill()
 
     # Reference grid.
-    llx, lly, urx, ury = dwg.corners()
+    llx, lly, urx, ury = dwg.bounds
     with dwg.style(rgb=(.5, 1, 1), width=1, dash=[5, 5], dash_offset=7.5):
         for xmin in tick_range(llx, urx, 20):
             dwg.move_to(xmin, lly)

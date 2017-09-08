@@ -3,7 +3,7 @@
 import collections
 
 from .defuzz import Defuzzer
-from .euclid import collinear, Point, Line, Segment
+from .euclid import collinear, Point, Line, Segment, Bounds
 from .postulates import adjacent_pairs, triples
 
 
@@ -47,6 +47,10 @@ class Path:
     def ends(self):
         yield self.points[0]
         yield self.points[-1]
+
+    def bounds(self):
+        """What is the `Bounds` for this path?"""
+        return Bounds.points(self.points)
 
     def segments(self):
         for p1, p2 in adjacent_pairs(self.points):
@@ -255,13 +259,12 @@ def show_paths(paths):
     ret += "]"
     return ret
 
-def paths_box(paths):
-    """Return the (ll, ur) pair of points that define the bounding box."""
-    minx = min(p.x for path in paths for p in path)
-    maxx = max(p.x for path in paths for p in path)
-    miny = min(p.y for path in paths for p in path)
-    maxy = max(p.y for path in paths for p in path)
-    return Point(minx, miny), Point(maxx, maxy)
+def paths_bounds(paths):
+    """Return the `Bounds` of the paths."""
+    bounds = paths[0].bounds()
+    for path in paths:
+        bounds |= path.bounds()
+    return bounds
 
 
 def equal_path(path1, path2):

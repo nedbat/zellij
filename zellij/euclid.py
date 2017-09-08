@@ -205,6 +205,14 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
             max(pt.y for pt in pts),
         )
 
+    @property
+    def width(self):
+        return self.urx - self.llx
+
+    @property
+    def height(self):
+        return self.ury - self.lly
+
     def __or__(self, other):
         return self.__class__(
             min(self.llx, other.llx),
