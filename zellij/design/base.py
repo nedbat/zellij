@@ -20,8 +20,8 @@ class PmmDesign(Design):
     def tileh(self):
         return self.tilew
 
-    def draw(self, pt):
-        pt.tile_pmm(self.draw_tile, self.tilew, self.tileh())
+    def draw(self, tiler):
+        tiler.tile_pmm(self.draw_tile, self.tilew, self.tileh())
 
 
 class P6mDesign(Design):
@@ -30,8 +30,8 @@ class P6mDesign(Design):
     def __init__(self, tilew):
         self.tilew = tilew
 
-    def draw(self, pt):
-        pt.tile_p6m(self.draw_tile, self.tilew)
+    def draw(self, tiler):
+        tiler.tile_p6m(self.draw_tile, self.tilew)
 
     def three_points(self):
         self.top = Point(0, 0)
