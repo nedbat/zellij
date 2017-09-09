@@ -37,13 +37,7 @@ def name_and_format(name, format):
 
 def nice_paths_bounds(paths):
     """Return the (llx, lly, urx, ury) for nicely enclosing the paths."""
-    llx, lly, urx, ury = bounds = paths_bounds(paths)
-    margin = max(bounds.width, bounds.height) * .02
-    urx += margin
-    ury += margin
-    llx -= margin
-    lly -= margin
-    return Bounds(llx, lly, urx, ury)
+    return paths_bounds(paths).expand(percent=2)
 
 
 class Drawing:

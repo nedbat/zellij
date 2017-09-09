@@ -220,3 +220,13 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
             max(self.urx, other.urx),
             max(self.ury, other.ury),
         )
+
+    def expand(self, *, percent):
+        """Create a Bounds slightly larger than this one."""
+        extra = max(self.width, self.height) * percent / 100
+        return Bounds(
+            self.llx - extra,
+            self.lly - extra,
+            self.urx + extra,
+            self.ury + extra,
+        )
