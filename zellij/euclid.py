@@ -230,3 +230,10 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
             self.urx + extra,
             self.ury + extra,
         )
+
+    def overlap(self, other):
+        """Do these two Bounds overlap at all?"""
+        return (
+            overlap(self.llx, self.urx, other.llx, other.urx) and
+            overlap(self.lly, self.ury, other.lly, other.ury)
+        )
