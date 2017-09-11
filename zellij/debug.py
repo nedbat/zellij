@@ -4,7 +4,7 @@ import re
 
 import click
 
-from zellij.drawing import Drawing, nice_paths_bounds
+from zellij.drawing import Drawing
 from zellij.euclid import Point
 from zellij.path import Path, paths_bounds
 
@@ -48,13 +48,7 @@ def debug_world(dwg0, paths):
     """
 
     # Get the path of the real drawing.
-    llx0, lly0, urx0, ury0 = dwg0.bounds
-    dwg0_path = Path([
-        Point(*dwg0.device_to_user(llx0, lly0)),
-        Point(*dwg0.device_to_user(urx0, lly0)),
-        Point(*dwg0.device_to_user(urx0, ury0)),
-        Point(*dwg0.device_to_user(llx0, ury0)),
-    ])
+    dwg0_path = Path([Point(*dwg0.device_to_user(*pt)) for pt in dwg0.bounds.corners()])
 
     # Get the bounds of everything we're going to draw.
     bounds = paths_bounds(paths)

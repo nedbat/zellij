@@ -205,6 +205,13 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
             max(pt.y for pt in pts),
         )
 
+    def corners(self):
+        """Produce the four Points at the corners of the bounds."""
+        yield Point(self.llx, self.lly)
+        yield Point(self.urx, self.lly)
+        yield Point(self.urx, self.ury)
+        yield Point(self.llx, self.ury)
+
     @property
     def width(self):
         return self.urx - self.llx
