@@ -5,7 +5,7 @@ Simple 2D Euclidean geometric primitives.
 from collections import namedtuple
 import math
 
-from .postulates import overlap, fbetween, isclose
+from .postulates import adjacent_pairs, overlap, fbetween, isclose
 
 
 class BadGeometry(Exception):
@@ -183,6 +183,17 @@ class Segment(namedtuple('Segment', 'p1 p2')):
         else:
             return None
 
+    def touches(self, other):
+        """
+        Does this segment touch another? True includes the cases that segments
+        intersect, or are coincident.
+        """
+        try:
+            pt = self.intersect(other)
+        except CoincidentLines:
+            return True
+        return pt is not None
+
     def sort_along(self, points):
         """Sort `points` so that they are ordered from p1 to p2.
 
@@ -212,13 +223,28 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
         yield Point(self.urx, self.ury)
         yield Point(self.llx, self.ury)
 
+    def sides(self):
+        """Produce the four Segments that form the sides of the bounds."""
+        corners = list(self.corners())
+        corners.append(corners[0])
+        for pt1, pt2 in adjacent_pairs(corners):
+            yield Segment(pt1, pt2)
+
     @property
     def width(self):
+        """The width of these Bounds."""
         return self.urx - self.llx
 
     @property
     def height(self):
+        """The height of these Bounds."""
         return self.ury - self.lly
+
+    def __contains__(self, pt):
+        return (
+            self.llx <= pt.x <= self.urx and
+            self.lly <= pt.y <= self.ury
+        )
 
     def __or__(self, other):
         return self.__class__(

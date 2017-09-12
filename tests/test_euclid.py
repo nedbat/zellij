@@ -172,7 +172,7 @@ def test_perpendicular(p1, p2, p3):
 
 # Segments
 
-@pytest.mark.parametrize("p1, p2, p3, p4, isect", [
+SEGMENT_INTERSECTIONS = [
     # Good intersection.
     ((0, 1), (2, 1),  (1, 0), (1, 2),  (1, 1)),
     # lines intersect, but segments don't.
@@ -183,19 +183,39 @@ def test_perpendicular(p1, p2, p3):
     ((0, 1), (2, 1),  (1, 3), (3, 3),  None),
     # lines are coincident, segments don't overlap.
     ((0, 1), (2, 1),  (3, 1), (5, 1),  None),
-])
+]
+
+@pytest.mark.parametrize("p1, p2, p3, p4, isect", SEGMENT_INTERSECTIONS)
 def test_segment_intersection(p1, p2, p3, p4, isect):
-    assert Segment(p1, p2).intersect(Segment(p3, p4)) == isect
+    seg12 = Segment(p1, p2)
+    seg34 = Segment(p3, p4)
+    assert seg12.intersect(seg34) == isect
+
+@pytest.mark.parametrize("p1, p2, p3, p4, isect", SEGMENT_INTERSECTIONS)
+def test_segment_touches(p1, p2, p3, p4, isect):
+    seg12 = Segment(p1, p2)
+    seg34 = Segment(p3, p4)
+    if isect is None:
+        assert not seg12.touches(seg34)
+    else:
+        assert seg12.touches(seg34)
 
 
-@pytest.mark.parametrize("p1, p2, p3, p4, err", [
+SEGMENT_INTERSECTION_ERRORS = [
     # lines are coincident, segments do overlap.
     ((0, 1), (2, 1),  (1, 1), (3, 1),  CoincidentLines),
     ((1, -5), (-1, -5), (-5, -5), (0, -5),  CoincidentLines),
-])
+]
+
+@pytest.mark.parametrize("p1, p2, p3, p4, err", SEGMENT_INTERSECTION_ERRORS)
 def test_segment_intersect_error(p1, p2, p3, p4, err):
     with pytest.raises(err):
         assert Segment(p1, p2).intersect(Segment(p3, p4))
+
+@pytest.mark.parametrize("p1, p2, p3, p4, err", SEGMENT_INTERSECTION_ERRORS)
+def test_segment_touches_errors(p1, p2, p3, p4, err):
+    assert err == CoincidentLines   # ick
+    assert Segment(p1, p2).touches(Segment(p3, p4))
 
 
 @given(ipoints, ipoints, lists(integers(min_value=1, max_value=99), min_size=1, max_size=5, unique=True))
@@ -243,12 +263,10 @@ def assert_good_bounds(bounds, pts):
     assert bounds.lly <= bounds.ury
 
     # The bounds must contain all the points.
-    assert all(bounds.llx <= pt.x for pt in pts)
-    assert all(bounds.lly <= pt.y for pt in pts)
-    assert all(bounds.urx >= pt.x for pt in pts)
-    assert all(bounds.ury >= pt.y for pt in pts)
+    assert all(bounds.llx <= pt.x <= bounds.urx for pt in pts)
+    assert all(bounds.lly <= pt.y <= bounds.ury for pt in pts)
 
-    # Each edge of the boundsounds must touch at least one point.
+    # Each edge of the bounds must touch at least one point.
     assert any(bounds.llx == pt.x for pt in pts)
     assert any(bounds.lly == pt.y for pt in pts)
     assert any(bounds.urx == pt.x for pt in pts)
@@ -265,3 +283,27 @@ def test_bounds_union(pts):
     b = b0 | b1
 
     assert_good_bounds(b, pts)
+
+
+@given(lists(ipoints, min_size=4, max_size=8, unique=True))
+def test_bounds_overlap(pts):
+    b0 = Bounds.points(pts[::2])
+    b1 = Bounds.points(pts[1::2])
+    assume(b0.width > 0 and b0.height > 0)
+    assume(b1.width > 0 and b1.height > 0)
+    assume(b0 != b1)
+
+    print(b0, b1)
+    if b0.overlap(b1):
+        # If they overlap, then one of the corners of b0 must be in b1,
+        # or vice-versa, or the side Segments must touch.
+        b0_in_b1 = any(pt in b1 for pt in b0.corners())
+        b1_in_b0 = any(pt in b0 for pt in b1.corners())
+        sides0 = list(b0.sides())
+        sides1 = list(b1.sides())
+        sides_touch = any(s0.touches(s1) for s0 in sides0 for s1 in sides1)
+        assert b0_in_b1 or b1_in_b0 or sides_touch
+    else:
+        # If they don't overlap, then none of the corners is in the other.
+        assert not any(pt in b1 for pt in b0.corners())
+        assert not any(pt in b0 for pt in b1.corners())
