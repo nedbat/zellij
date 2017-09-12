@@ -227,10 +227,6 @@ def draw_paths(paths, ctx):
         path.draw(ctx)
 
 
-def path_in_box(path, ll, ur):
-    return all(pt.in_box(ll, ur) for pt in path)
-
-
 def best_join(path, join_point, possibilities):
     others = [p for p in possibilities if p != path]
 
@@ -266,6 +262,9 @@ def paths_bounds(paths):
         bounds |= path.bounds()
     return bounds
 
+def clip_paths(paths, bounds):
+    """Return the paths that overlap the bounds."""
+    return [path for path in paths if path.bounds().overlap(bounds)]
 
 def equal_path(path1, path2):
     return path1.canonicalize() == path2.canonicalize()

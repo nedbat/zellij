@@ -10,8 +10,8 @@ import sys
 
 import cairo
 
-from .euclid import Bounds
-from .path import paths_bounds
+from .euclid import Bounds, Point
+from .path import Path, paths_bounds
 
 
 def name_and_format(name, format):
@@ -104,6 +104,10 @@ class Drawing:
         dy = self._fix_coord(dy)
         x, y = self.ctx.device_to_user(dx, dy)
         return x, y
+
+    def perimeter(self):
+        """The Path of the edges of the drawing, in user space."""
+        return Path([Point(*self.device_to_user(*pt)) for pt in self.bounds.corners()])
 
     def move_to(self, x, y):
         self.ctx.move_to(*self._fix_point(x, y))

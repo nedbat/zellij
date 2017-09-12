@@ -47,8 +47,8 @@ def debug_world(dwg0, paths):
     `paths` are the paths that comprise the world.
     """
 
-    # Get the path of the real drawing.
-    dwg0_path = Path([Point(*dwg0.device_to_user(*pt)) for pt in dwg0.bounds.corners()])
+    # Get the perimeter of the real drawing.
+    dwg0_path = dwg0.perimeter()
 
     # Get the bounds of everything we're going to draw.
     bounds = paths_bounds(paths)

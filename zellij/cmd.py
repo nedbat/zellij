@@ -9,7 +9,7 @@ from zellij.color import random_color, parse_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
-from zellij.path import combine_paths, draw_paths
+from zellij.path import combine_paths, draw_paths, clip_paths
 from zellij.path_tiler import PathTiler
 from zellij.strap import strapify
 
@@ -93,6 +93,7 @@ def straps(**opt):
     draw = design_class(tilew)
     draw.draw(tiler)
     paths = combine_paths(tiler.paths)
+    paths = clip_paths(paths, dwg.perimeter().bounds())
 
     if should_debug('world'):
         debug_world(dwg, paths)

@@ -41,13 +41,6 @@ class Point(namedtuple("Point", ["x", "y"])):
         x2, y2 = other
         return math.hypot(x2 - x1, y2 - y1)
 
-    def in_box(self, ll, ur):
-        """Is this point in the box defined by the lower-left and upper-right points?"""
-        x, y = self
-        llx, lly = ll
-        urx, ury = ur
-        return (llx <= x <= urx) and (lly <= y <= ury)
-
 
 def line_collinear(p1, p2, p3):
     """Are three points on the same line, regardless of order?"""
