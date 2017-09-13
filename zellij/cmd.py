@@ -92,11 +92,14 @@ def straps(**opt):
     design_class = get_design(opt['design'])
     draw = design_class(tilew)
     draw.draw(tiler)
-    paths = combine_paths(tiler.paths)
-    paths = clip_paths(paths, dwg.perimeter().bounds())
+    paths_all = combine_paths(tiler.paths)
+    paths = clip_paths(paths_all, dwg.perimeter().bounds())
 
     if should_debug('world'):
-        debug_world(dwg, paths)
+        debug_world(dwg, paths_styles=[
+            (paths_all, dict(width=1, rgb=(.75, .75, .75))),
+            (paths, dict(width=1.5, rgb=(1, 0, 0))),
+        ])
 
     straps = strapify(paths, **strap_kwargs)
 

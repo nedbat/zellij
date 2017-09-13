@@ -39,19 +39,21 @@ def tick_range(lo, hi, step):
     hi = ((hi // step) + 1) * step
     return range(lo, hi, step)
 
-def debug_world(dwg0, paths):
+def debug_world(dwg0, paths_styles):
     """Draw a picture of the entire world.
 
     `dwg0` is the Drawing we're really making.
 
-    `paths` are the paths that comprise the world.
+    `paths_styles` is a list of tuples: (paths, style) for drawing.
     """
 
     # Get the perimeter of the real drawing.
     dwg0_path = dwg0.perimeter()
 
     # Get the bounds of everything we're going to draw.
-    bounds = paths_bounds(paths)
+    bounds = paths_bounds(paths_styles[0][0])
+    for paths, styles in paths_styles:
+        bounds |= paths_bounds(paths)
     bounds |= dwg0_path.bounds()
     bounds = bounds.expand(percent=2)
 
@@ -94,7 +96,8 @@ def debug_world(dwg0, paths):
         dwg.stroke()
 
     # The paths themselves.
-    dwg.draw_paths(paths, width=1, rgb=(1, 0, 0))
+    for paths, styles in paths_styles:
+        dwg.draw_paths(paths, **styles)
 
     dwg.finish()
     print("Wrote debug_world.png")
