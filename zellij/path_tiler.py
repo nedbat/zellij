@@ -7,6 +7,7 @@ from affine import Affine
 
 from .euclid import Point
 from .path import Path
+from .postulates import isclose
 
 
 class PathCanvas:
@@ -104,6 +105,31 @@ class PathCanvas:
             yield
         finally:
             self.restore()
+
+
+def diamond_normalize(pt1, pt2):
+    """Create an affine transform to map diamonds to squares.
+
+    The parallellogram [(0, 0), pt1, pt2, pt1+pt2] will map onto
+    [(0, 0), (1, 0), (0, 1), (1, 1)].
+
+    Returns an Affine.
+    """
+    (x1, y1), (x2, y2) = pt1, pt2
+
+    assert not isclose(x1, 0)
+    assert not isclose(y2, 0)
+
+    y2scale = (y2 - (x2 * y1 / x1))
+    scale = Affine.scale(x1, y2scale)
+
+    shearx = x2 / y2scale
+    xform1 = Affine(1, shearx, 0, 0, 1, 0)
+
+    sheary = y1 / x1
+    xform2 = Affine(1, 0, 0, sheary, 1, 0)
+
+    return ~(xform2 * xform1 * scale)
 
 
 class PathTiler:

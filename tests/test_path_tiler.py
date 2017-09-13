@@ -1,8 +1,10 @@
 """Test path_tiler.py"""
 
 from zellij.euclid import Point
-from zellij.path_tiler import PathCanvas
+from zellij.path_tiler import PathCanvas, diamond_normalize
 from zellij.path import Path
+
+import pytest
 
 
 def test_do_nothing():
@@ -101,3 +103,25 @@ def test_rel_line_to():
     assert pt.paths == [
         Path([Point(1000.0, 2000.0), Point(1100.0, 2200.0)]),
     ]
+
+
+@pytest.mark.parametrize("pt1, pt2", [
+    ((1, 0), (0, 1)),
+    ((2, 0), (0, .3)),
+    ((1, 0), (.5, 1)),
+    ((2, 0), (.5, 1)),
+    ((1, .5), (0, 1)),
+    ((1, 0), (.5, .8)),
+    ((1.3, .1), (.2, .8)),
+])
+def test_diamond_normalize(pt1, pt2):
+    pt12 = tuple(v1 + v2 for v1, v2 in zip(pt1, pt2))
+    xform = diamond_normalize(pt1, pt2)
+    ins = [(0, 0), pt1, pt2, pt12]
+    outs = [(0, 0), (1, 0), (0, 1), (1, 1)]
+    for i, o in zip(ins, outs):
+        pti = Point(*i)
+        pto = Point(*o)
+        actual = Point(*(xform * pti))
+        print(pti, pto, actual)
+        assert actual.is_close(pto)
