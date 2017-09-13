@@ -10,7 +10,7 @@ from hypothesis.strategies import lists, integers
 import pytest
 
 from zellij.euclid import (
-    Line, Point, Segment, Bounds,
+    Line, Point, Segment, Bounds, EmptyBounds,
     along_the_way, collinear, line_collinear,
     CoincidentLines, ParallelLines,
 )
@@ -307,3 +307,12 @@ def test_bounds_overlap(pts):
         # If they don't overlap, then none of the corners is in the other.
         assert not any(pt in b1 for pt in b0.corners())
         assert not any(pt in b0 for pt in b1.corners())
+
+
+@given(lists(ipoints, min_size=2))
+def test_empty_bounds(pts):
+    bounds = EmptyBounds()
+    for pt in pts:
+        bounds |= Bounds.points([pt])
+
+    assert bounds == Bounds.points(pts)

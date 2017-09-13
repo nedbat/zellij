@@ -3,7 +3,7 @@
 import collections
 
 from .defuzz import Defuzzer
-from .euclid import collinear, Point, Line, Segment, Bounds
+from .euclid import collinear, Point, Line, Segment, Bounds, EmptyBounds
 from .postulates import adjacent_pairs, triples
 
 
@@ -257,7 +257,7 @@ def show_paths(paths):
 
 def paths_bounds(paths):
     """Return the `Bounds` of the paths."""
-    bounds = paths[0].bounds()
+    bounds = EmptyBounds()
     for path in paths:
         bounds |= path.bounds()
     return bounds

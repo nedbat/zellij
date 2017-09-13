@@ -5,7 +5,7 @@ import re
 import click
 
 from zellij.drawing import Drawing
-from zellij.euclid import Point
+from zellij.euclid import Point, EmptyBounds
 from zellij.path import Path, paths_bounds
 
 
@@ -51,7 +51,7 @@ def debug_world(dwg0, paths_styles):
     dwg0_path = dwg0.perimeter()
 
     # Get the bounds of everything we're going to draw.
-    bounds = paths_bounds(paths_styles[0][0])
+    bounds = EmptyBounds()
     for paths, styles in paths_styles:
         bounds |= paths_bounds(paths)
     bounds |= dwg0_path.bounds()

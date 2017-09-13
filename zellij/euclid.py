@@ -263,3 +263,12 @@ class Bounds(namedtuple('Bounds', 'llx lly urx ury')):
             overlap(self.llx, self.urx, other.llx, other.urx) and
             overlap(self.lly, self.ury, other.lly, other.ury)
         )
+
+
+class EmptyBounds:
+    """Represents the empty Bounds.
+
+    This is only useful for starting a chain of |= operations.
+    """
+    def __or__(self, other):
+        return other
