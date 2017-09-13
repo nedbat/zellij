@@ -1,6 +1,6 @@
 import pytest
 
-from zellij.postulates import adjacent_pairs, fbetween, overlap, triples
+from zellij.postulates import adjacent_pairs, all_pairs, fbetween, overlap, triples
 
 
 @pytest.mark.parametrize("seq, result", [
@@ -12,6 +12,16 @@ from zellij.postulates import adjacent_pairs, fbetween, overlap, triples
 ])
 def test_adjacent_pairs(seq, result):
     assert list(adjacent_pairs(seq)) == result
+
+
+@pytest.mark.parametrize("seq, result", [
+    ("abcd", ["ab", "ac", "ad", "bc", "bd", "cd"]),
+    ("a", []),
+    ("", []),
+])
+def test_all_pairs(seq, result):
+    actual = [a+b for a, b in all_pairs(seq)]
+    assert actual == result
 
 
 @pytest.mark.parametrize("a, b, c, result", [
