@@ -107,11 +107,11 @@ class PathCanvas:
             self.restore()
 
 
-def diamond_normalize(pt1, pt2):
-    """Create an affine transform to map diamonds to squares.
+def square_to_parallelogram(pt1, pt2):
+    """Create an affine transform to map unit square to a parallelogram.
 
-    The parallellogram [(0, 0), pt1, pt2, pt1+pt2] will map onto
-    [(0, 0), (1, 0), (0, 1), (1, 1)].
+    The unit square [(0, 0), (1, 0), (0, 1), (1, 1)] will map onto
+    the parallellogram [(0, 0), pt1, pt2, pt1+pt2].
 
     Returns an Affine.
     """
@@ -129,7 +129,7 @@ def diamond_normalize(pt1, pt2):
     sheary = y1 / x1
     xform2 = Affine(1, 0, 0, sheary, 1, 0)
 
-    return ~(xform2 * xform1 * scale)
+    return xform2 * xform1 * scale
 
 
 class PathTiler:
