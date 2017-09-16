@@ -6,7 +6,7 @@ import click
 
 from zellij.drawing import Drawing
 from zellij.euclid import Point, EmptyBounds
-from zellij.path import Path, paths_bounds
+from zellij.path import paths_bounds
 
 
 VALID_DEBUGS = ['opts', 'world', 'strapify']
