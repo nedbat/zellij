@@ -147,8 +147,7 @@ class PathTiler:
     # http://www.quadibloc.com/math/images/wall17.gif
     # https://www.math.toronto.edu/drorbn/Gallery/Symmetry/Tilings/Sanderson/index.html
 
-    def tile_p1(self, draw_func, vcol, vrow, buffer=None):
-        """Repeatedly call draw_func to tile the drawing."""
+    def p1_points(self, vcol, vrow, buffer=None):
         # Should compute exactly the grid of parallelograms needed, but I don't
         # know how yet.
         if buffer is None:
@@ -159,9 +158,14 @@ class PathTiler:
         tiles_down = int(dwgh // vry)
         for row in range(-buffer, tiles_across + buffer):
             for col in range(-buffer, tiles_down + buffer):
-                with self.pc.saved():
-                    self.pc.translate(row * vrx + col * vcx, row * vry + col * vcy)
-                    draw_func(self.pc)
+                yield (row * vrx + col * vcx, row * vry + col * vcy)
+
+    def tile_p1(self, draw_func, vcol, vrow, buffer=None):
+        """Repeatedly call draw_func to tile the drawing."""
+        for x, y in self.p1_points(vcol, vrow, buffer):
+            with self.pc.saved():
+                self.pc.translate(x, y)
+                draw_func(self.pc)
 
     def tile_pmm(self, draw_func, dx, dy):
         def four_mirror(pc):
