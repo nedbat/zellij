@@ -41,6 +41,10 @@ class Point(namedtuple("Point", ["x", "y"])):
         x2, y2 = other
         return math.hypot(x2 - x1, y2 - y1)
 
+    def transform(self, xform):
+        """Transform the Point through the affine `xform`."""
+        return Point(*(xform * self))
+
 
 def line_collinear(p1, p2, p3):
     """Are three points on the same line, regardless of order?"""

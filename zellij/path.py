@@ -56,6 +56,10 @@ class Path:
         for p1, p2 in adjacent_pairs(self.points):
             yield Segment(tuple(p1), tuple(p2))
 
+    def transform(self, xform):
+        """Transform the Path through the affine `xform`."""
+        return Path(pt.transform(xform) for pt in self)
+
     def any_collinear(self):
         """Are any of the parts of this path collinear?"""
         return any(collinear(*them) for them in triples(self.points))
