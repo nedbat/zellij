@@ -5,7 +5,7 @@ Simple 2D Euclidean geometric primitives.
 from collections import namedtuple
 import math
 
-from .postulates import adjacent_pairs, overlap, fbetween, isclose
+from .postulates import adjacent_pairs, overlap, fbetween, isclose, perturbed
 
 
 class BadGeometry(Exception):
@@ -44,6 +44,11 @@ class Point(namedtuple("Point", ["x", "y"])):
     def transform(self, xform):
         """Transform the Point through the affine `xform`."""
         return Point(*(xform * self))
+
+    def perturb(self, jitter):
+        """Jostle the point around randomly."""
+        x, y = self
+        return Point(perturbed(x, jitter), perturbed(y, jitter))
 
 
 def line_collinear(p1, p2, p3):

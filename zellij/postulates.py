@@ -2,6 +2,7 @@
 
 import itertools
 import math
+import random
 
 
 def isclose(a, b):
@@ -43,3 +44,8 @@ def fbetween(a, b, c):
         return True
     else:
         return isclose(a, b) or isclose(b, c)
+
+
+def perturbed(v, jitter):
+    """Return `v`, with -jitter..jitter randomly added."""
+    return v + 2*jitter * random.random() - jitter

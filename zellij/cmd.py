@@ -9,7 +9,7 @@ from zellij.color import random_color, parse_color
 from zellij.debug import debug_world, debug_click_options, should_debug
 from zellij.design import get_design
 from zellij.drawing import Drawing
-from zellij.path import combine_paths, draw_paths, clip_paths
+from zellij.path import combine_paths, draw_paths, clip_paths, perturb_paths
 from zellij.path_tiler import PathTiler
 from zellij.strap import strapify
 
@@ -35,6 +35,7 @@ _common_options = {
         click.option('--rotate', type=float, default=0, help='Angle to rotate the drawing'),
         click.option('--background', type=parse_color, help='The color of the background'),
         click.option('--format', help='The output format, png or svg'),
+        click.option('--perturb', type=float, default=0, help='A random amount to jostle points'),
         click.argument('design'),
     ],
 }
@@ -94,6 +95,9 @@ def straps(**opt):
     draw.draw(tiler)
     paths_all = combine_paths(tiler.paths)
     paths = clip_paths(paths_all, dwg.perimeter().bounds())
+
+    if opt['perturb']:
+        paths = perturb_paths(paths, opt['perturb'])
 
     if should_debug('world'):
         debug_world(dwg, paths_styles=[

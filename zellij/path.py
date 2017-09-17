@@ -128,6 +128,16 @@ class Path:
     def defuzz(self, defuzz):
         return Path([Point(*defuzz(pt)) for pt in self.points])
 
+    def perturb(self, jitter):
+        """Jostle around all the points in the path."""
+        pts = self.points
+        if self.closed:
+            pts = pts[:-1]
+        pts = [pt.perturb(jitter) for pt in pts]
+        if self.closed:
+            pts.append(pts[0])
+        return Path(pts)
+
     def penultimate(self, point):
         """The second-to-last point from whichever end ends with `point`."""
         if self.points[0] == point:
@@ -292,3 +302,7 @@ def seg_path_intersections(segment, path):
         pt = segment.intersect(pseg)
         if pt is not None:
             yield pt
+
+def perturb_paths(paths, jitter):
+    """Perturb all of the points in all of the path."""
+    return [path.perturb(jitter) for path in paths]
