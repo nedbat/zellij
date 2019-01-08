@@ -44,7 +44,7 @@ class Drawing:
     def __init__(self, width=None, height=None, name=None, bounds=None, bg=(1, 1, 1), format=None):
         """Create a new Cairo drawing.
 
-        If `bounds` is provided, it's a Bounds describing the extend of the
+        If `bounds` is provided, it's a Bounds describing the extent of the
         drawing.  Otherwise, provide `width` and `height` to specify a size
         explicitly.
 
