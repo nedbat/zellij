@@ -117,7 +117,7 @@ class Drawing:
 
     def rotate(self, degrees):
         # Cairo uses radians, let's be more convenient.
-        self.ctx.rotate(degrees * math.pi / 180)
+        self.ctx.rotate(math.radians(degrees))
 
     @contextlib.contextmanager
     def saved(self):
