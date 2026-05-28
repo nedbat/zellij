@@ -66,6 +66,8 @@ class Drawing:
             self.surface = cairo.ImageSurface(cairo.Format.ARGB32, self.width, self.height)
         elif self.format == 'svg':
             self.surface = cairo.SVGSurface(self.name, self.width, self.height)
+        elif self.format == 'pdf':
+            self.surface = cairo.PDFSurface(self.name, self.width, self.height)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_antialias(cairo.Antialias.BEST)
         self.ctx.set_line_cap(cairo.LineCap.ROUND)

@@ -108,10 +108,10 @@ def face(dwg, H):
         dwg.rotate(360 / 5)
 
 
-dwg = Drawing(width=800, height=800, name="tajra.png")
-dwg.translate(400, 400)
+dwg = Drawing(width=612, height=792, name="tajra.pdf")
+dwg.translate(300, 300)
 dwg.set_line_width(0.25)
 
-face(dwg, 300)
+face(dwg, 200)
 
 dwg.finish()
