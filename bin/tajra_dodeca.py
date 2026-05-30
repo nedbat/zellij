@@ -23,10 +23,14 @@ ARM_HEIGHT = P_HEIGHT - P_SHOULDER_HEIGHT
 ARM_BASE = ARM_HEIGHT / P_HEIGHT
 ARM_EDGE = sqrt((ARM_BASE / 2) ** 2 + ARM_HEIGHT**2)
 
-def face(dwg, H):
-    # The side of the large pentagon.
-    LS = H / P_CENTER_HEIGHT
+def face(dwg, LS):
+    """Draws one face centered at (0, 0) with an edge of LS."""
+
+    # The half-side of the large pentagon.
     LS2 = LS / 2
+
+    # The center height of the large pentagon.
+    H = LS * P_CENTER_HEIGHT
 
     # Side of the small pentagons that hold the small stars
     SS = LS * (P_SHOULDER_WIDTH / 2 / (2 * ARM_HEIGHT + 4 * P_SHOULDER_HEIGHT))
