@@ -24,7 +24,10 @@ ARM_BASE = ARM_HEIGHT / P_HEIGHT
 ARM_EDGE = sqrt((ARM_BASE / 2) ** 2 + ARM_HEIGHT**2)
 
 def face(dwg, LS):
-    """Draws one face centered at (0, 0) with an edge of LS."""
+    """Draws one face.
+
+    The bottom edge is at (0, 0) and rest on the horizontal axis.
+    """
 
     # The half-side of the large pentagon.
     LS2 = LS / 2
@@ -40,79 +43,88 @@ def face(dwg, LS):
     MS = MH / P_HEIGHT
 
     with dwg.saved():
-        for i in range(5):
-            if i == 0:
-                dwg.move_to(LS2, H)
-            dwg.line_to(-LS2, H)
-            dwg.rotate(360 / 5)
-        dwg.close_path()
-        dwg.clip()
+        # The rest of the drawing code wants the origin to be the center of
+        # the pentagon, so move the origin there
+        dwg.translate(LS2, H)
+
+        with dwg.saved():
+            for i in range(5):
+                if i == 0:
+                    dwg.move_to(-LS2, -H)
+                dwg.line_to(LS2, -H)
+                dwg.rotate(360 / 5)
+            dwg.close_path()
+            dwg.clip()
+
+            for _ in range(5):
+                x = 0
+                for dx, dashes in [
+                    (
+                        ARM_HEIGHT,
+                        [
+                            SS * ARM_BASE / 2,
+                            SS * ARM_EDGE * 2,
+                            SS * ARM_BASE,
+                            SS * ARM_EDGE + MS * ARM_EDGE,
+                            MS * ARM_BASE,
+                            SS * ARM_EDGE + MS * ARM_EDGE,
+                            SS * ARM_BASE,
+                            SS * ARM_EDGE + MS * ARM_EDGE,
+                        ],
+                    ),
+                    (
+                        2 * P_SHOULDER_HEIGHT,
+                        [
+                            MS * ARM_BASE / 2,
+                            MS * ARM_EDGE + SS * ARM_EDGE,
+                            SS * ARM_BASE,
+                            SS * ARM_EDGE * 2,
+                            SS * ARM_BASE,
+                            SS * ARM_EDGE * 2,
+                            SS * ARM_BASE,
+                            SS * ARM_EDGE * 3,  # overshoot but who cares
+                        ],
+                    ),
+                    (
+                        2 * ARM_HEIGHT,
+                        [
+                            MS * P_SHOULDER_WIDTH / 2,
+                            SS * ARM_EDGE,
+                        ],
+                    ),
+                    (
+                        2 * P_SHOULDER_HEIGHT - 2 * ARM_HEIGHT,
+                        [
+                            MS * P_SHOULDER_WIDTH / 2 + SS * P_SHOULDER_WIDTH + SS * ARM_EDGE,
+                            MS * ARM_EDGE,
+                        ],
+                    ),
+                ]:
+                    x += SS * dx
+                    for xx in [x, -x]:
+                        y = -H
+                        for gap, draw in itertools.batched(dashes, 2):
+                            y += gap
+                            dwg.move_to(xx, y)
+                            y += draw
+                            dwg.line_to(xx, y)
+                            dwg.stroke()
+
+                dwg.rotate(360 / 5)
 
         for _ in range(5):
-            x = 0
-            for dx, dashes in [
-                (
-                    ARM_HEIGHT,
-                    [
-                        SS * ARM_BASE / 2,
-                        SS * ARM_EDGE * 2,
-                        SS * ARM_BASE,
-                        SS * ARM_EDGE + MS * ARM_EDGE,
-                        MS * ARM_BASE,
-                        SS * ARM_EDGE + MS * ARM_EDGE,
-                        SS * ARM_BASE,
-                        SS * ARM_EDGE + MS * ARM_EDGE,
-                    ],
-                ),
-                (
-                    2 * P_SHOULDER_HEIGHT,
-                    [
-                        MS * ARM_BASE / 2,
-                        MS * ARM_EDGE + SS * ARM_EDGE,
-                        SS * ARM_BASE,
-                        SS * ARM_EDGE * 2,
-                        SS * ARM_BASE,
-                        SS * ARM_EDGE * 2,
-                        SS * ARM_BASE,
-                        SS * ARM_EDGE * 3,  # overshoot but who cares
-                    ],
-                ),
-                (
-                    2 * ARM_HEIGHT,
-                    [
-                        MS * P_SHOULDER_WIDTH / 2,
-                        SS * ARM_EDGE,
-                    ],
-                ),
-                (
-                    2 * P_SHOULDER_HEIGHT - 2 * ARM_HEIGHT,
-                    [
-                        MS * P_SHOULDER_WIDTH / 2 + SS * P_SHOULDER_WIDTH + SS * ARM_EDGE,
-                        MS * ARM_EDGE,
-                    ],
-                ),
-            ]:
-                x += SS * dx
-                for xx in [x, -x]:
-                    y = H
-                    for gap, draw in itertools.batched(dashes, 2):
-                        y -= gap
-                        dwg.move_to(xx, y)
-                        y -= draw
-                        dwg.line_to(xx, y)
-                        dwg.stroke()
-
+            # Base of the pentagon
+            dwg.move_to(-LS2, -H)
+            dwg.line_to(LS2, -H)
+            dwg.stroke()
             dwg.rotate(360 / 5)
 
-    for _ in range(5):
-        # Base of the pentagon
-        dwg.move_to(-LS2, H)
-        dwg.line_to(LS2, H)
-        dwg.stroke()
-        dwg.rotate(360 / 5)
 
-
+# Paper coordinates: pts, origin lower-left.
 dwg = Drawing(width=612, height=792, name="tajra.pdf")
+dwg.translate(0, 792)
+dwg.scale(1, -1)
+
 dwg.translate(300, 300)
 dwg.set_line_width(0.25)
 
