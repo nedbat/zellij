@@ -2,9 +2,10 @@
 # https://www.instagram.com/tajra.wd/p/DMVSwwmoHVJ/
 
 import itertools
-from math import sin, cos, tan, radians, sqrt
+from math import atan2, sin, cos, tan, degrees, radians, sqrt
 
 from zellij.drawing import Drawing
+from zellij.euclid import Point
 
 # Height to center of a pentagon with a base of 1.
 P_CENTER_HEIGHT = tan(radians(54)) / 2
@@ -16,7 +17,8 @@ P_HEIGHT = tan(radians(72)) / 2
 P_SHOULDER_HEIGHT = cos(radians(18))
 
 # Width of the shoulder (widest part of the pentagon).
-P_SHOULDER_WIDTH = 1 + 2 * sin(radians(18))
+P_SHOULDER_HANG = sin(radians(18))
+P_SHOULDER_WIDTH = 1 + 2 * P_SHOULDER_HANG
 
 # Height, base, and edge of one arm of a star in a pentagon with a base of 1.
 ARM_HEIGHT = P_HEIGHT - P_SHOULDER_HEIGHT
@@ -112,22 +114,66 @@ def face(dwg, LS):
 
                 dwg.rotate(360 / 5)
 
-        for _ in range(5):
-            # Base of the pentagon
-            dwg.move_to(-LS2, -H)
-            dwg.line_to(LS2, -H)
-            dwg.stroke()
-            dwg.rotate(360 / 5)
+        with dwg.style(rgb=(0.85, 0.85, 0.85)):
+            for _ in range(5):
+                # Base of the pentagon
+                dwg.move_to(-LS2, -H)
+                dwg.line_to(LS2, -H)
+                dwg.stroke()
+                dwg.rotate(360 / 5)
 
 
-# Paper coordinates: pts, origin lower-left.
+def one_face(dwg, LS, pt1, pt2, face_fn):
+    """Draw one face with an LS-long edge on (pt1, pt2), return three more vertex points."""
+    with dwg.saved():
+        dwg.translate(*pt1)
+        dwg.rotate(degrees(atan2(pt2[1] - pt1[1], pt2[0] - pt1[0])))
+
+        face_fn(dwg, LS)
+        pts = [
+            dwg.user_to_device(0, 0),
+            dwg.user_to_device(LS, 0),
+            dwg.user_to_device(LS * (1 + P_SHOULDER_HANG), LS * P_SHOULDER_HEIGHT),
+            dwg.user_to_device(LS / 2, LS * P_HEIGHT),
+            dwg.user_to_device(-LS * P_SHOULDER_HANG, LS * P_SHOULDER_HEIGHT),
+        ]
+
+    return [Point(*dwg.device_to_user(*pt)) for pt in pts]
+
+def dodeca_net(dwg, LS, face_fn):
+    """A dodecahedron net.
+
+    The first face is at (0, 0) with a side of LS.
+    """
+    def face(p1, p2):
+        return one_face(dwg, LS, p1, p2, face_fn)
+
+    pent0 = face(Point(0, 0), Point(1, 0))
+    pent1 = face(pent0[3], pent0[2])
+    pent2 = face(pent1[2], pent1[1])
+    pent3 = face(pent1[3], pent1[2])
+    pent4 = face(pent1[4], pent1[3])
+    pent5 = face(pent1[0], pent1[4])
+    pent6 = face(pent4[3], pent4[2])
+    pent7 = face(pent6[4], pent6[3])
+    pent8 = face(pent7[2], pent7[1])
+    pent9 = face(pent7[3], pent7[2])
+    pent10 = face(pent7[4], pent7[3])
+    pent11 = face(pent7[0], pent7[4])
+
+
+# Paper coordinates: pts, origin lower-left, but tilted a little.
 dwg = Drawing(width=612, height=792, name="tajra.pdf")
 dwg.translate(0, 792)
 dwg.scale(1, -1)
 
-dwg.translate(300, 300)
+dwg.translate(306, 396)
+dwg.rotate(10)
+dwg.translate(-306, -396)
+
+dwg.translate(160, 50)
 dwg.set_line_width(0.25)
 
-face(dwg, 200)
+dodeca_net(dwg, 90, face)
 
 dwg.finish()
