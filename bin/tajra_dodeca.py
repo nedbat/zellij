@@ -26,6 +26,7 @@ ARM_HEIGHT = P_HEIGHT - P_SHOULDER_HEIGHT
 ARM_BASE = ARM_HEIGHT / P_HEIGHT
 ARM_EDGE = sqrt((ARM_BASE / 2) ** 2 + ARM_HEIGHT**2)
 
+
 def face(dwg, LS):
     """Draws one face.
 
@@ -98,7 +99,9 @@ def face(dwg, LS):
                     (
                         2 * P_SHOULDER_HEIGHT - 2 * ARM_HEIGHT,
                         [
-                            MS * P_SHOULDER_WIDTH / 2 + SS * P_SHOULDER_WIDTH + SS * ARM_EDGE,
+                            MS * P_SHOULDER_WIDTH / 2
+                            + SS * P_SHOULDER_WIDTH
+                            + SS * ARM_EDGE,
                             MS * ARM_EDGE,
                         ],
                     ),
@@ -123,12 +126,14 @@ def face(dwg, LS):
                 dwg.stroke()
                 dwg.rotate(360 / 5)
 
+
 @contextlib.contextmanager
 def on_p1_p2(dwg, pt1, pt2):
     with dwg.saved():
         dwg.translate(*pt1)
         dwg.rotate(degrees(atan2(pt2[1] - pt1[1], pt2[0] - pt1[0])))
         yield None
+
 
 def one_face(dwg, LS, pt1, pt2, face_fn):
     """Draw one face with an LS-long edge on (pt1, pt2), return all the vertex points."""
@@ -163,11 +168,13 @@ def tab(dwg, LS, pt1, pt2, has_left, has_right):
                 dwg.line_to(LS - SHORT_DIST, TAB_WIDTH)
             dwg.stroke()
 
+
 def dodeca_net(dwg, LS, face_fn):
     """A dodecahedron net.
 
     The first face is at (0, 0) with a side of LS.
     """
+
     def face(p1, p2):
         return one_face(dwg, LS, p1, p2, face_fn)
 
@@ -183,7 +190,7 @@ def dodeca_net(dwg, LS, face_fn):
     pent9 = face(pent7[3], pent7[2])
     pent10 = face(pent7[4], pent7[3])
     pent11 = face(pent7[0], pent7[4])
-    
+
     def tabc(p1, p2):
         tab(dwg, LS, p1, p2, True, True)
 
@@ -213,6 +220,7 @@ def dodeca_net(dwg, LS, face_fn):
     tabc(pent10[4], pent10[3])
     tabr(pent10[0], pent10[4])
 
+
 # Paper coordinates: pts, origin lower-left, but tilted a little.
 dwg = Drawing(width=612, height=792, name="tajra.pdf")
 dwg.translate(0, 792)
@@ -220,12 +228,12 @@ dwg.scale(1, -1)
 
 if 1:
     # Border the printable region
-    with dwg.style(rgb=(.75, .75, .75), width=0.25, dash=[10, 5]):
+    with dwg.style(rgb=(0.75, 0.75, 0.75), width=0.25, dash=[10, 5]):
         qinch = 72 / 4
         dwg.move_to(qinch, qinch)
-        dwg.line_to(612-qinch, qinch)
-        dwg.line_to(612-qinch, 792-qinch)
-        dwg.line_to(qinch, 792-qinch)
+        dwg.line_to(612 - qinch, qinch)
+        dwg.line_to(612 - qinch, 792 - qinch)
+        dwg.line_to(qinch, 792 - qinch)
         dwg.close_path()
         dwg.stroke()
 
