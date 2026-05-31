@@ -1,6 +1,7 @@
 # A face of tajra's dodecahedron
 # https://www.instagram.com/tajra.wd/p/DMVSwwmoHVJ/
 
+import contextlib
 import itertools
 from math import atan2, sin, cos, tan, degrees, radians, sqrt
 
@@ -122,13 +123,16 @@ def face(dwg, LS):
                 dwg.stroke()
                 dwg.rotate(360 / 5)
 
-
-def one_face(dwg, LS, pt1, pt2, face_fn):
-    """Draw one face with an LS-long edge on (pt1, pt2), return three more vertex points."""
+@contextlib.contextmanager
+def on_p1_p2(dwg, pt1, pt2):
     with dwg.saved():
         dwg.translate(*pt1)
         dwg.rotate(degrees(atan2(pt2[1] - pt1[1], pt2[0] - pt1[0])))
+        yield None
 
+def one_face(dwg, LS, pt1, pt2, face_fn):
+    """Draw one face with an LS-long edge on (pt1, pt2), return all the vertex points."""
+    with on_p1_p2(dwg, pt1, pt2):
         face_fn(dwg, LS)
         pts = [
             dwg.user_to_device(0, 0),
@@ -139,6 +143,25 @@ def one_face(dwg, LS, pt1, pt2, face_fn):
         ]
 
     return [Point(*dwg.device_to_user(*pt)) for pt in pts]
+
+
+def tab(dwg, LS, pt1, pt2, has_left, has_right):
+    TAB_WIDTH = 72 / 4
+    GAP = 1
+    SHORT_DIST = TAB_WIDTH / tan(radians(36)) + 2 * GAP
+    with on_p1_p2(dwg, pt1, pt2):
+        with dwg.style(rgb=(0.75, 0.75, 0.75), width=0.25):
+            if has_left:
+                dwg.move_to(GAP, GAP)
+                dwg.line_to(TAB_WIDTH, TAB_WIDTH)
+            else:
+                dwg.move_to(SHORT_DIST, TAB_WIDTH)
+            if has_right:
+                dwg.line_to(LS - TAB_WIDTH, TAB_WIDTH)
+                dwg.line_to(LS - GAP, GAP)
+            else:
+                dwg.line_to(LS - SHORT_DIST, TAB_WIDTH)
+            dwg.stroke()
 
 def dodeca_net(dwg, LS, face_fn):
     """A dodecahedron net.
@@ -160,20 +183,59 @@ def dodeca_net(dwg, LS, face_fn):
     pent9 = face(pent7[3], pent7[2])
     pent10 = face(pent7[4], pent7[3])
     pent11 = face(pent7[0], pent7[4])
+    
+    def tabc(p1, p2):
+        tab(dwg, LS, p1, p2, True, True)
 
+    def tabr(p1, p2):
+        tab(dwg, LS, p1, p2, False, True)
+
+    def tabl(p1, p2):
+        tab(dwg, LS, p1, p2, True, False)
+
+    tabc(pent0[1], pent0[0])
+    tabr(pent0[2], pent0[1])
+    tabc(pent0[0], pent0[4])
+    tabc(pent2[4], pent2[3])
+    tabr(pent2[0], pent2[4])
+    tabl(pent4[2], pent4[1])
+    tabc(pent4[4], pent4[3])
+    tabr(pent4[0], pent4[4])
+    tabc(pent5[3], pent5[2])
+    tabr(pent5[0], pent5[4])
+    tabc(pent6[2], pent6[1])
+    tabr(pent6[3], pent6[2])
+    tabl(pent6[0], pent6[4])
+    tabc(pent8[3], pent8[2])
+    tabr(pent8[0], pent8[4])
+    tabc(pent9[3], pent9[2])
+    tabr(pent9[0], pent9[4])
+    tabc(pent10[4], pent10[3])
+    tabr(pent10[0], pent10[4])
 
 # Paper coordinates: pts, origin lower-left, but tilted a little.
 dwg = Drawing(width=612, height=792, name="tajra.pdf")
 dwg.translate(0, 792)
 dwg.scale(1, -1)
 
+if 1:
+    # Border the printable region
+    with dwg.style(rgb=(.75, .75, .75), width=0.25, dash=[10, 5]):
+        qinch = 72 / 4
+        dwg.move_to(qinch, qinch)
+        dwg.line_to(612-qinch, qinch)
+        dwg.line_to(612-qinch, 792-qinch)
+        dwg.line_to(qinch, 792-qinch)
+        dwg.close_path()
+        dwg.stroke()
+
 dwg.translate(306, 396)
-dwg.rotate(10)
+dwg.rotate(-10)
 dwg.translate(-306, -396)
 
-dwg.translate(160, 50)
+dwg.translate(140, 35)
 dwg.set_line_width(0.25)
 
-dodeca_net(dwg, 90, face)
+dodeca_net(dwg, 97, face)
 
 dwg.finish()
