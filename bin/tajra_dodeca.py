@@ -150,8 +150,8 @@ def one_face(dwg, LS, pt1, pt2, face_fn):
     return [Point(*dwg.device_to_user(*pt)) for pt in pts]
 
 
-def tab(dwg, LS, pt1, pt2, has_left, has_right):
-    TAB_WIDTH = 72 / 4
+def tab(dwg, LS, pt1, pt2, has_left, has_right, label=None):
+    TAB_WIDTH = 16
     GAP = 1
     SHORT_DIST = TAB_WIDTH / tan(radians(36)) + 2 * GAP
     with on_p1_p2(dwg, pt1, pt2):
@@ -167,6 +167,16 @@ def tab(dwg, LS, pt1, pt2, has_left, has_right):
             else:
                 dwg.line_to(LS - SHORT_DIST, TAB_WIDTH)
             dwg.stroke()
+
+            if label:
+                if isinstance(label, int):
+                    label = chr(ord("A") - 1 + label)
+                s = str(label)
+                x_move = dwg.text_extents(s).x_advance
+                dwg.move_to(LS / 2 - x_move / 2, TAB_WIDTH / 3)
+                with dwg.saved():
+                    dwg.scale(1, -1)
+                    dwg.show_text(str(label))
 
 
 def dodeca_net(dwg, LS, face_fn):
@@ -191,33 +201,33 @@ def dodeca_net(dwg, LS, face_fn):
     pent10 = face(pent7[4], pent7[3])
     pent11 = face(pent7[0], pent7[4])
 
-    def tabc(p1, p2):
-        tab(dwg, LS, p1, p2, True, True)
+    def tabc(p1, p2, label=None):
+        tab(dwg, LS, p1, p2, True, True, label=label)
 
-    def tabr(p1, p2):
-        tab(dwg, LS, p1, p2, False, True)
+    def tabr(p1, p2, label=None):
+        tab(dwg, LS, p1, p2, False, True, label=label)
 
-    def tabl(p1, p2):
-        tab(dwg, LS, p1, p2, True, False)
+    def tabl(p1, p2, label=None):
+        tab(dwg, LS, p1, p2, True, False, label=label)
 
     tabc(pent0[1], pent0[0])
-    tabr(pent0[2], pent0[1])
+    tabr(pent0[2], pent0[1], 3)
     tabc(pent0[0], pent0[4])
-    tabc(pent2[4], pent2[3])
-    tabr(pent2[0], pent2[4])
-    tabl(pent4[2], pent4[1])
+    tabc(pent2[3], pent2[2], 9)
+    tabc(pent2[4], pent2[3], 8)
+    tabr(pent2[0], pent2[4], 4)
+    tabc(pent3[3], pent3[2], 7)
+    tabc(pent3[4], pent3[3], 6)
+    tabl(pent4[2], pent4[1], 5)
     tabc(pent4[4], pent4[3])
-    tabr(pent4[0], pent4[4])
+    tabr(pent4[0], pent4[4], 1)
     tabc(pent5[3], pent5[2])
-    tabr(pent5[0], pent5[4])
-    tabc(pent6[2], pent6[1])
-    tabr(pent6[3], pent6[2])
+    tabc(pent5[4], pent5[3], "was C")
+    tabr(pent5[0], pent5[4], 2)
+    tabr(pent6[3], pent6[2], 7)
     tabl(pent6[0], pent6[4])
-    tabc(pent8[3], pent8[2])
-    tabr(pent8[0], pent8[4])
-    tabc(pent9[3], pent9[2])
-    tabr(pent9[0], pent9[4])
-    tabc(pent10[4], pent10[3])
+    tabr(pent8[0], pent8[4], 8)
+    tabr(pent9[0], pent9[4], 9)
     tabr(pent10[0], pent10[4])
 
 
@@ -237,13 +247,9 @@ if 1:
         dwg.close_path()
         dwg.stroke()
 
-dwg.translate(306, 396)
-dwg.rotate(-10)
-dwg.translate(-306, -396)
-
-dwg.translate(140, 35)
+dwg.translate(140, 36)
 dwg.set_line_width(0.25)
 
-dodeca_net(dwg, 97, face)
+dodeca_net(dwg, 98, face)
 
 dwg.finish()
