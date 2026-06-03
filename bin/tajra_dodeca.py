@@ -169,14 +169,11 @@ def tab(dwg, LS, pt1, pt2, has_left, has_right, label=None):
             dwg.stroke()
 
             if label:
-                if isinstance(label, int):
-                    label = chr(ord("A") - 1 + label)
-                s = str(label)
-                x_move = dwg.text_extents(s).x_advance
+                x_move = dwg.text_extents(label).x_advance
                 dwg.move_to(LS / 2 - x_move / 2, TAB_WIDTH / 3)
                 with dwg.saved():
                     dwg.scale(1, -1)
-                    dwg.show_text(str(label))
+                    dwg.show_text(label)
 
 
 def dodeca_net(dwg, LS, face_fn):
@@ -210,25 +207,25 @@ def dodeca_net(dwg, LS, face_fn):
     def tabl(p1, p2, label=None):
         tab(dwg, LS, p1, p2, True, False, label=label)
 
-    tabc(pent0[1], pent0[0])
-    tabr(pent0[2], pent0[1], 3)
-    tabc(pent0[0], pent0[4])
-    tabc(pent2[3], pent2[2], 9)
-    tabc(pent2[4], pent2[3], 8)
-    tabr(pent2[0], pent2[4], 4)
-    tabc(pent3[3], pent3[2], 7)
-    tabc(pent3[4], pent3[3], 6)
-    tabl(pent4[2], pent4[1], 5)
-    tabc(pent4[4], pent4[3])
-    tabr(pent4[0], pent4[4], 1)
-    tabc(pent5[3], pent5[2])
-    tabc(pent5[4], pent5[3], "was C")
-    tabr(pent5[0], pent5[4], 2)
-    tabr(pent6[3], pent6[2], 7)
-    tabl(pent6[0], pent6[4])
-    tabr(pent8[0], pent8[4], 8)
-    tabr(pent9[0], pent9[4], 9)
-    tabr(pent10[0], pent10[4])
+    tabc(pent0[1], pent0[0], "L")
+    tabr(pent0[2], pent0[1], "C")
+    tabc(pent0[0], pent0[4], "N")
+    tabc(pent2[3], pent2[2], "K")
+    tabc(pent2[4], pent2[3], "I")
+    tabr(pent2[0], pent2[4], "D")
+    tabc(pent3[3], pent3[2], "H")
+    tabc(pent3[4], pent3[3], "F")
+    tabl(pent4[2], pent4[1], "E")
+    tabc(pent4[4], pent4[3], "S")
+    tabr(pent4[0], pent4[4], "A")
+    tabc(pent5[3], pent5[2], "R")
+    tabc(pent5[4], pent5[3], "O")
+    tabr(pent5[0], pent5[4], "B")
+    tabr(pent6[3], pent6[2], "G")
+    tabl(pent6[0], pent6[4], "Q")
+    tabr(pent8[0], pent8[4], "J")
+    tabr(pent9[0], pent9[4], "M")
+    tabr(pent10[0], pent10[4], "P")
 
 
 # Paper coordinates: pts, origin lower-left, but tilted a little.
@@ -236,7 +233,7 @@ dwg = Drawing(width=612, height=792, name="tajra.pdf")
 dwg.translate(0, 792)
 dwg.scale(1, -1)
 
-if 1:
+if 0:
     # Border the printable region
     with dwg.style(rgb=(0.75, 0.75, 0.75), width=0.25, dash=[10, 5]):
         qinch = 72 / 4
