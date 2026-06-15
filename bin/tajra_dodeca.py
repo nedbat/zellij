@@ -228,7 +228,7 @@ def dodeca_net(dwg, LS, face_fn):
     tabr(pent10[0], pent10[4], "P")
 
 
-# Paper coordinates: pts, origin lower-left, but tilted a little.
+# Paper coordinates: pts, origin lower-left.
 dwg = Drawing(width=612, height=792, name="tajra.pdf")
 dwg.translate(0, 792)
 dwg.scale(1, -1)
@@ -244,9 +244,18 @@ if 0:
         dwg.close_path()
         dwg.stroke()
 
-dwg.translate(140, 36)
-dwg.set_line_width(0.25)
+with dwg.saved():
+    dwg.translate(140, 36)
+    dwg.set_line_width(0.25)
 
-dodeca_net(dwg, 98, face)
+    dodeca_net(dwg, 98, face)
+
+with dwg.saved():
+    dwg.translate(612 - 36, 792 - 36)
+    dwg.rotate(270)
+    dwg.scale(1, -1)
+    dwg.move_to(0, 0)
+    dwg.show_text("A design by Taj Ragoo: https://nedbatchelder.com/blog/202606/dodecahedron_with_stars.  Cut, fold, and glue the tabs in order.")
+
 
 dwg.finish()
