@@ -251,11 +251,18 @@ with dwg.saved():
     dodeca_net(dwg, 98, face)
 
 with dwg.saved():
-    dwg.translate(612 - 36, 792 - 36)
+    dwg.translate(72, 792 - 36)
     dwg.rotate(270)
     dwg.scale(1, -1)
-    dwg.move_to(0, 0)
-    dwg.show_text("A design by Taj Ragoo: https://nedbatchelder.com/blog/202606/dodecahedron_with_stars.  Cut, fold, and glue the tabs in order.")
+    for yline, text in enumerate(
+        [
+            "A dodecahedron design by Taj Ragoo: @tajra on Instagram",
+            "Cut, fold, and glue the tabs in order",
+            "https://nedbatchelder.com/blog/202606/dodecahedron_with_stars",
+        ]
+    ):
+        dwg.move_to(0, yline * 12)
+        dwg.show_text(text)
 
 
 dwg.finish()
